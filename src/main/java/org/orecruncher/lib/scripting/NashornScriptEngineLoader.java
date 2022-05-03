@@ -17,7 +17,7 @@
  */
 package org.orecruncher.lib.scripting;
 
-import jdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 import javax.script.ScriptEngine;
 

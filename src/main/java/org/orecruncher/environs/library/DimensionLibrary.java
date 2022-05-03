@@ -18,33 +18,32 @@
 
 package org.orecruncher.environs.library;
 
+import com.google.gson.reflect.TypeToken;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import org.orecruncher.dsurround.DynamicSurroundings;
+import org.orecruncher.environs.Environs;
+import org.orecruncher.environs.config.Config;
+import org.orecruncher.environs.library.config.DimensionConfig;
+import org.orecruncher.lib.collections.ObjectArray;
+import org.orecruncher.lib.logging.IModLog;
+import org.orecruncher.lib.resource.IResourceAccessor;
+import org.orecruncher.lib.resource.ResourceUtils;
+import org.orecruncher.lib.service.IModuleService;
+import org.orecruncher.lib.service.ModuleServiceManager;
+import org.orecruncher.lib.validation.ListValidator;
+import org.orecruncher.lib.validation.Validators;
+
+import javax.annotation.Nonnull;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
-
-import javax.annotation.Nonnull;
-
-import com.google.gson.reflect.TypeToken;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import org.orecruncher.dsurround.DynamicSurroundings;
-import org.orecruncher.environs.config.Config;
-import org.orecruncher.environs.Environs;
-import org.orecruncher.environs.library.config.DimensionConfig;
-import org.orecruncher.lib.collections.ObjectArray;
-import org.orecruncher.lib.logging.IModLog;
-import org.orecruncher.lib.resource.IResourceAccessor;
-import org.orecruncher.lib.resource.ResourceUtils;
-import org.orecruncher.lib.service.ModuleServiceManager;
-import org.orecruncher.lib.service.IModuleService;
-import org.orecruncher.lib.validation.ListValidator;
-import org.orecruncher.lib.validation.Validators;
 
 @OnlyIn(Dist.CLIENT)
 public final class DimensionLibrary {
@@ -57,7 +56,7 @@ public final class DimensionLibrary {
 
 	private static final ObjectArray<DimensionConfig> cache = new ObjectArray<>();
 	// TODO:  What type of hash map?
-	private static final HashMap<RegistryKey<World>, DimensionInfo> configs = new HashMap<>();
+	private static final HashMap<ResourceKey<Level>, DimensionInfo> configs = new HashMap<>();
 
 	static void initialize() {
 		ModuleServiceManager.instance().add(new DimensionLibraryService());
@@ -99,13 +98,13 @@ public final class DimensionLibrary {
 	}
 
 	@Nonnull
-	public static DimensionInfo getData(@Nonnull final World world) {
-		RegistryKey<World> key = world.getDimensionKey();
+	public static DimensionInfo getData(@Nonnull final Level world) {
+		ResourceKey<Level> key = world.dimension();
 		DimensionInfo dimInfo = configs.get(key);
 
 		if (dimInfo == null) {
 			DimensionConfig config = null;
-			ResourceLocation location = key.getLocation();
+			ResourceLocation location = key.location();
 			for (final DimensionConfig e : cache)
 				if (e.dimensionId.equals(location.toString())) {
 					config = e;

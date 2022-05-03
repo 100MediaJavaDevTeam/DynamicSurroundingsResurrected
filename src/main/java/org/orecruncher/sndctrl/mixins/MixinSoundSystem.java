@@ -18,13 +18,13 @@
 
 package org.orecruncher.sndctrl.mixins;
 
-import net.minecraft.client.audio.SoundSystem;
+import com.mojang.blaze3d.audio.Library;
 import org.orecruncher.sndctrl.config.Config;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.ModifyConstant;
 
-@Mixin(SoundSystem.class)
+@Mixin(Library.class)
 public class MixinSoundSystem {
 
     /**
@@ -33,7 +33,7 @@ public class MixinSoundSystem {
      * @param v Existing value for the number of streaming sounds (should be 8)
      * @return The quantity of streaming sounds (10)
      */
-    @ModifyConstant(method = "init()V", constant = @Constant(intValue = 8))
+    @ModifyConstant(method = "init", constant = @Constant(intValue = 8))
     private int initialize(int v) {
         return Config.CLIENT.sound.streamingSoundCount.get();
     }

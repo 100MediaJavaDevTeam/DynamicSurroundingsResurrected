@@ -18,8 +18,8 @@
 
 package org.orecruncher.lib.scripting.sets;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.DimensionType;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -50,8 +50,8 @@ public class DimensionVariables extends VariableSet<IDimensionVariables> impleme
     public void update() {
         if (GameUtils.isInGame()) {
             assert GameUtils.getWorld() != null;
-            final DimensionType dim = GameUtils.getWorld().getDimensionType();
-            final ResourceLocation location = GameUtils.getWorld().getDimensionKey().getLocation();
+            final DimensionType dim = GameUtils.getWorld().dimensionType();
+            final ResourceLocation location = GameUtils.getWorld().dimension().location();
             this.id = location.toString();
             this.hasSky = dim.hasSkyLight();
             this.name = location.getPath();

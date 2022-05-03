@@ -17,7 +17,7 @@
  */
 package org.orecruncher.environs.mixins;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import org.orecruncher.environs.library.BlockStateData;
 import org.orecruncher.environs.misc.IMixinBlockData;
 import org.spongepowered.asm.mixin.Mixin;

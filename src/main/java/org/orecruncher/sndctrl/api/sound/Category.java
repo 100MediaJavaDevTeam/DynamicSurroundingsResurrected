@@ -19,10 +19,10 @@
 package org.orecruncher.sndctrl.api.sound;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -38,19 +38,19 @@ import java.util.function.Supplier;
 public class Category implements ISoundCategory {
     // Mappings for easy searching
     private static final Map<String, ISoundCategory> nameToCategory = new HashMap<>();
-    private static final Map<SoundCategory, ISoundCategory> categoryToNew = new IdentityHashMap<>();
+    private static final Map<SoundSource, ISoundCategory> categoryToNew = new IdentityHashMap<>();
 
     // Sound categories of the base Minecraft game
-    public static final ISoundCategory MASTER = new SoundCategoryWrapper(SoundCategory.MASTER, () -> false, () -> false);
-    public static final ISoundCategory MUSIC = new FaderSoundCategoryWrapper(SoundCategory.MUSIC, () -> false, () -> false);
-    public static final ISoundCategory RECORDS = new FaderSoundCategoryWrapper(SoundCategory.RECORDS, Config.CLIENT.sound.occludeRecords::get, () -> true);
-    public static final ISoundCategory WEATHER = new SoundCategoryWrapper(SoundCategory.WEATHER, Config.CLIENT.sound.occludeWeather::get);
-    public static final ISoundCategory BLOCKS = new SoundCategoryWrapper(SoundCategory.BLOCKS);
-    public static final ISoundCategory HOSTILE = new SoundCategoryWrapper(SoundCategory.HOSTILE);
-    public static final ISoundCategory NEUTRAL = new SoundCategoryWrapper(SoundCategory.NEUTRAL);
-    public static final ISoundCategory PLAYERS = new SoundCategoryWrapper(SoundCategory.PLAYERS);
-    public static final ISoundCategory AMBIENT = new SoundCategoryWrapper(SoundCategory.AMBIENT);
-    public static final ISoundCategory VOICE = new SoundCategoryWrapper(SoundCategory.VOICE);
+    public static final ISoundCategory MASTER = new SoundCategoryWrapper(SoundSource.MASTER, () -> false, () -> false);
+    public static final ISoundCategory MUSIC = new FaderSoundCategoryWrapper(SoundSource.MUSIC, () -> false, () -> false);
+    public static final ISoundCategory RECORDS = new FaderSoundCategoryWrapper(SoundSource.RECORDS, Config.CLIENT.sound.occludeRecords::get, () -> true);
+    public static final ISoundCategory WEATHER = new SoundCategoryWrapper(SoundSource.WEATHER, Config.CLIENT.sound.occludeWeather::get);
+    public static final ISoundCategory BLOCKS = new SoundCategoryWrapper(SoundSource.BLOCKS);
+    public static final ISoundCategory HOSTILE = new SoundCategoryWrapper(SoundSource.HOSTILE);
+    public static final ISoundCategory NEUTRAL = new SoundCategoryWrapper(SoundSource.NEUTRAL);
+    public static final ISoundCategory PLAYERS = new SoundCategoryWrapper(SoundSource.PLAYERS);
+    public static final ISoundCategory AMBIENT = new SoundCategoryWrapper(SoundSource.AMBIENT);
+    public static final ISoundCategory VOICE = new SoundCategoryWrapper(SoundSource.VOICE);
 
     public static final ISoundCategory CONFIG = new Category(
             "CONFIG",
@@ -70,16 +70,16 @@ public class Category implements ISoundCategory {
     };
 
     static {
-        categoryToNew.put(SoundCategory.MASTER, MASTER);
-        categoryToNew.put(SoundCategory.MUSIC, MUSIC);
-        categoryToNew.put(SoundCategory.RECORDS, RECORDS);
-        categoryToNew.put(SoundCategory.WEATHER, WEATHER);
-        categoryToNew.put(SoundCategory.BLOCKS, BLOCKS);
-        categoryToNew.put(SoundCategory.HOSTILE, HOSTILE);
-        categoryToNew.put(SoundCategory.NEUTRAL, NEUTRAL);
-        categoryToNew.put(SoundCategory.PLAYERS, PLAYERS);
-        categoryToNew.put(SoundCategory.AMBIENT, AMBIENT);
-        categoryToNew.put(SoundCategory.VOICE, VOICE);
+        categoryToNew.put(SoundSource.MASTER, MASTER);
+        categoryToNew.put(SoundSource.MUSIC, MUSIC);
+        categoryToNew.put(SoundSource.RECORDS, RECORDS);
+        categoryToNew.put(SoundSource.WEATHER, WEATHER);
+        categoryToNew.put(SoundSource.BLOCKS, BLOCKS);
+        categoryToNew.put(SoundSource.HOSTILE, HOSTILE);
+        categoryToNew.put(SoundSource.NEUTRAL, NEUTRAL);
+        categoryToNew.put(SoundSource.PLAYERS, PLAYERS);
+        categoryToNew.put(SoundSource.AMBIENT, AMBIENT);
+        categoryToNew.put(SoundSource.VOICE, VOICE);
 
         register(CONFIG);
     }
@@ -139,7 +139,7 @@ public class Category implements ISoundCategory {
      * @return Instance of the ISoundCategory that corresponds to the provided SoundCategory
      */
     @Nonnull
-    public static Optional<ISoundCategory> getCategory(@Nonnull final SoundCategory cat) {
+    public static Optional<ISoundCategory> getCategory(@Nonnull final SoundSource cat) {
         return Optional.of(categoryToNew.get(cat));
     }
 
@@ -150,11 +150,11 @@ public class Category implements ISoundCategory {
      * @return ISoundCategory for the given sound
      */
     @Nonnull
-    public static Optional<ISoundCategory> getCategory(@Nonnull final ISound sound) {
+    public static Optional<ISoundCategory> getCategory(@Nonnull final SoundInstance sound) {
         if (sound instanceof ISoundInstance) {
             return Optional.of(((ISoundInstance) sound).getSoundCategory());
         }
-        return getCategory(sound.getCategory());
+        return getCategory(sound.getSource());
     }
 
     /**
@@ -200,8 +200,8 @@ public class Category implements ISoundCategory {
 
     @Override
     @Nonnull
-    public ITextComponent getTextComponent() {
-        return new TranslationTextComponent(this.translationKey);
+    public Component getTextComponent() {
+        return new TranslatableComponent(this.translationKey);
     }
 
     @Override
@@ -236,19 +236,19 @@ public class Category implements ISoundCategory {
     }
 
     private static class SoundCategoryWrapper implements ISoundCategory {
-        private final SoundCategory category;
+        private final SoundSource category;
         private final Supplier<Boolean> occlusion;
         private final Supplier<Boolean> effects;
 
-        public SoundCategoryWrapper(@Nonnull final SoundCategory cat) {
+        public SoundCategoryWrapper(@Nonnull final SoundSource cat) {
             this(cat, () -> true, () -> true);
         }
 
-        public SoundCategoryWrapper(@Nonnull final SoundCategory cat, @Nonnull final Supplier<Boolean> occlusion) {
+        public SoundCategoryWrapper(@Nonnull final SoundSource cat, @Nonnull final Supplier<Boolean> occlusion) {
             this(cat, occlusion, () -> true);
         }
 
-        public SoundCategoryWrapper(@Nonnull final SoundCategory cat, @Nonnull final Supplier<Boolean> occlusion, @Nonnull final Supplier<Boolean> effects) {
+        public SoundCategoryWrapper(@Nonnull final SoundSource cat, @Nonnull final Supplier<Boolean> occlusion, @Nonnull final Supplier<Boolean> effects) {
             this.category = cat;
             this.occlusion = occlusion;
             this.effects = effects;
@@ -261,23 +261,23 @@ public class Category implements ISoundCategory {
         }
 
         @Override
-        public ITextComponent getTextComponent() {
+        public Component getTextComponent() {
             // From the SoundConfig slider logic for Vanilla categories
-            return new TranslationTextComponent("soundCategory." + this.getName());
+            return new TranslatableComponent("soundCategory." + this.getName());
         }
 
         @Override
         public float getVolumeScale() {
-            return GameUtils.getGameSettings().getSoundLevel(this.category);
+            return GameUtils.getGameSettings().getSoundSourceVolume(this.category);
         }
 
         @Override
         public void setVolumeScale(final float scale) {
-            GameUtils.getGameSettings().setSoundLevel(this.category, scale);
+            GameUtils.getGameSettings().setSoundCategoryVolume(this.category, scale);
         }
 
         @Nonnull
-        public SoundCategory getRealCategory() {
+        public SoundSource getRealCategory() {
             return this.category;
         }
 
@@ -300,7 +300,7 @@ public class Category implements ISoundCategory {
 
     private static class FaderSoundCategoryWrapper extends SoundCategoryWrapper {
 
-        public FaderSoundCategoryWrapper(@Nonnull final SoundCategory cat, @Nonnull final Supplier<Boolean> occlusion, @Nonnull final Supplier<Boolean> effects) {
+        public FaderSoundCategoryWrapper(@Nonnull final SoundSource cat, @Nonnull final Supplier<Boolean> occlusion, @Nonnull final Supplier<Boolean> effects) {
             super(cat, occlusion, effects);
         }
 

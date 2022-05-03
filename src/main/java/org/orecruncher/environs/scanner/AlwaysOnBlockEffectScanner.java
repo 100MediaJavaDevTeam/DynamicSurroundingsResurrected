@@ -18,18 +18,17 @@
 
 package org.orecruncher.environs.scanner;
 
-import java.util.Collection;
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.util.math.BlockPos;
 import org.orecruncher.environs.effects.BlockEffect;
 import org.orecruncher.environs.library.BlockStateUtil;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Random;
 
 /**
  * This guy scans a large area around the player looking for blocks to spawn
@@ -53,7 +52,7 @@ public class AlwaysOnBlockEffectScanner extends CuboidScanner {
 
 	@Override
 	public void blockScan(@Nonnull final BlockState state, @Nonnull final BlockPos pos, @Nonnull final Random rand) {
-		final IBlockReader provider = this.locus.getWorld();
+		final BlockGetter provider = this.locus.getWorld();
 		final Collection<BlockEffect> effects = BlockStateUtil.getData(state).getAlwaysOnEffects();
 		for (final BlockEffect be : effects) {
 			if (be.canTrigger(provider, state, pos, rand))

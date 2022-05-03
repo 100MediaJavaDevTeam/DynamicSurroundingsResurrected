@@ -19,13 +19,13 @@
 package org.orecruncher.sndctrl.audio;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.LocatableSound;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3i;
+import net.minecraft.client.resources.sounds.AbstractSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -36,18 +36,18 @@ import org.orecruncher.sndctrl.audio.handlers.SoundVolumeEvaluator;
 import javax.annotation.Nonnull;
 
 @OnlyIn(Dist.CLIENT)
-public class SoundInstance extends LocatableSound implements ISoundInstance {
+public class DSSoundInstance extends AbstractSoundInstance implements ISoundInstance {
 
     private SoundState state;
     private final ISoundCategory category;
 
     private int playDelay;
 
-    public SoundInstance(@Nonnull final SoundEvent event, @Nonnull final ISoundCategory cat) {
-        this(event.getName(), cat);
+    public DSSoundInstance(@Nonnull final SoundEvent event, @Nonnull final ISoundCategory cat) {
+        this(event.getLocation(), cat);
     }
 
-    public SoundInstance(@Nonnull final ResourceLocation soundResource, @Nonnull final ISoundCategory cat) {
+    public DSSoundInstance(@Nonnull final ResourceLocation soundResource, @Nonnull final ISoundCategory cat) {
         super(soundResource, cat.getRealCategory());
 
         this.state = SoundState.NONE;
@@ -55,16 +55,16 @@ public class SoundInstance extends LocatableSound implements ISoundInstance {
         this.volume = 1F;
         this.pitch = 1F;
         this.x = this.y = this.z = 0;
-        this.repeat = false;
-        this.repeatDelay = 0;
-        this.attenuationType = ISound.AttenuationType.LINEAR;
+        this.looping = false;
+        this.delay = 0;
+        this.attenuation = DSSoundInstance.Attenuation.LINEAR;
 
         this.playDelay = 0;
-        this.sound = SoundHandler.MISSING_SOUND;
+        this.sound = SoundManager.EMPTY_SOUND;
 
         // Force creation of the sound instance now.  Need the info in the OGG definition for attenuation
         // distance prior to submission.
-        this.createAccessor(GameUtils.getSoundHander());
+        this.resolve(GameUtils.getSoundHander());
     }
 
     @Override
@@ -94,24 +94,24 @@ public class SoundInstance extends LocatableSound implements ISoundInstance {
         this.z = z;
     }
 
-    public void setPosition(@Nonnull final Vector3i pos) {
+    public void setPosition(@Nonnull final Vec3i pos) {
         this.setPosition(pos.getX() + 0.5F, pos.getY() + 0.5F, pos.getZ() + 0.5F);
     }
 
-    public void setPosition(@Nonnull final Vector3d pos) {
+    public void setPosition(@Nonnull final Vec3 pos) {
         this.setPosition((float) pos.x, (float) pos.y, (float) pos.z);
     }
 
-    public void setAttenuationType(@Nonnull final ISound.AttenuationType type) {
-        this.attenuationType = type;
+    public void setAttenuationType(@Nonnull final DSSoundInstance.Attenuation type) {
+        this.attenuation = type;
     }
 
     public void setRepeat(final boolean flag) {
-        this.repeat = flag;
+        this.looping = flag;
     }
 
     public void setRepeatDelay(final int delay) {
-        this.repeatDelay = delay;
+        this.delay = delay;
     }
 
     public void setVolume(final float v) {
@@ -123,7 +123,7 @@ public class SoundInstance extends LocatableSound implements ISoundInstance {
     }
 
     public void setGlobal(final boolean flag) {
-        this.global = flag;
+        this.relative = flag;
     }
 
     public boolean isDonePlaying() {
@@ -143,9 +143,9 @@ public class SoundInstance extends LocatableSound implements ISoundInstance {
     @Nonnull
     public String toString() {
         return MoreObjects.toStringHelper(this)
-                .addValue(getSoundLocation().toString())
+                .addValue(getLocation().toString())
                 .addValue(getSoundCategory().toString())
-                .addValue(getAttenuationType().toString())
+                .addValue(getAttenuation().toString())
                 .addValue(getState().toString())
                 .add("v", getVolume())
                 .add("ev", getEffectiveVolume(this))
@@ -156,7 +156,7 @@ public class SoundInstance extends LocatableSound implements ISoundInstance {
                 .toString();
     }
 
-    static float getEffectiveVolume(@Nonnull final ISound sound) {
+    static float getEffectiveVolume(@Nonnull final SoundInstance sound) {
         try {
             return SoundVolumeEvaluator.getClampedVolume(sound);
         } catch(@Nonnull final Throwable ignored) {

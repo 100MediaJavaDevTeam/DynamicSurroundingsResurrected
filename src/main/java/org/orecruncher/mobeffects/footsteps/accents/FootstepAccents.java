@@ -18,9 +18,9 @@
 
 package org.orecruncher.mobeffects.footsteps.accents;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.collections.ObjectArray;
@@ -44,7 +44,7 @@ public class FootstepAccents {
     }
 
     public static void provide(@Nonnull final LivingEntity entity, @Nonnull final BlockPos pos, @Nonnull final ObjectArray<IAcoustic> in) {
-        final BlockState state = entity.getEntityWorld().getBlockState(pos);
+        final BlockState state = entity.getCommandSenderWorld().getBlockState(pos);
         providers.forEach(provider -> {
             if (provider.isEnabled())
                 provider.provide(entity, pos, state, in);

@@ -18,12 +18,11 @@
 
 package org.orecruncher.lib;
 
-import javax.annotation.Nonnull;
-
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-import net.minecraft.world.World;
+import javax.annotation.Nonnull;
 
 @OnlyIn(Dist.CLIENT)
 public class MinecraftClock {
@@ -42,11 +41,11 @@ public class MinecraftClock {
 
 	}
 
-	public MinecraftClock(@Nonnull final World world) {
+	public MinecraftClock(@Nonnull final Level world) {
 		update(world);
 	}
 
-	public void update(@Nonnull final World world) {
+	public void update(@Nonnull final Level world) {
 
 		long time = world.getDayTime();
 		this.day = (int) (time / 24000);

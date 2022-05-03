@@ -19,19 +19,19 @@
 package org.orecruncher.sndctrl.audio.acoustic;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.sndctrl.api.acoustics.AcousticEvent;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
 import org.orecruncher.sndctrl.api.acoustics.IAcousticFactory;
 import org.orecruncher.sndctrl.api.sound.ISoundCategory;
-import org.orecruncher.sndctrl.audio.AudioEngine;
 import org.orecruncher.sndctrl.api.sound.ISoundInstance;
+import org.orecruncher.sndctrl.audio.AudioEngine;
 
 import javax.annotation.Nonnull;
 import java.util.Objects;
@@ -46,12 +46,12 @@ public class SimpleAcoustic implements IAcoustic {
     private final ResourceLocation name;
 
     public SimpleAcoustic(@Nonnull final SoundEvent event, @Nonnull final ISoundCategory category) {
-        this(event.getName(), event);
+        this(event.getLocation(), event);
         this.factory.setCategory(category);
     }
 
     public SimpleAcoustic(@Nonnull final SoundEvent event) {
-        this(event.getName(), event);
+        this(event.getLocation(), event);
     }
 
     public SimpleAcoustic(@Nonnull final ResourceLocation name, @Nonnull final SoundEvent evt) {
@@ -84,7 +84,7 @@ public class SimpleAcoustic implements IAcoustic {
     }
 
     @Override
-    public void playAt(@Nonnull final Vector3d pos, @Nonnull final AcousticEvent ignored) {
+    public void playAt(@Nonnull final Vec3 pos, @Nonnull final AcousticEvent ignored) {
         play(this.factory.createSoundAt(pos));
     }
 

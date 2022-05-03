@@ -19,7 +19,7 @@
 package org.orecruncher.environs.handlers;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -72,7 +72,7 @@ public class HandlerBase {
      *
      * @param player The player currently behind the keyboard.
      */
-    public void process(@Nonnull final PlayerEntity player) {
+    public void process(@Nonnull final Player player) {
 
     }
 

@@ -18,61 +18,60 @@
 
 package org.orecruncher.environs.effects.particles;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.particle.DiggingParticle;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.TerrainParticle;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.WorldUtils;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
 @OnlyIn(Dist.CLIENT)
-public class DustParticle extends DiggingParticle {
+public class DustParticle extends TerrainParticle {
 
-	private final BlockPos.Mutable pos = new BlockPos.Mutable();
+	private final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
-	public DustParticle(final World world, final double x, final double y, final double z, final BlockState state) {
+	public DustParticle(final Level world, final double x, final double y, final double z, final BlockState state) {
 		this(world, x, y, z, 0, 0, 0, state);
 	}
 
-	public DustParticle(final World world, final double x, final double y, final double z, final double dX, final double dY, final double dZ, final BlockState state) {
-		super((ClientWorld) world, x, y, z, 0, 0, 0, state);
+	public DustParticle(final Level world, final double x, final double y, final double z, final double dX, final double dY, final double dZ, final BlockState state) {
+		super((ClientLevel) world, x, y, z, 0, 0, 0, state);
 
-		this.canCollide = false;
-		this.motionX = dX;
-		this.motionY = dY;
-		this.motionZ = dZ;
+		this.hasPhysics = false;
+		this.xd = dX;
+		this.yd = dY;
+		this.zd = dZ;
 
-		multiplyParticleScaleBy((float) (0.3F + this.rand.nextGaussian() / 30.0F));
-		setPosition(this.posX, this.posY, this.posZ);
+		scale((float) (0.3F + this.random.nextGaussian() / 30.0F));
+		setPos(this.x, this.y, this.z);
 	}
 
 	@Override
 	public void move(final double dX, final double dY, final double dZ) {
-		this.posX += dX;
-		this.posY += dY;
-		this.posZ += dZ;
+		this.x += dX;
+		this.y += dY;
+		this.z += dZ;
 	}
 
 	@Override
 	public void tick() {
-		this.prevPosX = this.posX;
-		this.prevPosY = this.posY;
-		this.prevPosZ = this.posZ;
-		this.motionY -= 0.04D * this.particleGravity;
-		move(this.motionX, this.motionY, this.motionZ);
-		this.motionX *= 0.9800000190734863D;
-		this.motionY *= 0.9800000190734863D;
-		this.motionZ *= 0.9800000190734863D;
+		this.xo = this.x;
+		this.yo = this.y;
+		this.zo = this.z;
+		this.yd -= 0.04D * this.gravity;
+		move(this.xd, this.yd, this.zd);
+		this.xd *= 0.9800000190734863D;
+		this.yd *= 0.9800000190734863D;
+		this.zd *= 0.9800000190734863D;
 
-		this.pos.setPos(this.posX, this.posY, this.posZ);
+		this.pos.set(this.x, this.y, this.z);
 
-		if (this.maxAge-- <= 0) {
-			setExpired();
-		} else if (WorldUtils.isBlockSolid(this.world, this.pos)) {
-			setExpired();
+		if (this.lifetime-- <= 0) {
+			remove();
+		} else if (WorldUtils.isBlockSolid(this.level, this.pos)) {
+			remove();
 		}
 	}
 }

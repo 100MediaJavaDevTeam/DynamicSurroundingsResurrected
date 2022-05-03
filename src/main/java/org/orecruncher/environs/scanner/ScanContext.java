@@ -18,27 +18,25 @@
 
 package org.orecruncher.environs.scanner;
 
-import javax.annotation.Nonnull;
-
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import net.minecraft.util.math.BlockPos;
 import org.orecruncher.lib.logging.IModLog;
 
+import javax.annotation.Nonnull;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class ScanContext {
 
-	private final Supplier<IBlockReader> worldReader;
+	private final Supplier<BlockGetter> worldReader;
 	private final Supplier<BlockPos> scanCenter;
 	private final Supplier<Integer> worldReference;
 	private final Supplier<IModLog> logger;
 
 	public ScanContext(
-			@Nonnull final Supplier<IBlockReader> worldReader,
+			@Nonnull final Supplier<BlockGetter> worldReader,
 			@Nonnull final Supplier<BlockPos> scanCenter,
 			@Nonnull final Supplier<IModLog> logger,
 			@Nonnull final Supplier<Integer> worldReference
@@ -50,7 +48,7 @@ public class ScanContext {
 	}
 
 	@Nonnull
-	public IBlockReader getWorld() {
+	public BlockGetter getWorld() {
 		return this.worldReader.get();
 	}
 

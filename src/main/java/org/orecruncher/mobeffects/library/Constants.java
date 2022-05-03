@@ -18,12 +18,12 @@
 
 package org.orecruncher.mobeffects.library;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import org.orecruncher.mobeffects.config.Config;
 import org.orecruncher.mobeffects.MobEffects;
+import org.orecruncher.mobeffects.config.Config;
 import org.orecruncher.sndctrl.api.acoustics.AcousticEvent;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
 import org.orecruncher.sndctrl.api.sound.Category;
@@ -66,7 +66,7 @@ public final class Constants {
     public static final ResourceLocation MEDIUM_FOOT_ARMOR = new ResourceLocation(MobEffects.MOD_ID, "medium_foot");
     public static final ResourceLocation HEAVY_FOOT_ARMOR = new ResourceLocation(MobEffects.MOD_ID, "heavy_foot");
     public static final ResourceLocation CRYSTAL_FOOT_ARMOR = new ResourceLocation(MobEffects.MOD_ID, "crystal_foot");
-    public static final ResourceLocation NETHERITE_ARMOR = SoundEvents.ITEM_ARMOR_EQUIP_NETHERITE.getName();
+    public static final ResourceLocation NETHERITE_ARMOR = SoundEvents.ARMOR_EQUIP_NETHERITE.getLocation();
 
     public static final ResourceLocation LEATHER_ARMOR_EQUIP = LIGHT_ARMOR;
     public static final ResourceLocation CHAIN_ARMOR_EQUIP = MEDIUM_ARMOR;

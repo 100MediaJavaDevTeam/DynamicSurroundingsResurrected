@@ -18,9 +18,9 @@
 
 package org.orecruncher.lib.scripting.sets;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.Effects;
-import net.minecraft.world.World;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -34,25 +34,25 @@ public class PlayerVariables extends VariableSet<IPlayerVariables> implements IP
 
     private final LazyVariable<Boolean> isSuffocating = new LazyVariable<>(() -> {
         if (GameUtils.isInGame()) {
-            final PlayerEntity player = GameUtils.getPlayer();
-            return !player.isCreative() && player.getAir() < 0;
+            final Player player = GameUtils.getPlayer();
+            return !player.isCreative() && player.getAirSupply() < 0;
         }
         return false;
     });
     private final LazyVariable<Boolean> canSeeSky = new LazyVariable<>(() -> {
         if (GameUtils.isInGame()) {
-            final World world = GameUtils.getWorld();
-            final PlayerEntity player = GameUtils.getPlayer();
-            return world.canBlockSeeSky(player.getPosition().add(0, 2, 0));
+            final Level world = GameUtils.getWorld();
+            final Player player = GameUtils.getPlayer();
+            return world.canSeeSkyFromBelowWater(player.blockPosition().offset(0, 2, 0));
         }
         return false;
     });
     private final LazyVariable<Boolean> canRainOn = new LazyVariable<>(() -> {
         if (GameUtils.isInGame()) {
-            final World world = GameUtils.getWorld();
-            final PlayerEntity player = GameUtils.getPlayer();
-            if (world.canBlockSeeSky(player.getPosition().add(0, 2, 0)))
-                return WorldUtils.getTopSolidOrLiquidBlock(world, player.getPosition()).getY() <= player.getPosition().getY();
+            final Level world = GameUtils.getWorld();
+            final Player player = GameUtils.getPlayer();
+            if (world.canSeeSkyFromBelowWater(player.blockPosition().offset(0, 2, 0)))
+                return WorldUtils.getTopSolidOrLiquidBlock(world, player.blockPosition()).getY() <= player.blockPosition().getY();
         }
         return false;
     });
@@ -84,28 +84,28 @@ public class PlayerVariables extends VariableSet<IPlayerVariables> implements IP
     public void update() {
 
         if (GameUtils.isInGame()) {
-            final PlayerEntity player = GameUtils.getPlayer();
+            final Player player = GameUtils.getPlayer();
             assert player != null;
 
             this.isCreative = player.isCreative();
-            this.isBurning = player.isBurning();
-            this.isFlying = player.isAirBorne;
+            this.isBurning = player.isOnFire();
+            this.isFlying = player.hasImpulse;
             this.isSprintnig = player.isSprinting();
             this.isInLava = player.isInLava();
             this.isInvisible = player.isInvisible();
-            this.isBlind = player.isPotionActive(Effects.BLINDNESS);
+            this.isBlind = player.hasEffect(MobEffects.BLINDNESS);
             this.isInWater = player.isInWater();
-            this.isWet = player.isWet();
-            this.isRiding = player.isOnePlayerRiding();
+            this.isWet = player.isInWaterOrRain();
+            this.isRiding = player.hasExactlyOnePlayerPassenger();
             this.isOnGround = player.isOnGround();
-            this.isMoving = player.distanceWalkedModified != player.prevDistanceWalkedModified;
+            this.isMoving = player.walkDist != player.walkDistO;
             this.health = player.getHealth();
             this.maxHealth = player.getMaxHealth();
-            this.foodLevel = player.getFoodStats().getFoodLevel();
-            this.foodSaturationLevel = player.getFoodStats().getSaturationLevel();
-            this.x = player.getPosX();
-            this.y = player.getPosY();
-            this.z = player.getPosZ();
+            this.foodLevel = player.getFoodData().getFoodLevel();
+            this.foodSaturationLevel = player.getFoodData().getSaturationLevel();
+            this.x = player.getX();
+            this.y = player.getY();
+            this.z = player.getZ();
 
         } else {
 

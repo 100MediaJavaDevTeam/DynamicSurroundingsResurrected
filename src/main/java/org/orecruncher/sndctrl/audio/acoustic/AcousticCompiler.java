@@ -20,9 +20,9 @@ package org.orecruncher.sndctrl.audio.acoustic;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.*;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.StringUtils;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.StringUtil;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.JsonUtils;
@@ -205,13 +205,13 @@ public final class AcousticCompiler {
     private Optional<IAcoustic> inlineHandler(@Nonnull final Map.Entry<String, JsonElement> entry) throws AcousticException {
         final String sound = entry.getValue().getAsString();
 
-        if (StringUtils.isNullOrEmpty(sound)) {
+        if (StringUtil.isNullOrEmpty(sound)) {
             return Optional.of(NullAcoustic.INSTANCE);
         }
 
         final ResourceLocation res = resolveResource(sound, null);
         final SoundEvent evt = SoundLibrary.getSound(res).orElseThrow(IllegalStateException::new);
-        final ISoundCategory cat = SoundLibrary.getSoundCategory(evt.getName(), Category.AMBIENT);
+        final ISoundCategory cat = SoundLibrary.getSoundCategory(evt.getLocation(), Category.AMBIENT);
         return Optional.of(new SimpleAcoustic(res, new AcousticFactory(evt, cat)));
     }
 
@@ -220,7 +220,7 @@ public final class AcousticCompiler {
         final AcousticFactory factory = create(entry.getValue().getAsJsonObject());
         final ResourceLocation acousticId;
 
-        if (StringUtils.isNullOrEmpty(entry.getKey())) {
+        if (StringUtil.isNullOrEmpty(entry.getKey())) {
             acousticId = factory.getResourceName();
         } else {
             acousticId = resolveResource(entry.getKey(), null);
@@ -235,7 +235,7 @@ public final class AcousticCompiler {
         final AcousticFactory factory = create(obj);
         final ResourceLocation acousticId;
 
-        if (StringUtils.isNullOrEmpty(entry.getKey())) {
+        if (StringUtil.isNullOrEmpty(entry.getKey())) {
             acousticId = factory.getResourceName();
         } else {
             acousticId = resolveResource(entry.getKey(), null);
@@ -329,7 +329,7 @@ public final class AcousticCompiler {
             throw new AcousticException("Sound name property not found");
 
         final String soundName = obj.get(Constants.NAME).getAsString();
-        if (StringUtils.isNullOrEmpty(soundName))
+        if (StringUtil.isNullOrEmpty(soundName))
             throw new AcousticException("Invalid sound name '%s'", soundName);
 
         final ResourceLocation res = resolveResource(soundName, null);
@@ -383,9 +383,9 @@ public final class AcousticCompiler {
     @Nonnull
     private ResourceLocation resolveResource(@Nonnull final String name, @Nullable final String defaultName) throws AcousticException {
         String n = name;
-        if (StringUtils.isNullOrEmpty(n))
+        if (StringUtil.isNullOrEmpty(n))
             n = defaultName;
-        if (StringUtils.isNullOrEmpty(n))
+        if (StringUtil.isNullOrEmpty(n))
             throw new AcousticException("Sound name is null or empty");
         return AcousticLibrary.resolveResource(this.nameSpace, n);
     }

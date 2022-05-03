@@ -18,7 +18,7 @@
 
 package org.orecruncher.lib;
 
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -79,22 +79,22 @@ public final class Diagnostics {
             final DiagnosticEvent evt = new DiagnosticEvent();
 
             evt.getRight().add("");
-            evt.getRight().add(TextFormatting.LIGHT_PURPLE + clientTick.toString());
-            evt.getRight().add(TextFormatting.LIGHT_PURPLE + lastTick.toString());
-            evt.getRight().add(TextFormatting.LIGHT_PURPLE + diagnostics.toString());
-            evt.getRight().add(TextFormatting.LIGHT_PURPLE + String.format("TPS:%7.3fms", tps));
+            evt.getRight().add(ChatFormatting.LIGHT_PURPLE + clientTick.toString());
+            evt.getRight().add(ChatFormatting.LIGHT_PURPLE + lastTick.toString());
+            evt.getRight().add(ChatFormatting.LIGHT_PURPLE + diagnostics.toString());
+            evt.getRight().add(ChatFormatting.LIGHT_PURPLE + String.format("TPS:%7.3fms", tps));
 
             MinecraftForge.EVENT_BUS.post(evt);
             lastEvent = evt;
 
             if (!lastEvent.getTimers().isEmpty()) {
                 for (final TimerEMA timer : lastEvent.getTimers())
-                    evt.getRight().add(TextFormatting.GREEN + timer.toString());
+                    evt.getRight().add(ChatFormatting.GREEN + timer.toString());
             }
 
             if (!lastEvent.getRenderTimers().isEmpty()) {
                 for (final TimerEMA timer : lastEvent.getRenderTimers())
-                    evt.getRight().add(TextFormatting.AQUA + timer.toString());
+                    evt.getRight().add(ChatFormatting.AQUA + timer.toString());
             }
 
             diagnostics.end();

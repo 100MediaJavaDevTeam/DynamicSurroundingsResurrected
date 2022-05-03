@@ -18,13 +18,13 @@
 
 package org.orecruncher.environs.effects.particles;
 
-import net.minecraft.client.particle.IAnimatedSprite;
-import net.minecraft.client.particle.IParticleRenderType;
-import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -34,59 +34,59 @@ import javax.annotation.Nonnull;
 import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
-public class SteamCloudParticle extends SpriteTexturedParticle {
+public class SteamCloudParticle extends TextureSheetParticle {
 
     private static final Random RANDOM = XorShiftRandom.current();
 
-    private final IAnimatedSprite field_217583_C;
+    private final SpriteSet sprites;
 
-    public SteamCloudParticle(World world, double x, double y, double z, double dY) {
-        super((ClientWorld) world, x, y, z, RANDOM.nextGaussian() * 0.02D, dY,
+    public SteamCloudParticle(Level world, double x, double y, double z, double dY) {
+        super((ClientLevel) world, x, y, z, RANDOM.nextGaussian() * 0.02D, dY,
                 RANDOM.nextGaussian() * 0.02D);
 
-        this.field_217583_C = GameUtils.getMC().particles.sprites.get(ParticleTypes.CLOUD.getRegistryName());
-        this.motionX *= 0.1F;
-        this.motionY *= 0.1F;
-        this.motionZ *= 0.1F;
+        this.sprites = GameUtils.getMC().particleEngine.spriteSets.get(ParticleTypes.CLOUD.getRegistryName());
+        this.xd *= 0.1F;
+        this.yd *= 0.1F;
+        this.zd *= 0.1F;
         //this.motionX += motionX;
-        this.motionY += dY;
+        this.yd += dY;
         //this.motionZ += motionZ;
         float f1 = 1.0F - (float) (Math.random() * (double) 0.3F);
-        this.particleRed = f1;
-        this.particleGreen = f1;
-        this.particleBlue = f1;
-        this.particleScale *= 1.875F;
+        this.rCol = f1;
+        this.gCol = f1;
+        this.bCol = f1;
+        this.quadSize *= 1.875F;
         int i = (int) (8.0D / (Math.random() * 0.8D + 0.3D));
-        this.maxAge = (int) Math.max((float) i * 2.5F, 1.0F);
-        this.canCollide = false;
-        this.selectSpriteWithAge(this.field_217583_C);
+        this.lifetime = (int) Math.max((float) i * 2.5F, 1.0F);
+        this.hasPhysics = false;
+        this.setSpriteFromAge(this.sprites);
     }
 
     @Nonnull
-    public IParticleRenderType getRenderType() {
-        return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    public float getScale(float p_217561_1_) {
-        return this.particleScale * MathHelper.clamp(((float) this.age + p_217561_1_) / (float) this.maxAge * 32.0F, 0.0F, 1.0F);
+    public float getQuadSize(float p_217561_1_) {
+        return this.quadSize * Mth.clamp(((float) this.age + p_217561_1_) / (float) this.lifetime * 32.0F, 0.0F, 1.0F);
     }
 
     public void tick() {
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
-        if (this.age++ >= this.maxAge) {
-            this.setExpired();
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
+        if (this.age++ >= this.lifetime) {
+            this.remove();
         } else {
-            this.selectSpriteWithAge(this.field_217583_C);
-            this.move(this.motionX, this.motionY, this.motionZ);
-            this.motionX *= 0.96F;
-            this.motionY *= 0.96F;
-            this.motionZ *= 0.96F;
+            this.setSpriteFromAge(this.sprites);
+            this.move(this.xd, this.yd, this.zd);
+            this.xd *= 0.96F;
+            this.yd *= 0.96F;
+            this.zd *= 0.96F;
 
             if (this.onGround) {
-                this.motionX *= 0.7F;
-                this.motionZ *= 0.7F;
+                this.xd *= 0.7F;
+                this.zd *= 0.7F;
             }
 
         }

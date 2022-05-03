@@ -76,7 +76,7 @@ public class MorningFogRangeCalculator extends VanillaFogRangeCalculator {
     public FogResult calculate(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
         this.cache.set(event);
         if (this.type != FogType.NONE && this.cache.getStart() > this.type.getReserve()) {
-            final float ca = GameUtils.getWorld().func_242415_f((float) event.getRenderPartialTicks());
+            final float ca = GameUtils.getWorld().getTimeOfDay((float) event.getPartialTicks());
             if (ca >= this.type.getStart() && ca <= this.type.getEnd()) {
                 final float mid = (this.type.getStart() + this.type.getEnd()) / 2F;
                 final float factor = 1F - MathStuff.abs(ca - mid) / (mid - this.type.getStart());

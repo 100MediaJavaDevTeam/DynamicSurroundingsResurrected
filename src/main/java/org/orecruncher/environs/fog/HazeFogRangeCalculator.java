@@ -18,7 +18,7 @@
 
 package org.orecruncher.environs.fog;
 
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -62,7 +62,7 @@ public class HazeFogRangeCalculator extends VanillaFogRangeCalculator {
 
             // Calculate the players Y. If it's in the band range calculate the fog
             // parameters
-            final Vector3d eyes = GameUtils.getPlayer().getEyePosition((float) event.getRenderPartialTicks());
+            final Vec3 eyes = GameUtils.getPlayer().getEyePosition((float) event.getPartialTicks());
             if (eyes.y > lowY && eyes.y < highY) {
                 final float coreLowY = lowY + BAND_OFFSETS;
                 final float coreHighY = coreLowY + BAND_CORE_SIZE;

@@ -20,7 +20,6 @@ package org.orecruncher.environs.shaders.aurora;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
 import org.orecruncher.environs.handlers.CommonState;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.TickCounter;
@@ -44,7 +43,7 @@ public class AuroraUtils {
 	 * The range in chunks of the player view.
 	 */
 	public static int getChunkRenderDistance() {
-		return GameUtils.getGameSettings().renderDistanceChunks;
+		return GameUtils.getGameSettings().renderDistance;
 	}
 
 	/*
@@ -53,7 +52,7 @@ public class AuroraUtils {
 	 * calculations.
 	 */
 	public static float getTimeSeconds() {
-		return ((float) TickCounter.getTickCount() + GameUtils.getMC().getRenderPartialTicks()) / 20F;
+		return ((float) TickCounter.getTickCount() + GameUtils.getMC().getFrameTime()) / 20F;
 	}
 
 	/*

@@ -18,7 +18,7 @@
 
 package org.orecruncher.lib.gui;
 
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -26,22 +26,22 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public final class ColorPalette {
     // Minecraft colors mapped to codes
-    public static final Color MC_BLACK = new Color(TextFormatting.BLACK);
-    public static final Color MC_DARKBLUE = new Color(TextFormatting.DARK_BLUE);
-    public static final Color MC_DARKGREEN = new Color(TextFormatting.DARK_GREEN);
-    public static final Color MC_DARKAQUA = new Color(TextFormatting.DARK_AQUA);
-    public static final Color MC_DARKRED = new Color(TextFormatting.DARK_RED);
-    public static final Color MC_DARKPURPLE = new Color(TextFormatting.DARK_PURPLE);
-    public static final Color MC_GOLD = new Color(TextFormatting.GOLD);
-    public static final Color MC_GRAY = new Color(TextFormatting.GRAY);
-    public static final Color MC_DARKGRAY = new Color(TextFormatting.DARK_GRAY);
-    public static final Color MC_BLUE = new Color(TextFormatting.BLUE);
-    public static final Color MC_GREEN = new Color(TextFormatting.GREEN);
-    public static final Color MC_AQUA = new Color(TextFormatting.AQUA);
-    public static final Color MC_RED = new Color(TextFormatting.RED);
-    public static final Color MC_LIGHTPURPLE = new Color(TextFormatting.LIGHT_PURPLE);
-    public static final Color MC_YELLOW = new Color(TextFormatting.YELLOW);
-    public static final Color MC_WHITE = new Color(TextFormatting.WHITE);
+    public static final Color MC_BLACK = new Color(ChatFormatting.BLACK);
+    public static final Color MC_DARKBLUE = new Color(ChatFormatting.DARK_BLUE);
+    public static final Color MC_DARKGREEN = new Color(ChatFormatting.DARK_GREEN);
+    public static final Color MC_DARKAQUA = new Color(ChatFormatting.DARK_AQUA);
+    public static final Color MC_DARKRED = new Color(ChatFormatting.DARK_RED);
+    public static final Color MC_DARKPURPLE = new Color(ChatFormatting.DARK_PURPLE);
+    public static final Color MC_GOLD = new Color(ChatFormatting.GOLD);
+    public static final Color MC_GRAY = new Color(ChatFormatting.GRAY);
+    public static final Color MC_DARKGRAY = new Color(ChatFormatting.DARK_GRAY);
+    public static final Color MC_BLUE = new Color(ChatFormatting.BLUE);
+    public static final Color MC_GREEN = new Color(ChatFormatting.GREEN);
+    public static final Color MC_AQUA = new Color(ChatFormatting.AQUA);
+    public static final Color MC_RED = new Color(ChatFormatting.RED);
+    public static final Color MC_LIGHTPURPLE = new Color(ChatFormatting.LIGHT_PURPLE);
+    public static final Color MC_YELLOW = new Color(ChatFormatting.YELLOW);
+    public static final Color MC_WHITE = new Color(ChatFormatting.WHITE);
 
     public static final Color RED = new Color(255, 0, 0);
     public static final Color ORANGE = new Color(255, 127, 0);

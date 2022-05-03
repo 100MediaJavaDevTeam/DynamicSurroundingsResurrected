@@ -17,7 +17,7 @@
  */
 package org.orecruncher.environs.mixins;
 
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.biome.Biome;
 import org.orecruncher.environs.config.Config;
 import org.orecruncher.environs.handlers.FogHandler;
 import org.orecruncher.environs.library.BiomeInfo;

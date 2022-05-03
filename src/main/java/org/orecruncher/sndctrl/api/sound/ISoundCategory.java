@@ -18,8 +18,8 @@
 
 package org.orecruncher.sndctrl.api.sound;
 
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -36,7 +36,7 @@ public interface ISoundCategory {
     /**
      * Get the category name suitable for display
      */
-    ITextComponent getTextComponent();
+    Component getTextComponent();
 
     /**
      * Should the category show up in the quick volume set menu
@@ -70,10 +70,10 @@ public interface ISoundCategory {
      * @return
      */
     @Nonnull
-    default SoundCategory getRealCategory() {
+    default SoundSource getRealCategory() {
         // Do not change from MASTER.  This gets passed down into the Minecraft engine so it can make
         // decisions about what to do.  If tied to a different category it could result in some strange
         // behaviors.
-        return SoundCategory.MASTER;
+        return SoundSource.MASTER;
     }
 }

@@ -18,9 +18,9 @@
 
 package org.orecruncher.lib.resource;
 
-import net.minecraft.resources.IResourcePack;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.io.IOUtils;
@@ -31,10 +31,10 @@ import java.io.InputStream;
 @OnlyIn(Dist.CLIENT)
 final class ResourceAccessorPack extends ResourceAccessorBase {
 
-    private final IResourcePack pack;
+    private final PackResources pack;
     private final ResourceLocation actual;
 
-    public ResourceAccessorPack(@Nonnull final ResourceLocation location, @Nonnull final IResourcePack pack, @Nonnull final ResourceLocation actual) {
+    public ResourceAccessorPack(@Nonnull final ResourceLocation location, @Nonnull final PackResources pack, @Nonnull final ResourceLocation actual) {
         super(location);
         this.pack = pack;
         this.actual = actual;
@@ -43,7 +43,7 @@ final class ResourceAccessorPack extends ResourceAccessorBase {
     @Override
     protected byte[] getAsset() {
         try {
-            try (InputStream stream = this.pack.getResourceStream(ResourcePackType.CLIENT_RESOURCES, this.actual)) {
+            try (InputStream stream = this.pack.getResource(PackType.CLIENT_RESOURCES, this.actual)) {
                 return IOUtils.toByteArray(stream);
             }
         } catch (@Nonnull final Throwable t) {

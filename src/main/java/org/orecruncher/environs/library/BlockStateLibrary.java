@@ -20,27 +20,29 @@ package org.orecruncher.environs.library;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.reflect.TypeToken;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.StringUtils;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.environs.Environs;
 import org.orecruncher.environs.effects.BlockEffectType;
-import org.orecruncher.environs.library.config.*;
-import org.orecruncher.lib.tags.TagUtils;
+import org.orecruncher.environs.library.config.AcousticConfig;
+import org.orecruncher.environs.library.config.BlockConfig;
+import org.orecruncher.environs.library.config.EffectConfig;
 import org.orecruncher.lib.blockstate.BlockStateMatcher;
 import org.orecruncher.lib.blockstate.BlockStateMatcherMap;
 import org.orecruncher.lib.fml.ForgeUtils;
 import org.orecruncher.lib.logging.IModLog;
 import org.orecruncher.lib.resource.IResourceAccessor;
 import org.orecruncher.lib.resource.ResourceUtils;
-import org.orecruncher.lib.service.ModuleServiceManager;
 import org.orecruncher.lib.service.IModuleService;
+import org.orecruncher.lib.service.ModuleServiceManager;
+import org.orecruncher.lib.tags.TagUtils;
 import org.orecruncher.lib.validation.ListValidator;
 import org.orecruncher.lib.validation.Validators;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
@@ -141,9 +143,9 @@ public final class BlockStateLibrary {
     private static Collection<BlockStateMatcher> expand(@Nonnull final String blockName) {
         if (blockName.startsWith(TAG_SPECIFIER)) {
             final String tagName = blockName.substring(1);
-            final ITag<Block> tag = TagUtils.getBlockTag(tagName);
+            final Tag<Block> tag = TagUtils.getBlockTag(tagName);
             if (tag != null) {
-                return tag.getAllElements().stream().map(BlockStateMatcher::create).filter(m -> !m.isEmpty()).collect(Collectors.toList());
+                return tag.getValues().stream().map(BlockStateMatcher::create).filter(m -> !m.isEmpty()).collect(Collectors.toList());
             }
             LOGGER.debug("Unknown block tag '%s' in Block specification", tagName);
         } else {
@@ -178,9 +180,9 @@ public final class BlockStateLibrary {
             ForgeUtils.getBlockStates().forEach(BlockStateUtil::getData);
             ForgeUtils.getBlockStates().stream().map(BlockStateUtil::getData).forEach(BlockStateData::trim);
 
-            BlockStateUtil.setData(Blocks.AIR.getDefaultState(), BlockStateData.DEFAULT);
-            BlockStateUtil.setData(Blocks.CAVE_AIR.getDefaultState(), BlockStateData.DEFAULT);
-            BlockStateUtil.setData(Blocks.VOID_AIR.getDefaultState(), BlockStateData.DEFAULT);
+            BlockStateUtil.setData(Blocks.AIR.defaultBlockState(), BlockStateData.DEFAULT);
+            BlockStateUtil.setData(Blocks.CAVE_AIR.defaultBlockState(), BlockStateData.DEFAULT);
+            BlockStateUtil.setData(Blocks.VOID_AIR.defaultBlockState(), BlockStateData.DEFAULT);
         }
 
         @Override

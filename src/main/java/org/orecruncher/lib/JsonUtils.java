@@ -20,17 +20,14 @@ package org.orecruncher.lib;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import net.minecraft.util.ResourceLocation;
-import org.orecruncher.lib.resource.ResourceUtils;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 

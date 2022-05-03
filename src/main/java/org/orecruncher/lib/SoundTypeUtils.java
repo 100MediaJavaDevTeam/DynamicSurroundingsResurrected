@@ -19,8 +19,8 @@
 package org.orecruncher.lib;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.block.SoundType;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.block.SoundType;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -38,51 +38,51 @@ public final class SoundTypeUtils {
         soundTypeMap.defaultReturnValue("CUSTOM");
 
         soundTypeMap.put(SoundType.WOOD, "WOOD");
-        soundTypeMap.put(SoundType.GROUND, "GROUND");
-        soundTypeMap.put(SoundType.PLANT, "PLANT");
-        soundTypeMap.put(SoundType.LILY_PADS, "LILY_PADS");
+        soundTypeMap.put(SoundType.GRAVEL, "GROUND");
+        soundTypeMap.put(SoundType.GRASS, "PLANT");
+        soundTypeMap.put(SoundType.LILY_PAD, "LILY_PADS");
         soundTypeMap.put(SoundType.STONE, "STONE");
         soundTypeMap.put(SoundType.METAL, "METAL");
         soundTypeMap.put(SoundType.GLASS, "GLASS");
-        soundTypeMap.put(SoundType.CLOTH, "CLOTH");
+        soundTypeMap.put(SoundType.WOOL, "CLOTH");
         soundTypeMap.put(SoundType.SAND, "SAND");
         soundTypeMap.put(SoundType.SNOW, "SNOW");
         soundTypeMap.put(SoundType.LADDER, "LADDER");
         soundTypeMap.put(SoundType.ANVIL, "ANVIL");
-        soundTypeMap.put(SoundType.SLIME, "SLIME");
-        soundTypeMap.put(SoundType.HONEY, "HONEY");
+        soundTypeMap.put(SoundType.SLIME_BLOCK, "SLIME");
+        soundTypeMap.put(SoundType.HONEY_BLOCK, "HONEY");
         soundTypeMap.put(SoundType.WET_GRASS, "WET_GRASS");
-        soundTypeMap.put(SoundType.CORAL, "CORAL");
+        soundTypeMap.put(SoundType.CORAL_BLOCK, "CORAL");
         soundTypeMap.put(SoundType.BAMBOO, "BAMBOO");
         soundTypeMap.put(SoundType.BAMBOO_SAPLING, "BAMBOO_SAPLING");
         soundTypeMap.put(SoundType.SCAFFOLDING, "SCAFFOLDING");
         soundTypeMap.put(SoundType.SWEET_BERRY_BUSH, "SWEET_BERRY_BUSH");
         soundTypeMap.put(SoundType.CROP, "CROP");
-        soundTypeMap.put(SoundType.STEM, "STEM");
+        soundTypeMap.put(SoundType.HARD_CROP, "STEM");
         soundTypeMap.put(SoundType.VINE, "VINE");
         soundTypeMap.put(SoundType.NETHER_WART, "NETHER_WART");
         soundTypeMap.put(SoundType.LANTERN, "LANTERN");
-        soundTypeMap.put(SoundType.HYPHAE, "HYPHAE");
+        soundTypeMap.put(SoundType.STEM, "HYPHAE");
         soundTypeMap.put(SoundType.NYLIUM, "NYLIUM");
         soundTypeMap.put(SoundType.FUNGUS, "FUNGUS");
-        soundTypeMap.put(SoundType.ROOT, "ROOT");
+        soundTypeMap.put(SoundType.ROOTS, "ROOT");
         soundTypeMap.put(SoundType.SHROOMLIGHT, "SHROOMLIGHT");
-        soundTypeMap.put(SoundType.NETHER_VINE, "NETHER_VINE");
-        soundTypeMap.put(SoundType.NETHER_VINE_LOWER_PITCH, "NETHER_VINE_LOWER_PITCH");
+        soundTypeMap.put(SoundType.WEEPING_VINES, "NETHER_VINE");
+        soundTypeMap.put(SoundType.TWISTING_VINES, "NETHER_VINE_LOWER_PITCH");
         soundTypeMap.put(SoundType.SOUL_SAND, "SOUL_SAND");
         soundTypeMap.put(SoundType.SOUL_SOIL, "SOUL_SOIL");
         soundTypeMap.put(SoundType.BASALT, "BASALT");
-        soundTypeMap.put(SoundType.WART, "WART");
+        soundTypeMap.put(SoundType.WART_BLOCK, "WART");
         soundTypeMap.put(SoundType.NETHERRACK, "NETHERRACK");
-        soundTypeMap.put(SoundType.NETHER_BRICK, "NETHER_BRICK");
-        soundTypeMap.put(SoundType.NETHER_SPROUT, "NETHER_SPROUT");
+        soundTypeMap.put(SoundType.NETHER_BRICKS, "NETHER_BRICK");
+        soundTypeMap.put(SoundType.NETHER_SPROUTS, "NETHER_SPROUT");
         soundTypeMap.put(SoundType.NETHER_ORE, "NETHER_ORE");
-        soundTypeMap.put(SoundType.BONE, "BONE");
-        soundTypeMap.put(SoundType.NETHERITE, "NETHERITE");
+        soundTypeMap.put(SoundType.BONE_BLOCK, "BONE");
+        soundTypeMap.put(SoundType.NETHERITE_BLOCK, "NETHERITE");
         soundTypeMap.put(SoundType.ANCIENT_DEBRIS, "ANCIENT_DEBRIS");
         soundTypeMap.put(SoundType.LODESTONE, "LODESTONE");
         soundTypeMap.put(SoundType.CHAIN, "CHAIN");
-        soundTypeMap.put(SoundType.NETHER_GOLD, "NETHER_GOLD");
+        soundTypeMap.put(SoundType.NETHER_GOLD_ORE, "NETHER_GOLD");
         soundTypeMap.put(SoundType.GILDED_BLACKSTONE, "GILDED_BLACKSTONE");
 
         // Create the inverse map
@@ -115,6 +115,6 @@ public final class SoundTypeUtils {
     }
 
     public static boolean isValid(@Nonnull final SoundEvent se) {
-        return se != null && se.getName() != null;
+        return se != null && se.getLocation() != null;
     }
 }

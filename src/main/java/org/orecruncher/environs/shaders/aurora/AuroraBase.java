@@ -18,13 +18,9 @@
 
 package org.orecruncher.environs.shaders.aurora;
 
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.config.Config;
@@ -34,6 +30,9 @@ import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.gui.Color;
 import org.orecruncher.lib.math.MathStuff;
 import org.orecruncher.lib.random.XorShiftRandom;
+
+import javax.annotation.Nonnull;
+import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class AuroraBase implements IAurora {
@@ -45,7 +44,7 @@ public abstract class AuroraBase implements IAurora {
 	protected final AuroraLifeTracker tracker;
 	protected final AuroraColor colors;
 
-	protected final PlayerEntity player;
+	protected final Player player;
 	protected final DimensionInfo dimInfo;
 
 	public AuroraBase(final long seed) {
@@ -96,15 +95,15 @@ public abstract class AuroraBase implements IAurora {
 	}
 
 	protected double getTranslationX(final float partialTick) {
-		return MathHelper.lerp(partialTick, this.player.lastTickPosX, this.player.getPosX());
+		return Mth.lerp(partialTick, this.player.xOld, this.player.getX());
 	}
 
 	protected double getTranslationZ(final float partialTick) {
-		return MathHelper.lerp(partialTick, this.player.lastTickPosZ, this.player.getPosZ()) - AuroraUtils.PLAYER_FIXED_Z_OFFSET;
+		return Mth.lerp(partialTick, this.player.zOld, this.player.getZ()) - AuroraUtils.PLAYER_FIXED_Z_OFFSET;
 	}
 
 	protected double getTranslationY(final float partialTick) {
-		final double posY = MathHelper.lerp(partialTick, this.player.lastTickPosY, this.player.getPosY()) + AuroraUtils.PLAYER_FIXED_Y_OFFSET;
+		final double posY = Mth.lerp(partialTick, this.player.yOld, this.player.getY()) + AuroraUtils.PLAYER_FIXED_Y_OFFSET;
 		final double limit = (this.dimInfo.getSkyHeight() + this.dimInfo.getCloudHeight()) / 2D;
 		return MathStuff.clamp(posY, AuroraUtils.PLAYER_FIXED_Y_OFFSET, limit);
 	}
@@ -125,7 +124,7 @@ public abstract class AuroraBase implements IAurora {
 	}
 
 	@Override
-	public abstract void render(@Nonnull final MatrixStack matrixStack, final float partialTick);
+	public abstract void render(@Nonnull final PoseStack matrixStack, final float partialTick);
 
 	@Override
 	public String toString() {

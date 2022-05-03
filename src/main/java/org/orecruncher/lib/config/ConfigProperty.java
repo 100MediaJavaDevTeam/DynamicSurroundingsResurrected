@@ -18,9 +18,9 @@
 
 package org.orecruncher.lib.config;
 
-import net.minecraft.client.gui.DialogTexts;
-import net.minecraft.util.StringUtils;
-import net.minecraft.util.text.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.*;
+import net.minecraft.util.StringUtil;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -50,7 +50,7 @@ public final class ConfigProperty {
     private final ForgeConfigSpec.ValueSpec valueSpec;
     private final String name;
 
-    private ITextComponent[] toolTip;
+    private Component[] toolTip;
 
     private ConfigProperty(@Nonnull final ForgeConfigSpec.ConfigValue<?> configEntry) {
         this(specAccessor.get(configEntry), configEntry);
@@ -67,13 +67,13 @@ public final class ConfigProperty {
     }
 
     @Nonnull
-    public IFormattableTextComponent getConfigName() {
+    public MutableComponent getConfigName() {
         final String key = getTranslationKey();
-        if (StringUtils.isNullOrEmpty(key)) {
-            return new StringTextComponent(this.name);
+        if (StringUtil.isNullOrEmpty(key)) {
+            return new TextComponent(this.name);
         }
 
-        return new TranslationTextComponent(key);
+        return new TranslatableComponent(key);
     }
 
     @Nullable
@@ -82,17 +82,17 @@ public final class ConfigProperty {
     }
 
     @Nullable
-    public ITextComponent[] getTooltip() {
+    public Component[] getTooltip() {
         if (this.toolTip == null) {
-            final List<ITextComponent> result = new ArrayList<>();
+            final List<Component> result = new ArrayList<>();
             String key = getTranslationKey();
-            if (StringUtils.isNullOrEmpty(key)) {
+            if (StringUtil.isNullOrEmpty(key)) {
                 key = getComment();
-                if (StringUtils.isNullOrEmpty(key))
+                if (StringUtil.isNullOrEmpty(key))
                     return null;
-                result.add(new StringTextComponent(key));
+                result.add(new TextComponent(key));
             } else {
-                final ITextComponent title = new StringTextComponent(TextFormatting.GOLD + new TranslationTextComponent(key).getString());
+                final Component title = new TextComponent(ChatFormatting.GOLD + new TranslatableComponent(key).getString());
                 result.add(title);
                 result.addAll(GuiHelpers.getTrimmedTextCollection(key + ".tooltip", TOOLTIP_WIDTH));
             }
@@ -101,25 +101,25 @@ public final class ConfigProperty {
             if (theDefault != null) {
                 String text = theDefault.toString();
                 if (text.compareToIgnoreCase("true") == 0)
-                    text = DialogTexts.OPTIONS_ON.getString();
+                    text = CommonComponents.OPTION_ON.getString();
                 else if (text.compareToIgnoreCase("false") == 0)
-                    text = DialogTexts.OPTIONS_OFF.getString();
+                    text = CommonComponents.OPTION_OFF.getString();
                 else
                     text = GuiHelpers.getTrimmedText(text, TOOLTIP_WIDTH).getString();
-                text = new TranslationTextComponent("dsurround.text.format.default", text).getString();
-                result.add(new StringTextComponent(text));
+                text = new TranslatableComponent("dsurround.text.format.default", text).getString();
+                result.add(new TextComponent(text));
             }
 
             final Object range = this.valueSpec.getRange();
             if (range != null) {
-                result.add(new StringTextComponent(TextFormatting.GREEN + "[ " + range.toString() + " ]"));
+                result.add(new TextComponent(ChatFormatting.GREEN + "[ " + range.toString() + " ]"));
             }
 
             if (getNeedsWorldRestart()) {
-                result.add(new TranslationTextComponent("dsurround.text.tooltip.restartRequired"));
+                result.add(new TranslatableComponent("dsurround.text.tooltip.restartRequired"));
             }
 
-            this.toolTip = result.toArray(new ITextComponent[0]);
+            this.toolTip = result.toArray(new Component[0]);
         }
 
         return this.toolTip;

@@ -18,10 +18,10 @@
 
 package org.orecruncher.lib.resource;
 
-import net.minecraft.resources.IResourcePack;
-import net.minecraft.resources.ResourcePackInfo;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.Lib;
@@ -66,7 +66,7 @@ public final class ResourceUtils {
         final String parentModConfigs = modId + "/configs";
 
         final Map<ResourceLocation, IResourceAccessor> locations = new HashMap<>();
-        final Collection<ResourcePackInfo> packs = ForgeUtils.getEnabledResourcePacks();
+        final Collection<Pack> packs = ForgeUtils.getEnabledResourcePacks();
 
         // Cache the namespaces so we don't do discovery unnecessarily.
         final Collection<String> namespaceList = discoverNamespaces(resourceContainer);
@@ -75,9 +75,9 @@ public final class ResourceUtils {
         // so we do not need to scan JARs directly.  The collection returned is already sorted so that the first
         // entries in the collection are lower priority that those further in the collection.  The result is that
         // higher priority resource packs will replace data from lower priority packs if there is an overlap.
-        for (final ResourcePackInfo pack : packs) {
-            final IResourcePack rp = pack.getResourcePack();
-            final Set<String> namespaces = rp.getResourceNamespaces(ResourcePackType.CLIENT_RESOURCES);
+        for (final Pack pack : packs) {
+            final PackResources rp = pack.open();
+            final Set<String> namespaces = rp.getNamespaces(PackType.CLIENT_RESOURCES);
             for (final String mod : namespaceList) {
                 if (namespaces.contains(mod)) {
                     final String container = String.format(resourceContainer, config);
@@ -122,14 +122,14 @@ public final class ResourceUtils {
      */
     public static Collection<IResourceAccessor> findSounds() {
         final List<IResourceAccessor> results = new ArrayList<>();
-        final Collection<ResourcePackInfo> packs = ForgeUtils.getEnabledResourcePacks();
+        final Collection<Pack> packs = ForgeUtils.getEnabledResourcePacks();
 
-        for (final ResourcePackInfo pack : packs) {
-            final IResourcePack rp = pack.getResourcePack();
-            final Set<String> embeddedNamespaces = rp.getResourceNamespaces(ResourcePackType.CLIENT_RESOURCES);
+        for (final Pack pack : packs) {
+            final PackResources rp = pack.open();
+            final Set<String> embeddedNamespaces = rp.getNamespaces(PackType.CLIENT_RESOURCES);
             for (final String ns : embeddedNamespaces) {
                 final ResourceLocation location = new ResourceLocation(ns, "sounds.json");
-                final IResourceAccessor accessor = IResourceAccessor.createPackResource(pack.getResourcePack(), location, location);
+                final IResourceAccessor accessor = IResourceAccessor.createPackResource(pack.open(), location, location);
                 if (accessor.exists()) {
                     results.add(accessor);
                 }
@@ -159,15 +159,15 @@ public final class ResourceUtils {
         // 2. The pack itself has it's own namespace, and it is providing resources that are not associated with any
         //    other mod present.  We identify these namespaces by the presence of a manifest file.
         //
-        final Collection<ResourcePackInfo> packs = ForgeUtils.getEnabledResourcePacks();
+        final Collection<Pack> packs = ForgeUtils.getEnabledResourcePacks();
 
-        for (final ResourcePackInfo pack : packs) {
-            final IResourcePack rp = pack.getResourcePack();
-            final Set<String> embeddedNamespaces = rp.getResourceNamespaces(ResourcePackType.CLIENT_RESOURCES);
+        for (final Pack pack : packs) {
+            final PackResources rp = pack.open();
+            final Set<String> embeddedNamespaces = rp.getNamespaces(PackType.CLIENT_RESOURCES);
             for (final String ns : embeddedNamespaces) {
                 if (!namespaces.contains(ns)) {
                     final ResourceLocation location = new ResourceLocation(ns, container);
-                    final IResourceAccessor accessor = IResourceAccessor.createPackResource(pack.getResourcePack(), location, location);
+                    final IResourceAccessor accessor = IResourceAccessor.createPackResource(pack.open(), location, location);
                     if (accessor.exists()) {
                         final Manifest manifest = accessor.as(Manifest.class);
                         if (manifest != null) {

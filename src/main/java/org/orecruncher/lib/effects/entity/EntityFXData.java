@@ -20,15 +20,25 @@ package org.orecruncher.lib.effects.entity;
 
 import javax.annotation.Nullable;
 
+import dev._100media.capabilitysyncer.core.EntityCapability;
+import dev._100media.capabilitysyncer.network.EntityCapabilityStatusPacket;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.network.simple.SimpleChannel;
 import org.orecruncher.lib.effects.EntityEffectManager;
 
 
 @OnlyIn(Dist.CLIENT)
-public class EntityFXData implements IEntityFX {
+public class EntityFXData extends EntityCapability implements IEntityFX {
 
 	protected EntityEffectManager handler;
+
+	public EntityFXData(LivingEntity entity) {
+		super(entity);
+	}
 
 	@Override
 	public void set(@Nullable final EntityEffectManager handler) {
@@ -41,4 +51,23 @@ public class EntityFXData implements IEntityFX {
 		return this.handler;
 	}
 
+	// Since this is a client-only cap, we don't need any of this stuff
+
+	@Override
+	public EntityCapabilityStatusPacket createUpdatePacket() {
+		return null;
+	}
+
+	@Override
+	public SimpleChannel getNetworkChannel() {
+		return null;
+	}
+
+	@Override
+	public CompoundTag serializeNBT(boolean savingToDisk) {
+		return null;
+	}
+
+	@Override
+	public void deserializeNBT(CompoundTag nbt, boolean readingFromDisk) {}
 }

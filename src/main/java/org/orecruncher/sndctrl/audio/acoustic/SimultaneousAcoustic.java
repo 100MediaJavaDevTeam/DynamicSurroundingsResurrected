@@ -19,10 +19,10 @@
 package org.orecruncher.sndctrl.audio.acoustic;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.collections.ObjectArray;
@@ -77,7 +77,7 @@ public class SimultaneousAcoustic implements IAcoustic {
     }
 
     @Override
-    public void playAt(@Nonnull final Vector3d pos, @Nonnull final AcousticEvent event) {
+    public void playAt(@Nonnull final Vec3 pos, @Nonnull final AcousticEvent event) {
         for (final IAcoustic a : this.acoustics)
             a.playAt(pos, event);
     }

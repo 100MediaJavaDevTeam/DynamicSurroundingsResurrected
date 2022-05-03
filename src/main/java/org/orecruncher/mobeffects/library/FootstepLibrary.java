@@ -21,22 +21,21 @@ package org.orecruncher.mobeffects.library;
 import com.google.gson.reflect.TypeToken;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.commons.lang3.tuple.Pair;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.lib.SoundTypeUtils;
-import org.orecruncher.lib.tags.TagUtils;
 import org.orecruncher.lib.blockstate.BlockStateMatcher;
 import org.orecruncher.lib.blockstate.BlockStateMatcherMap;
 import org.orecruncher.lib.blockstate.BlockStateParser;
@@ -44,12 +43,13 @@ import org.orecruncher.lib.fml.ForgeUtils;
 import org.orecruncher.lib.logging.IModLog;
 import org.orecruncher.lib.resource.IResourceAccessor;
 import org.orecruncher.lib.resource.ResourceUtils;
-import org.orecruncher.lib.service.ModuleServiceManager;
 import org.orecruncher.lib.service.IModuleService;
+import org.orecruncher.lib.service.ModuleServiceManager;
+import org.orecruncher.lib.tags.TagUtils;
 import org.orecruncher.lib.validation.MapValidator;
 import org.orecruncher.lib.validation.Validators;
-import org.orecruncher.mobeffects.config.Config;
 import org.orecruncher.mobeffects.MobEffects;
+import org.orecruncher.mobeffects.config.Config;
 import org.orecruncher.mobeffects.footsteps.Generator;
 import org.orecruncher.mobeffects.footsteps.GeneratorQP;
 import org.orecruncher.mobeffects.footsteps.Substrate;
@@ -72,13 +72,13 @@ import java.util.stream.Stream;
 @Mod.EventBusSubscriber(modid = MobEffects.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class FootstepLibrary {
 
-    private static final String TEXT_FOOTSTEPS = TextFormatting.DARK_PURPLE + "<Footsteps>";
+    private static final String TEXT_FOOTSTEPS = ChatFormatting.DARK_PURPLE + "<Footsteps>";
     private static final Map<Substrate, BlockAcousticMap> substrateMap = new EnumMap<>(Substrate.class);
     private static final List<SoundType> FOOTPRINT_SOUND_PROFILE =
             Arrays.asList(
                     SoundType.SAND,
-                    SoundType.GROUND,
-                    SoundType.SLIME,
+                    SoundType.GRAVEL,
+                    SoundType.SLIME_BLOCK,
                     SoundType.SNOW
             );
     private static final Set<Material> FOOTPRINT_MATERIAL = new ReferenceOpenHashSet<>();
@@ -104,13 +104,13 @@ public final class FootstepLibrary {
 
         // Initialize the known materials that leave footprints
         FOOTPRINT_MATERIAL.add(Material.CLAY);
-        FOOTPRINT_MATERIAL.add(Material.EARTH);
+        FOOTPRINT_MATERIAL.add(Material.DIRT);
         FOOTPRINT_MATERIAL.add(Material.SPONGE);
         FOOTPRINT_MATERIAL.add(Material.SAND);
-        FOOTPRINT_MATERIAL.add(Material.SNOW_BLOCK);
         FOOTPRINT_MATERIAL.add(Material.SNOW);
+        FOOTPRINT_MATERIAL.add(Material.TOP_SNOW);
         FOOTPRINT_MATERIAL.add(Material.CAKE);
-        FOOTPRINT_MATERIAL.add(Material.ORGANIC);
+        FOOTPRINT_MATERIAL.add(Material.GRASS);
 
         final MacroEntry MESSY = new MacroEntry("messy", "messy_ground");
         final MacroEntry NOT_EMITTER = new MacroEntry(null, "not_emitter");
@@ -396,13 +396,13 @@ public final class FootstepLibrary {
             tagName = tagName.substring(0, idx);
         }
 
-        final ITag<Block> blockTag = TagUtils.getBlockTag(tagName);
+        final Tag<Block> blockTag = TagUtils.getBlockTag(tagName);
         if (blockTag != null) {
-            final List<Block> elements = blockTag.getAllElements();
+            final List<Block> elements = blockTag.getValues();
             if (elements.size() == 0) {
                 LOGGER.debug("No blocks associated with tag '%s'", tagName);
             } else {
-                for (final Block b : blockTag.getAllElements()) {
+                for (final Block b : blockTag.getValues()) {
                     String blockName = Objects.requireNonNull(b.getRegistryName()).toString();
                     if (substrate != null)
                         blockName = blockName + "+" + substrate;
@@ -432,9 +432,9 @@ public final class FootstepLibrary {
     @Nonnull
     public static Generator createGenerator(@Nonnull final LivingEntity entity) {
         Variator var;
-        if (entity.isChild()) {
+        if (entity.isBaby()) {
             var = childVariator;
-        } else if (entity instanceof PlayerEntity) {
+        } else if (entity instanceof Player) {
             var = Config.CLIENT.footsteps.footstepsAsQuadruped.get() ? playerQuadrupedVariator : playerVariator;
         } else {
             var = getVariator(entity.getType().getRegistryName().toString());
@@ -467,7 +467,7 @@ public final class FootstepLibrary {
         // emitter.  Otherwise we get strange effects when edge walking on blocks with a plant
         // to the side.
         final Material mat = state.getMaterial();
-        if (mat == null || !mat.blocksMovement() || mat.isLiquid())
+        if (mat == null || !mat.blocksMotion() || mat.isLiquid())
             return Constants.NOT_EMITTER;
         final IAcoustic acoustic = Primitives.getFootstepAcoustic(state);
         return acoustic == NullAcoustic.INSTANCE ? Constants.NOT_EMITTER : acoustic;

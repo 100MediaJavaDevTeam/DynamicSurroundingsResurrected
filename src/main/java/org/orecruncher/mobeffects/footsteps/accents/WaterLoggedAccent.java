@@ -18,11 +18,11 @@
 
 package org.orecruncher.mobeffects.footsteps.accents;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.IWaterLoggable;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.collections.ObjectArray;
@@ -46,7 +46,7 @@ class WaterLoggedAccent implements IFootstepAccentProvider {
             @Nonnull final BlockPos blockPos,
             @Nonnull final BlockState posState,
             @Nonnull final ObjectArray<IAcoustic> acoustics) {
-        if (posState.getBlock() instanceof IWaterLoggable) {
+        if (posState.getBlock() instanceof SimpleWaterloggedBlock) {
             final FluidState fluid = posState.getFluidState();
             if (!fluid.isEmpty())
                 acoustics.add(FootstepLibrary.getWaterLoggedAcoustic());

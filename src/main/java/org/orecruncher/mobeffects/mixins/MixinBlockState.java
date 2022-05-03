@@ -18,7 +18,7 @@
 
 package org.orecruncher.mobeffects.mixins;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import org.orecruncher.mobeffects.misc.IMixinFootstepData;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
 import org.spongepowered.asm.mixin.Mixin;

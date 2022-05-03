@@ -17,6 +17,8 @@
  */
 package org.orecruncher.lib.scripting;
 
+import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
+
 import javax.annotation.Nonnull;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -24,10 +26,10 @@ import javax.script.ScriptEngineManager;
 class ScriptEngineLoader {
     public static ScriptEngine getEngine() {
         try {
-            return new ScriptEngineManager().getEngineByName("JavaScript");
+            return new NashornScriptEngineFactory().getScriptEngine();
             //return NashornScriptEngineLoader.getEngine();
         } catch (@Nonnull final Throwable ignore) {
         }
-        return new ScriptEngineManager().getEngineByName("JavaScript");
+        return new NashornScriptEngineFactory().getScriptEngine();
     }
 }

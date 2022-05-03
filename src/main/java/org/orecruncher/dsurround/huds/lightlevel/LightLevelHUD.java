@@ -18,31 +18,32 @@
 
 package org.orecruncher.dsurround.huds.lightlevel;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.EntitySpawnPlacementRegistry;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.world.LightType;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.SpawnPlacements;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.opengl.GL11;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.dsurround.config.Config;
 import org.orecruncher.lib.GameUtils;
@@ -53,14 +54,12 @@ import org.orecruncher.lib.gui.ColorPalette;
 import org.orecruncher.lib.math.MathStuff;
 import org.orecruncher.lib.particles.FrustumHelper;
 
-import org.lwjgl.opengl.GL11;
-
 import javax.annotation.Nonnull;
 
 @Mod.EventBusSubscriber(modid = DynamicSurroundings.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class LightLevelHUD {
 
-    private static FontRenderer font;
+    private static Font font;
 
     public enum Mode {
         BLOCK,
@@ -99,7 +98,7 @@ public final class LightLevelHUD {
 
     private static final int ALLOCATION_SIZE = 2048;
     private static final ObjectArray<LightCoord> lightLevels = new ObjectArray<>(ALLOCATION_SIZE);
-    private static final BlockPos.Mutable mutable = new BlockPos.Mutable();
+    private static final BlockPos.MutableBlockPos mutable = new BlockPos.MutableBlockPos();
     private static int nextCoord = 0;
 
     private static final String[] lightLevelText = new String[16];
@@ -120,7 +119,7 @@ public final class LightLevelHUD {
     }
 
     protected static boolean inFrustum(final double x, final double y, final double z) {
-        return FrustumHelper.isLocationInFrustum(new Vector3d(x, y, z));
+        return FrustumHelper.isLocationInFrustum(new Vec3(x, y, z));
     }
 
     protected static boolean renderLightLevel(@Nonnull final BlockState state, @Nonnull final BlockState below) {
@@ -132,39 +131,39 @@ public final class LightLevelHUD {
     protected static float heightAdjustment(@Nonnull final BlockState state, @Nonnull final BlockState below,
                                             @Nonnull final BlockPos pos) {
         if (state.getMaterial() == Material.AIR) {
-            final VoxelShape shape = below.getCollisionShape(GameUtils.getWorld(), pos.down());
-            return shape.isEmpty() ? 0 : (float) shape.getEnd(Direction.Axis.Y) - 1;
+            final VoxelShape shape = below.getCollisionShape(GameUtils.getWorld(), pos.below());
+            return shape.isEmpty() ? 0 : (float) shape.max(Direction.Axis.Y) - 1;
         }
 
         final VoxelShape shape = below.getCollisionShape(GameUtils.getWorld(), pos);
         if (shape.isEmpty())
             return 0F;
-        final float adjust = (float) (shape.getEnd(Direction.Axis.Y));
+        final float adjust = (float) (shape.max(Direction.Axis.Y));
         return state.getBlock() == Blocks.SNOW ? adjust + 0.125F : adjust;
     }
 
-    protected static void updateLightInfo(@Nonnull final Vector3d position) {
+    protected static void updateLightInfo(@Nonnull final Vec3 position) {
 
-        final FontRenderer fr = GameUtils.getMC().fontRenderer;
+        final Font fr = GameUtils.getMC().font;
 
         if (fr != font) {
             font = fr;
             for (int i = 0; i < 16; i++)
-                margins[i] = -(font.getStringWidth(lightLevelText[i]) + 1) / 2;
+                margins[i] = -(font.width(lightLevelText[i]) + 1) / 2;
         }
 
         nextCoord = 0;
 
         final ColorSet colors = Config.CLIENT.lightLevel.colorSet.get();
         final Mode displayMode = Config.CLIENT.lightLevel.mode.get();
-        final int skyLightSub = GameUtils.getWorld().getSkylightSubtracted();
+        final int skyLightSub = GameUtils.getWorld().getSkyDarken();
         final int rangeXZ = Config.CLIENT.lightLevel.range.get() * 2 + 1;
         final int rangeY = Config.CLIENT.lightLevel.range.get() + 1;
         final int originX = MathStuff.floor(position.x) - (rangeXZ / 2);
         final int originZ = MathStuff.floor(position.z) - (rangeXZ / 2);
         final int originY = MathStuff.floor(position.y) - (rangeY - 3);
 
-        final ClientWorld world = GameUtils.getWorld();
+        final ClientLevel world = GameUtils.getWorld();
 
         for (int dX = 0; dX < rangeXZ; dX++)
             for (int dZ = 0; dZ < rangeXZ; dZ++) {
@@ -185,20 +184,20 @@ public final class LightLevelHUD {
                     final BlockState state = world.getBlockState(pos);
 
                     if (lastState == null)
-                        lastState = world.getBlockState(pos.down());
+                        lastState = world.getBlockState(pos.below());
 
                     if (renderLightLevel(state, lastState)) {
-                        mutable.setPos(trueX, trueY, trueZ);
+                        mutable.set(trueX, trueY, trueZ);
 
-                        final boolean mobSpawn = lastState.canCreatureSpawn(
+                        final boolean mobSpawn = lastState.isValidSpawn(
                                 GameUtils.getWorld(),
                                 mutable,
-                                EntitySpawnPlacementRegistry.PlacementType.ON_GROUND,
+                                SpawnPlacements.Type.ON_GROUND,
                                 EntityType.ZOMBIE);
 
                         if (mobSpawn || !Config.CLIENT.lightLevel.hideSafe.get()) {
-                            final int blockLight = world.getLightFor(LightType.BLOCK, mutable);
-                            final int skyLight = world.getLightFor(LightType.SKY, mutable) - skyLightSub;
+                            final int blockLight = world.getBrightness(LightLayer.BLOCK, mutable);
+                            final int skyLight = world.getBrightness(LightLayer.SKY, mutable) - skyLightSub;
                             final int effective = Math.max(blockLight, skyLight);
 
                             final int result;
@@ -244,55 +243,55 @@ public final class LightLevelHUD {
     @SubscribeEvent
     public static void doTick(@Nonnull final TickEvent.PlayerTickEvent event) {
 
-        if (!showHUD || event.side == LogicalSide.SERVER || event.phase == TickEvent.Phase.END || GameUtils.getMC().isGamePaused())
+        if (!showHUD || event.side == LogicalSide.SERVER || event.phase == TickEvent.Phase.END || GameUtils.getMC().isPaused())
             return;
 
-        if (event.player == null || event.player.world == null)
+        if (event.player == null || event.player.level == null)
             return;
 
         if (TickCounter.getTickCount() % 4 != 0)
             return;
 
-        updateLightInfo(event.player.getPositionVec());
+        updateLightInfo(event.player.position());
     }
 
-    public static void render(@Nonnull final MatrixStack matrixStack, final float partialTicks) {
+    public static void render(@Nonnull final PoseStack matrixStack, final float partialTicks) {
         if (!showHUD || nextCoord == 0)
             return;
 
-        final PlayerEntity player = GameUtils.getPlayer();
+        final Player player = GameUtils.getPlayer();
         if (player == null)
             return;
 
         drawStringRender(matrixStack, player);
     }
 
-    private static void drawStringRender(@Nonnull final MatrixStack matrixStack, @Nonnull final PlayerEntity player) {
+    private static void drawStringRender(@Nonnull final PoseStack matrixStack, @Nonnull final Player player) {
 
         final boolean thirdPerson = GameUtils.isThirdPersonView();
-        Direction playerFacing = player.getHorizontalFacing();
+        Direction playerFacing = player.getDirection();
         if (thirdPerson)
             playerFacing = playerFacing.getOpposite();
         if (playerFacing == Direction.SOUTH || playerFacing == Direction.NORTH)
             playerFacing = playerFacing.getOpposite();
-        final float rotationAngle = playerFacing.getOpposite().getHorizontalAngle();
+        final float rotationAngle = playerFacing.getOpposite().toYRot();
 
         final Quaternion rotY = Vector3f.YP.rotationDegrees(rotationAngle);
         final Quaternion rotX = Vector3f.XP.rotationDegrees(90);
-        final Vector3d view = GameUtils.getMC().gameRenderer.getActiveRenderInfo().getProjectedView();
-        matrixStack.push();
-        matrixStack.translate(-view.getX(), -view.getY(), -view.getZ());
+        final Vec3 view = GameUtils.getMC().gameRenderer.getMainCamera().getPosition();
+        matrixStack.pushPose();
+        matrixStack.translate(-view.x(), -view.y(), -view.z());
 
-        RenderSystem.disableLighting();
+//        RenderSystem.disableLighting();
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
         RenderSystem.enableDepthTest();
         RenderSystem.depthFunc(GL11.GL_LEQUAL);
         RenderSystem.depthMask(true);
 
-        IRenderTypeBuffer.Impl buffer = IRenderTypeBuffer.getImpl(Tessellator.getInstance().getBuffer());
+        MultiBufferSource.BufferSource buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
 
-        final int yAdjust = -(font.FONT_HEIGHT / 2);
+        final int yAdjust = -(font.lineHeight / 2);
 
         for (int i = 0; i < nextCoord; i++) {
             final LightCoord coord = lightLevels.get(i);
@@ -300,28 +299,28 @@ public final class LightLevelHUD {
             final int margin = margins[coord.lightLevel];
             final float scale = 0.07F;
 
-            matrixStack.push();
+            matrixStack.pushPose();
             matrixStack.translate(coord.x + 0.5D, coord.y, coord.z + 0.5D);
-            matrixStack.rotate(rotY);
-            matrixStack.rotate(rotX);
+            matrixStack.mulPose(rotY);
+            matrixStack.mulPose(rotX);
             matrixStack.scale(-scale, -scale, scale);
 
-            font.renderString(
+            font.drawInBatch(
                     text,
                     margin,
                     yAdjust,
                     coord.color,
                     false,
-                    matrixStack.getLast().getMatrix(),
+                    matrixStack.last().pose(),
                     buffer,
                     false,
                     0,
                     15728880);
 
-            matrixStack.pop();
+            matrixStack.popPose();
         }
 
-        buffer.finish();
-        matrixStack.pop();
+        buffer.endBatch();
+        matrixStack.popPose();
     }
 }

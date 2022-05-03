@@ -18,19 +18,20 @@
 
 package org.orecruncher.environs.shaders.aurora;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.*;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.math.vector.Vector3f;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.shaders.ShaderPrograms;
-import org.orecruncher.lib.shaders.ShaderCallContext;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.math.MathStuff;
+import org.orecruncher.lib.shaders.ShaderCallContext;
 
 import javax.annotation.Nonnull;
 import java.util.function.Consumer;
@@ -87,7 +88,7 @@ public class AuroraShaderBand extends AuroraBase {
 		return AuroraBand.AURORA_AMPLITUDE;
 	}
 
-	protected void generateBand(@Nonnull final IVertexBuilder builder, @Nonnull final Matrix4f matrix) {
+	protected void generateBand(@Nonnull final VertexConsumer builder, @Nonnull final Matrix4f matrix) {
 
 		for (int i = 0; ; i++) {
 			final Vector3f[] quad = this.band.getPanelQuad(i);
@@ -97,16 +98,16 @@ public class AuroraShaderBand extends AuroraBase {
 			final float u1 = i * this.panelTexWidth;
 			final float u2 = u1 + this.panelTexWidth;
 
-			builder.pos(matrix, quad[0].getX(), quad[0].getY(), quad[0].getZ()).tex(u1, V1).endVertex();
-			builder.pos(matrix, quad[1].getX(), quad[1].getY(), quad[1].getZ()).tex(u2, V1).endVertex();
-			builder.pos(matrix, quad[2].getX(), quad[2].getY(), quad[2].getZ()).tex(u2, V2).endVertex();
-			builder.pos(matrix, quad[3].getX(), quad[3].getY(), quad[3].getZ()).tex(u1, V2).endVertex();
+			builder.vertex(matrix, quad[0].x(), quad[0].y(), quad[0].z()).uv(u1, V1).endVertex();
+			builder.vertex(matrix, quad[1].x(), quad[1].y(), quad[1].z()).uv(u2, V1).endVertex();
+			builder.vertex(matrix, quad[2].x(), quad[2].y(), quad[2].z()).uv(u2, V2).endVertex();
+			builder.vertex(matrix, quad[3].x(), quad[3].y(), quad[3].z()).uv(u1, V2).endVertex();
 		}
 
 	}
 
 	@Override
-	public void render(@Nonnull final MatrixStack matrixStack, final float partialTick) {
+	public void render(@Nonnull final PoseStack matrixStack, final float partialTick) {
 
 		if (this.program == null)
 			return;
@@ -117,25 +118,25 @@ public class AuroraShaderBand extends AuroraBase {
 		final double tranX = getTranslationX(partialTick);
 		final double tranZ = getTranslationZ(partialTick);
 
-		final Vector3d view = GameUtils.getMC().gameRenderer.getActiveRenderInfo().getProjectedView();
-		matrixStack.push();
-		matrixStack.translate(-view.getX(), -view.getY(), -view.getZ());
+		final Vec3 view = GameUtils.getMC().gameRenderer.getMainCamera().getPosition();
+		matrixStack.pushPose();
+		matrixStack.translate(-view.x(), -view.y(), -view.z());
 
 		final RenderType type = AuroraRenderType.QUAD;
-		final IRenderTypeBuffer.Impl buffer = GameUtils.getMC().getRenderTypeBuffers().getBufferSource();
+		final MultiBufferSource.BufferSource buffer = GameUtils.getMC().renderBuffers().bufferSource();
 
 		ShaderPrograms.MANAGER.useShader(this.program, this.callback);
 
 		try {
 
 			for (int b = 0; b < this.bandCount; b++) {
-				final IVertexBuilder builder = buffer.getBuffer(type);
-				matrixStack.push();
+				final VertexConsumer builder = buffer.getBuffer(type);
+				matrixStack.pushPose();
 				matrixStack.translate(tranX, tranY, tranZ + this.offset * b);
-				generateBand(builder, matrixStack.getLast().getMatrix());
-				matrixStack.pop();
+				generateBand(builder, matrixStack.last().pose());
+				matrixStack.popPose();
 				RenderSystem.disableDepthTest();
-				buffer.finish(type);
+				buffer.endBatch(type);
 			}
 
 		} catch (final Exception ex) {
@@ -145,7 +146,7 @@ public class AuroraShaderBand extends AuroraBase {
 
 		ShaderPrograms.MANAGER.releaseShader();
 
-		matrixStack.pop();
+		matrixStack.popPose();
 	}
 
 	@Override

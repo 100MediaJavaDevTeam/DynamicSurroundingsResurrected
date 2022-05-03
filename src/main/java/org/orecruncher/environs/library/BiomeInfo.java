@@ -18,29 +18,29 @@
 
 package org.orecruncher.environs.library;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.BiomeDictionary.Type;
 import org.apache.commons.lang3.StringUtils;
 import org.orecruncher.environs.Environs;
-import org.orecruncher.environs.library.config.BiomeConfig;
 import org.orecruncher.environs.library.config.AcousticConfig;
+import org.orecruncher.environs.library.config.BiomeConfig;
 import org.orecruncher.lib.WeightTable;
-
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
-import net.minecraftforge.common.BiomeDictionary.Type;
 import org.orecruncher.lib.collections.ObjectArray;
 import org.orecruncher.lib.gui.Color;
 import org.orecruncher.lib.math.MathStuff;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
 import org.orecruncher.sndctrl.api.acoustics.Library;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Random;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @OnlyIn(Dist.CLIENT)
 public final class BiomeInfo implements Comparable<BiomeInfo> {
@@ -119,7 +119,7 @@ public final class BiomeInfo implements Comparable<BiomeInfo> {
 		return name == null ? "UNKNOWN" : name;
 	}
 
-	public Biome.RainType getPrecipitationType() {
+	public Biome.Precipitation getPrecipitationType() {
 		return this.biome.getPrecipitationType();
 	}
 

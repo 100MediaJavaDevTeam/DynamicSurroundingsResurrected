@@ -18,16 +18,15 @@
 
 package org.orecruncher.environs.library;
 
-import java.util.Set;
-
-import javax.annotation.Nonnull;
-
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary.Type;
+
+import javax.annotation.Nonnull;
+import java.util.Set;
 
 @OnlyIn(Dist.CLIENT)
 public interface IBiome {
@@ -40,7 +39,7 @@ public interface IBiome {
 
 	Set<Type> getTypes();
 
-	Biome.RainType getPrecipitationType();
+	Biome.Precipitation getPrecipitationType();
 
 	float getFloatTemperature(@Nonnull final BlockPos pos);
 

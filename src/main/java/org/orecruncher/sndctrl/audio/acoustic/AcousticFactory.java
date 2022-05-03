@@ -18,22 +18,18 @@
 
 package org.orecruncher.sndctrl.audio.acoustic;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.random.XorShiftRandom;
 import org.orecruncher.sndctrl.api.acoustics.IAcousticFactory;
-import org.orecruncher.sndctrl.api.sound.IFadableSoundInstance;
-import org.orecruncher.sndctrl.api.sound.ISoundCategory;
+import org.orecruncher.sndctrl.api.sound.*;
 import org.orecruncher.sndctrl.audio.BackgroundSoundInstance;
-import org.orecruncher.sndctrl.api.sound.ISoundInstance;
-import org.orecruncher.sndctrl.api.sound.SoundBuilder;
-import org.orecruncher.sndctrl.api.sound.Category;
 import org.orecruncher.sndctrl.audio.EntitySoundInstance;
-import org.orecruncher.sndctrl.audio.SoundInstance;
+import org.orecruncher.sndctrl.audio.DSSoundInstance;
 
 import javax.annotation.Nonnull;
 import java.util.Random;
@@ -55,12 +51,12 @@ public class AcousticFactory extends SoundBuilder implements IAcousticFactory {
         super(event, category);
     }
 
-    private static Vector3d randomPoint(final int minRange, final int maxRange) {
+    private static Vec3 randomPoint(final int minRange, final int maxRange) {
         // Establish a random unit vector
         final double x = RANDOM.nextDouble() - 0.5D;
         final double y = RANDOM.nextDouble() - 0.5D;
         final double z = RANDOM.nextDouble() - 0.5D;
-        final Vector3d vec = new Vector3d(x, y, z).normalize();
+        final Vec3 vec = new Vec3(x, y, z).normalize();
 
         // Establish the range and scaling value
         final int range = maxRange - minRange;
@@ -91,7 +87,7 @@ public class AcousticFactory extends SoundBuilder implements IAcousticFactory {
     @Override
     @Nonnull
     public ISoundInstance createSoundAt(@Nonnull final BlockPos pos) {
-        final SoundInstance sound = makeSound();
+        final DSSoundInstance sound = makeSound();
         sound.setPosition(pos);
         return sound;
     }
@@ -101,8 +97,8 @@ public class AcousticFactory extends SoundBuilder implements IAcousticFactory {
      */
     @Override
     @Nonnull
-    public ISoundInstance createSoundAt(@Nonnull final Vector3d pos) {
-        final SoundInstance sound = makeSound();
+    public ISoundInstance createSoundAt(@Nonnull final Vec3 pos) {
+        final DSSoundInstance sound = makeSound();
         sound.setPosition(pos);
         return sound;
     }
@@ -128,11 +124,11 @@ public class AcousticFactory extends SoundBuilder implements IAcousticFactory {
      */
     @Nonnull
     public ISoundInstance createSoundNear(@Nonnull final Entity entity, final int minRange, final int maxRange) {
-        final Vector3d offset = randomPoint(minRange, maxRange);
-        final float posX = (float) (entity.getPosX() + offset.getX());
-        final float posY = (float) (entity.getPosY() + entity.getEyeHeight() + offset.getY());
-        final float posZ = (float) (entity.getPosZ() + offset.getZ());
-        final SoundInstance sound = makeSound();
+        final Vec3 offset = randomPoint(minRange, maxRange);
+        final float posX = (float) (entity.getX() + offset.x());
+        final float posY = (float) (entity.getY() + entity.getEyeHeight() + offset.y());
+        final float posZ = (float) (entity.getZ() + offset.z());
+        final DSSoundInstance sound = makeSound();
         sound.setPosition(posX, posY, posZ);
         return sound;
     }

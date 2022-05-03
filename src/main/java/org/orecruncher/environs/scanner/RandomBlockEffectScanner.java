@@ -18,22 +18,19 @@
 
 package org.orecruncher.environs.scanner;
 
-import java.util.Collection;
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import net.minecraft.util.math.BlockPos;
 import org.orecruncher.environs.effects.BlockEffect;
 import org.orecruncher.environs.library.BlockStateData;
 import org.orecruncher.environs.library.BlockStateUtil;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
+
+import javax.annotation.Nonnull;
+import java.util.Collection;
+import java.util.Random;
 
 /**
  * Modeled after WorldClient::doVoidFogParticles() which handles the random
@@ -64,7 +61,7 @@ public class RandomBlockEffectScanner extends RandomScanner {
 
 	@Override
 	public void blockScan(@Nonnull final BlockState state, @Nonnull final BlockPos pos, @Nonnull final Random rand) {
-		final IBlockReader world = this.locus.getWorld();
+		final BlockGetter world = this.locus.getWorld();
 		final BlockStateData profile = BlockStateUtil.getData(state);
 		final Collection<BlockEffect> effects = profile.getEffects();
 

@@ -18,38 +18,36 @@
 
 package org.orecruncher.environs.library;
 
+import com.google.gson.reflect.TypeToken;
+import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
+import net.minecraft.core.BlockPos;
+import net.minecraft.data.worldgen.biome.Biomes;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import org.orecruncher.dsurround.DynamicSurroundings;
+import org.orecruncher.environs.Environs;
+import org.orecruncher.environs.config.Config;
+import org.orecruncher.environs.library.config.BiomeConfig;
+import org.orecruncher.lib.fml.ForgeUtils;
+import org.orecruncher.lib.logging.IModLog;
+import org.orecruncher.lib.math.MathStuff;
+import org.orecruncher.lib.resource.IResourceAccessor;
+import org.orecruncher.lib.resource.ResourceUtils;
+import org.orecruncher.lib.service.IModuleService;
+import org.orecruncher.lib.service.ModuleServiceManager;
+import org.orecruncher.lib.validation.ListValidator;
+import org.orecruncher.lib.validation.Validators;
+
+import javax.annotation.Nonnull;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import javax.annotation.Nonnull;
-
-import com.google.gson.reflect.TypeToken;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tags.FluidTags;
-import net.minecraft.world.biome.BiomeRegistry;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import org.orecruncher.dsurround.DynamicSurroundings;
-import org.orecruncher.environs.config.Config;
-import org.orecruncher.environs.Environs;
-import org.orecruncher.environs.library.config.BiomeConfig;
-import org.orecruncher.lib.fml.ForgeUtils;
-import org.orecruncher.lib.logging.IModLog;
-import org.orecruncher.lib.math.MathStuff;
-
-import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
-import org.orecruncher.lib.resource.IResourceAccessor;
-import org.orecruncher.lib.resource.ResourceUtils;
-import org.orecruncher.lib.service.ModuleServiceManager;
-import org.orecruncher.lib.service.IModuleService;
-import org.orecruncher.lib.validation.ListValidator;
-import org.orecruncher.lib.validation.Validators;
 
 @OnlyIn(Dist.CLIENT)
 public final class BiomeLibrary {
@@ -126,12 +124,12 @@ public final class BiomeLibrary {
 	}
 
 	@Nonnull
-	public static BiomeInfo getPlayerBiome(@Nonnull final PlayerEntity player, final boolean getTrue) {
-		final Biome biome = player.getEntityWorld().getBiome(new BlockPos(player.getPosX(), 0, player.getPosZ()));
+	public static BiomeInfo getPlayerBiome(@Nonnull final Player player, final boolean getTrue) {
+		final Biome biome = player.getCommandSenderWorld().getBiome(new BlockPos(player.getX(), 0, player.getZ()));
 		BiomeInfo info = BiomeUtil.getBiomeData(biome);
 
 		if (!getTrue) {
-			if (player.areEyesInFluid(FluidTags.WATER)) {
+			if (player.isEyeInFluid(FluidTags.WATER)) {
 				if (info.isRiver())
 					info = UNDERRIVER_INFO;
 				else if (info.isDeepOcean())
@@ -141,8 +139,8 @@ public final class BiomeLibrary {
 				else
 					info = UNDERWATER_INFO;
 			} else {
-				final DimensionInfo dimInfo = DimensionLibrary.getData(player.getEntityWorld());
-				final int theY = MathStuff.floor(player.getPosY());
+				final DimensionInfo dimInfo = DimensionLibrary.getData(player.getCommandSenderWorld());
+				final int theY = MathStuff.floor(player.getY());
 				if ((theY + INSIDE_Y_ADJUST) <= dimInfo.getSeaLevel())
 					info = UNDERGROUND_INFO;
 				else if (theY >= dimInfo.getSpaceHeight())
@@ -184,8 +182,8 @@ public final class BiomeLibrary {
 			});
 
 			// Make sure the default biomes are set
-			BiomeUtil.getBiomeData(BiomeRegistry.PLAINS);
-			BiomeUtil.getBiomeData(BiomeRegistry.THE_VOID);
+			BiomeUtil.getBiomeData(Biomes.PLAINS);
+			BiomeUtil.getBiomeData(Biomes.THE_VOID);
 
 			final Collection<IResourceAccessor> configs = ResourceUtils.findConfigs(DynamicSurroundings.MOD_ID, DynamicSurroundings.DATA_PATH, "biomes.json");
 
@@ -205,8 +203,8 @@ public final class BiomeLibrary {
 		@Override
 		public void stop() {
 			ForgeUtils.getBiomes().forEach(b -> BiomeUtil.setBiomeData(b, null));
-			BiomeUtil.setBiomeData(BiomeRegistry.PLAINS, null);
-			BiomeUtil.setBiomeData(BiomeRegistry.THE_VOID, null);
+			BiomeUtil.setBiomeData(Biomes.PLAINS, null);
+			BiomeUtil.setBiomeData(Biomes.THE_VOID, null);
 		}
 	}
 

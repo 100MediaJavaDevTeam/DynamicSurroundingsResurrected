@@ -20,11 +20,11 @@ package org.orecruncher.sndctrl.audio;
 
 import com.google.common.collect.ImmutableList;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.*;
-import net.minecraft.client.audio.ChannelManager.Entry;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.ChannelAccess.ChannelHandle;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.MinecraftForge;
@@ -37,9 +37,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.events.DiagnosticEvent;
 import org.orecruncher.lib.logging.IModLog;
-import org.orecruncher.sndctrl.config.Config;
 import org.orecruncher.sndctrl.SoundControl;
 import org.orecruncher.sndctrl.api.sound.ISoundInstance;
+import org.orecruncher.sndctrl.config.Config;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,15 +56,15 @@ import java.util.stream.Collectors;
 @OnlyIn(Dist.CLIENT)
 public final class AudioEngine {
     private static final IModLog LOGGER = SoundControl.LOGGER.createChild(AudioEngine.class);
-    private static final String FMT_DBG_SOUND_SYSTEM = TextFormatting.AQUA + "SoundSystem: %d/%d";
-    private static final String FMT_DBG_TRACKED = TextFormatting.AQUA + "AudioEngine: %d";
-    private static final String FMT_DBG_SOUND = TextFormatting.GOLD + "%s: %d";
+    private static final String FMT_DBG_SOUND_SYSTEM = ChatFormatting.AQUA + "SoundSystem: %d/%d";
+    private static final String FMT_DBG_TRACKED = ChatFormatting.AQUA + "AudioEngine: %d";
+    private static final String FMT_DBG_SOUND = ChatFormatting.GOLD + "%s: %d";
     private static final ReferenceOpenHashSet<ISoundInstance> playingSounds = new ReferenceOpenHashSet<>(256);
 
     @Nonnull
     private static List<String> diagnostics = ImmutableList.of();
     @Nullable
-    private static ISound playedSound = null;
+    private static SoundInstance playedSound = null;
 
     private AudioEngine() {
     }
@@ -167,8 +167,8 @@ public final class AudioEngine {
         LOGGER.debug(Config.Flags.SOUND_PLAY, () -> {
             final double distance;
             if (GameUtils.getPlayer() != null) {
-                final Vector3d location = new Vector3d(sound.getX(), sound.getY(), sound.getZ());
-                distance = Math.sqrt(GameUtils.getPlayer().getDistanceSq(location));
+                final Vec3 location = new Vec3(sound.getX(), sound.getY(), sound.getZ());
+                distance = Math.sqrt(GameUtils.getPlayer().distanceToSqr(location));
             } else {
                 distance = 0;
             }
@@ -187,8 +187,8 @@ public final class AudioEngine {
         if (event.side != LogicalSide.CLIENT || event.phase != Phase.START)
             return;
 
-        final Map<ISound, Integer> delayedSounds = SoundUtils.getDelayedSounds();
-        final Map<ISound, Entry> playing = SoundUtils.getPlayingSounds();
+        final Map<SoundInstance, Integer> delayedSounds = SoundUtils.getDelayedSounds();
+        final Map<SoundInstance, ChannelHandle> playing = SoundUtils.getPlayingSounds();
 
         /*
          Process our queued sounds to make sure the state is appropriate. A sound can move between the playing sound
@@ -232,13 +232,13 @@ public final class AudioEngine {
         processTerminalSounds();
 
         // Generate diagnostics if needed.
-        if (processDiagnostics() && Minecraft.getInstance().gameSettings.showDebugInfo) {
+        if (processDiagnostics() && Minecraft.getInstance().options.renderDebug) {
             diagnostics = new ArrayList<>(16);
             diagnostics.add(String.format(FMT_DBG_SOUND_SYSTEM, SoundUtils.getTotalPlaying(), SoundUtils.getMaxSounds()));
             diagnostics.add(String.format(FMT_DBG_TRACKED, playingSounds.size()));
 
             playing.keySet().stream()
-                    .map(s -> s.getSound().getSoundLocation())
+                    .map(s -> s.getSound().getLocation())
                     .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
                     .entrySet().stream()
                     .map(e -> String.format(FMT_DBG_SOUND, e.getKey().toString(), e.getValue()))
@@ -274,7 +274,7 @@ public final class AudioEngine {
      * the sound is too far away (based on the sound instance distance value).
      * @param sound Sound that is being queued into the audio engine
      */
-    public static void onPlaySound(@Nonnull final ISound sound) {
+    public static void onPlaySound(@Nonnull final SoundInstance sound) {
         playedSound = sound;
         if (!(playedSound instanceof ISoundInstance)) {
             LOGGER.debug(Config.Flags.BASIC_SOUND_PLAY, () -> String.format("PLAYING: [%s]", SoundUtils.debugString(playedSound)));

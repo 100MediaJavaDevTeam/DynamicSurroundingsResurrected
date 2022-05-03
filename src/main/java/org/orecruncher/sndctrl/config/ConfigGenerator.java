@@ -18,11 +18,11 @@
 
 package org.orecruncher.sndctrl.config;
 
-import me.shedaniel.clothconfig2.forge.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.forge.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.forge.impl.builders.*;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import me.shedaniel.clothconfig2.api.ConfigBuilder;
+import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.impl.builders.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.config.ClothAPIFactory;
@@ -37,9 +37,9 @@ public class ConfigGenerator {
     @Nonnull
     public static SubCategoryBuilder generate(@Nonnull final ConfigBuilder builder, @Nonnull final ConfigEntryBuilder entryBuilder) {
 
-        SubCategoryBuilder modCategory = ClothAPIFactory.createSubCategory(entryBuilder, "sndctrl.modname", TextFormatting.GOLD, false);
+        SubCategoryBuilder modCategory = ClothAPIFactory.createSubCategory(entryBuilder, "sndctrl.modname", ChatFormatting.GOLD, false);
 
-        SubCategoryBuilder subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "sndctrl.cfg.logging", TextFormatting.YELLOW, false);
+        SubCategoryBuilder subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "sndctrl.cfg.logging", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,
@@ -52,7 +52,7 @@ public class ConfigGenerator {
 
         modCategory.add(subCategory.build());
 
-        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "sndctrl.cfg.sound", TextFormatting.YELLOW, false);
+        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "sndctrl.cfg.sound", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,
@@ -104,7 +104,7 @@ public class ConfigGenerator {
                         Config.CLIENT.sound.individualSounds,
                         (v) -> {
                             if (!IndividualSoundConfig.isValid(v))
-                                return Optional.of(new TranslationTextComponent("sndctrl.message.cfg.soundconfig.invalid"));
+                                return Optional.of(new TranslatableComponent("sndctrl.message.cfg.soundconfig.invalid"));
                             return Optional.empty();
                         }));
 
@@ -116,7 +116,7 @@ public class ConfigGenerator {
 
         modCategory.add(subCategory.build());
 
-        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "sndctrl.cfg.effects", TextFormatting.YELLOW, false);
+        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "sndctrl.cfg.effects", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,

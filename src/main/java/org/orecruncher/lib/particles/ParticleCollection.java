@@ -18,10 +18,10 @@
 
 package org.orecruncher.lib.particles;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.particle.IParticleRenderType;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.world.World;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -48,13 +48,13 @@ final class ParticleCollection extends BaseParticle {
     protected final LoggingTimerEMA render;
     protected final LoggingTimerEMA tick;
     protected final ObjectArray<IParticleMote> myParticles = new ObjectArray<>(ALLOCATION_SIZE);
-    protected final IParticleRenderType renderType;
+    protected final ParticleRenderType renderType;
     protected long lastTickUpdate;
 
-    ParticleCollection(@Nonnull final String name, @Nonnull final World world, @Nonnull final IParticleRenderType renderType) {
+    ParticleCollection(@Nonnull final String name, @Nonnull final Level world, @Nonnull final ParticleRenderType renderType) {
         super(world, 0, 0, 0);
 
-        this.canCollide = false;
+        this.hasPhysics = false;
         this.renderType = renderType;
         this.render = new LoggingTimerEMA("Render " + name);
         this.tick = new LoggingTimerEMA("Tick " + name);
@@ -87,7 +87,7 @@ final class ParticleCollection extends BaseParticle {
 
     public boolean shouldDie() {
         final boolean timeout = (TickCounter.getTickCount() - this.lastTickUpdate) > TICK_GRACE;
-        return timeout || size() == 0 || this.world != GameUtils.getWorld();
+        return timeout || size() == 0 || this.level != GameUtils.getWorld();
     }
 
     @Override
@@ -97,7 +97,7 @@ final class ParticleCollection extends BaseParticle {
             this.lastTickUpdate = TickCounter.getTickCount();
             this.myParticles.removeIf(UPDATE_REMOVE);
             if (shouldDie()) {
-                setExpired();
+                remove();
             }
         }
         this.tick.end();
@@ -109,7 +109,7 @@ final class ParticleCollection extends BaseParticle {
     }
 
     @Override
-    public void renderParticle(@Nonnull final IVertexBuilder buffer, @Nonnull final ActiveRenderInfo renderInfo, final float partialTicks) {
+    public void render(@Nonnull final VertexConsumer buffer, @Nonnull final Camera renderInfo, final float partialTicks) {
         this.render.begin();
         for (final IParticleMote mote : this.myParticles)
             if (FrustumHelper.isLocationInFrustum(mote.getPosition()))
@@ -119,7 +119,7 @@ final class ParticleCollection extends BaseParticle {
 
     @Override
     @Nonnull
-    public IParticleRenderType getRenderType() {
+    public ParticleRenderType getRenderType() {
         return this.renderType;
     }
 
@@ -128,7 +128,7 @@ final class ParticleCollection extends BaseParticle {
      * ParticleCollections manager.
      */
     public interface ICollectionFactory {
-        ParticleCollection create(@Nonnull final String name, @Nonnull final World world, @Nonnull final IParticleRenderType renderType);
+        ParticleCollection create(@Nonnull final String name, @Nonnull final Level world, @Nonnull final ParticleRenderType renderType);
     }
 
 }

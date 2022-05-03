@@ -18,15 +18,14 @@
 
 package org.orecruncher.lib.particles;
 
-import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.Particle;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.math.TimerEMA;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.lang.ref.WeakReference;
 import java.util.Optional;
 
@@ -35,18 +34,18 @@ final class ParticleCollectionHelper implements IParticleCollection {
 
     protected final String name;
     protected final ParticleCollection.ICollectionFactory factory;
-    protected final IParticleRenderType renderType;
+    protected final ParticleRenderType renderType;
 
     // Weak reference because the particle could be evicted from Minecraft's
     // particle manager for some reason.
     protected WeakReference<ParticleCollection> collection;
 
-    public ParticleCollectionHelper(@Nonnull final String name, @Nonnull final IParticleRenderType renderType) {
+    public ParticleCollectionHelper(@Nonnull final String name, @Nonnull final ParticleRenderType renderType) {
         this(name, ParticleCollection.FACTORY, renderType);
     }
 
     public ParticleCollectionHelper(@Nonnull final String name, @Nonnull final ParticleCollection.ICollectionFactory factory,
-                                    @Nonnull final IParticleRenderType renderType) {
+                                    @Nonnull final ParticleRenderType renderType) {
         this.name = name;
         this.renderType = renderType;
         this.factory = factory;
@@ -64,7 +63,7 @@ final class ParticleCollectionHelper implements IParticleCollection {
         if (pc == null || !pc.isAlive()) {
             pc = this.factory.create(this.name, GameUtils.getWorld(), this.renderType);
             this.collection = new WeakReference<>(pc);
-            GameUtils.getMC().particles.addEffect(pc);
+            GameUtils.getMC().particleEngine.add(pc);
         }
         return Optional.of(pc);
     }
@@ -84,7 +83,7 @@ final class ParticleCollectionHelper implements IParticleCollection {
     }
 
     void clear() {
-        resolve().ifPresent(Particle::setExpired);
+        resolve().ifPresent(Particle::remove);
         this.collection = null;
     }
 

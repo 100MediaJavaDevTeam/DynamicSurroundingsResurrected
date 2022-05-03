@@ -20,24 +20,27 @@ package org.orecruncher.environs.effects.particles;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.particle.IParticleRenderType;
-import net.minecraft.client.renderer.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.common.Mod;
 import org.orecruncher.environs.Environs;
 import org.orecruncher.environs.config.Config;
-import org.orecruncher.lib.particles.*;
+import org.orecruncher.lib.particles.CollectionManager;
+import org.orecruncher.lib.particles.DSParticleRenderType;
+import org.orecruncher.lib.particles.IParticleCollection;
+import org.orecruncher.lib.particles.IParticleMote;
 
 import javax.annotation.Nonnull;
 
 @Mod.EventBusSubscriber(modid = Environs.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class Collections {
 
-    private static final IParticleRenderType RIPPLE_RENDER =
-            new ParticleRenderType(new ResourceLocation(Environs.MOD_ID,"textures/particles/ripple.png")) {
+    private static final DSParticleRenderType RIPPLE_RENDER =
+            new DSParticleRenderType(new ResourceLocation(Environs.MOD_ID,"textures/particles/ripple.png")) {
 
                 @Override
                 protected ResourceLocation getTexture() {
@@ -45,17 +48,17 @@ public final class Collections {
                 }
 
                 @Override
-                public void beginRender(@Nonnull BufferBuilder buffer, @Nonnull TextureManager textureManager) {
-                    super.beginRender(buffer, textureManager);
+                public void begin(@Nonnull BufferBuilder buffer, @Nonnull TextureManager textureManager) {
+                    super.begin(buffer, textureManager);
                     RenderSystem.depthMask(true);
                     RenderSystem.enableBlend();
                     RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-                    RenderSystem.alphaFunc(516, 0.003921569F);
+//                    RenderSystem.alphaFunc(516, 0.003921569F);
                 }
             };
 
-    private static final IParticleRenderType SPRAY_RENDER = new ParticleRenderType(new ResourceLocation(Environs.MOD_ID,"textures/particles/rainsplash.png"));
-    private static final IParticleRenderType FIREFLY_RENDER = IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    private static final DSParticleRenderType SPRAY_RENDER = new DSParticleRenderType(new ResourceLocation(Environs.MOD_ID,"textures/particles/rainsplash.png"));
+    private static final ParticleRenderType FIREFLY_RENDER = ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
 
     private final static IParticleCollection theRipples = CollectionManager.create("Rain Ripples", RIPPLE_RENDER);
     private final static IParticleCollection theSprays = CollectionManager.create("Water Spray", SPRAY_RENDER);
@@ -65,7 +68,7 @@ public final class Collections {
 
     }
 
-    public static void addWaterRipple(@Nonnull final IBlockReader world, final double x, final double y,
+    public static void addWaterRipple(@Nonnull final BlockGetter world, final double x, final double y,
                                       final double z) {
         if (theRipples.canFit()) {
             final IParticleMote mote = new MoteWaterRipple(world, x, y, z);
@@ -73,7 +76,7 @@ public final class Collections {
         }
     }
 
-    public static boolean addWaterSpray(@Nonnull final IBlockReader world, final double x, final double y,
+    public static boolean addWaterSpray(@Nonnull final BlockGetter world, final double x, final double y,
                                               final double z, final double dX, final double dY, final double dZ) {
         if (theSprays.canFit()) {
             final IParticleMote mote = new MoteWaterSpray(world, x, y, z, dX, dY, dZ);
@@ -87,7 +90,7 @@ public final class Collections {
         return theSprays.canFit();
     }
 
-    public static void addRainSplash(@Nonnull final IBlockReader world, final double x, final double y,
+    public static void addRainSplash(@Nonnull final BlockGetter world, final double x, final double y,
                                               final double z) {
         if (theSprays.canFit()) {
             final IParticleMote mote = new MoteRainSplash(world, x, y, z);
@@ -95,7 +98,7 @@ public final class Collections {
         }
     }
 
-    public static void addFireFly(@Nonnull final IBlockReader world, final double x, final double y, final double z) {
+    public static void addFireFly(@Nonnull final BlockGetter world, final double x, final double y, final double z) {
         if (theFireFlies.canFit()) {
             final IParticleMote mote = new MoteFireFly(world, x, y, z);
             theFireFlies.add(mote);

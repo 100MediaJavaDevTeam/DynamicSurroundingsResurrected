@@ -18,7 +18,7 @@
 
 package org.orecruncher.lib.collections;
 
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.Mth;
 import org.apache.commons.lang3.ArrayUtils;
 import org.orecruncher.lib.math.MathStuff;
 
@@ -55,7 +55,7 @@ public class ObjectArray<T> implements Collection<T> {
     }
 
     private void resize() {
-        final int newSize = MathHelper.smallestEncompassingPowerOfTwo(MathStuff.max(this.data.length * 2, DEFAULT_SIZE));
+        final int newSize = Mth.smallestEncompassingPowerOfTwo(MathStuff.max(this.data.length * 2, DEFAULT_SIZE));
         final Object[] t = new Object[newSize];
         if (this.data.length > 0)
             System.arraycopy(this.data, 0, t, 0, this.data.length);

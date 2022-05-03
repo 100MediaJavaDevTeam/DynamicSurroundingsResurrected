@@ -20,8 +20,8 @@ package org.orecruncher.sndctrl.library;
 
 import com.google.gson.reflect.TypeToken;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -74,7 +74,7 @@ public final class SoundLibrary {
 
         // Initializes the internal sound registry once all the other mods have
         // registered their sounds.
-        ForgeRegistries.SOUND_EVENTS.forEach(se -> myRegistry.put(se.getName(), se));
+        ForgeRegistries.SOUND_EVENTS.forEach(se -> myRegistry.put(se.getLocation(), se));
 
         // Gather up resource pack sound files and process them to ensure meta data is collected
         // and we become aware of configured sounds.  Resource pack sounds generally replace existing

@@ -19,18 +19,17 @@
 package org.orecruncher.lib.biomes;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.FluidState;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.data.worldgen.biome.Biomes;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeRegistry;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary;
@@ -78,15 +77,15 @@ public class BiomeUtilities {
     }
 
     @Nonnull
-    public static Color getColorForLiquid(@Nonnull final IBlockReader world, @Nonnull final BlockPos pos) {
+    public static Color getColorForLiquid(@Nonnull final BlockGetter world, @Nonnull final BlockPos pos) {
         final FluidState fluidState = world.getFluidState(pos);
 
         if (fluidState.isEmpty())
             return NO_COLOR;
 
         // If the fluid is water, need to check the biome for coloration
-        final Fluid fluid = fluidState.getFluid();
-        if (fluid.isIn(FluidTags.WATER)) {
+        final Fluid fluid = fluidState.getType();
+        if (fluid.is(FluidTags.WATER)) {
             final Biome biome = BiomeUtilities.getClientBiome(pos);
             if (biome != null)
                 return new Color(biome.getWaterColor());
@@ -104,7 +103,7 @@ public class BiomeUtilities {
                     loc = forgeBiome.getRegistryName();
             }
             if (loc != null) {
-                RegistryKey<Biome> key = RegistryKey.getOrCreateKey(Registry.BIOME_KEY, loc);
+                ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, loc);
                 return BiomeDictionary.getTypes(key);
             }
         } catch (@Nonnull final Throwable t) {
@@ -116,24 +115,24 @@ public class BiomeUtilities {
 
     @Nullable
     public static Biome getClientBiome(@Nonnull final BlockPos pos) {
-        final ClientWorld world = GameUtils.getWorld();
+        final ClientLevel world = GameUtils.getWorld();
         if (world == null)
-            return BiomeRegistry.THE_VOID;
+            return Biomes.THE_VOID;
         final Biome biome = world.getBiome(pos);
         return getClientBiome(biome);
     }
 
     @Nullable
     public static Biome getClientBiome(@Nonnull final Biome biome) {
-        final ClientWorld world = GameUtils.getWorld();
+        final ClientLevel world = GameUtils.getWorld();
         if (world == null)
-            return BiomeRegistry.THE_VOID;
-        ResourceLocation loc = world.func_241828_r().getRegistry(Registry.BIOME_KEY).getKey(biome);
+            return Biomes.THE_VOID;
+        ResourceLocation loc = world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
         if (loc == null)
-            return BiomeRegistry.THE_VOID;
+            return Biomes.THE_VOID;
         final Biome result = ForgeRegistries.BIOMES.getValue(loc);
         if (result == null)
-            return BiomeRegistry.THE_VOID;
+            return Biomes.THE_VOID;
         return result;
     }
 }

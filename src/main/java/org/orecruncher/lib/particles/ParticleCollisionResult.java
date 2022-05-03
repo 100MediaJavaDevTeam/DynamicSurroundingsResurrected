@@ -18,11 +18,11 @@
 
 package org.orecruncher.lib.particles;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -32,17 +32,17 @@ import javax.annotation.Nullable;
 @OnlyIn(Dist.CLIENT)
 public final class ParticleCollisionResult {
 
-    public final IBlockReader world;
-    public final Vector3d position;
+    public final BlockGetter world;
+    public final Vec3 position;
     public final BlockState state;
     public final FluidState fluidState;
     public final boolean onGround;
 
-    public ParticleCollisionResult(@Nonnull final IBlockReader world, @Nonnull final Vector3d pos, @Nonnull final BlockState state, final boolean onGround, @Nullable final FluidState fluid) {
+    public ParticleCollisionResult(@Nonnull final BlockGetter world, @Nonnull final Vec3 pos, @Nonnull final BlockState state, final boolean onGround, @Nullable final FluidState fluid) {
         this.world = world;
         this.position = pos;
         this.state = state;
         this.onGround = onGround;
-        this.fluidState = fluid != null ? fluid : Fluids.EMPTY.getDefaultState();
+        this.fluidState = fluid != null ? fluid : Fluids.EMPTY.defaultFluidState();
     }
 }

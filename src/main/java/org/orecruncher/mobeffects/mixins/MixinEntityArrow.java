@@ -17,24 +17,24 @@
  */
 package org.orecruncher.mobeffects.mixins;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.projectile.AbstractArrowEntity;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.level.Level;
 import org.orecruncher.mobeffects.config.Config;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(AbstractArrowEntity.class)
+@Mixin(AbstractArrow.class)
 public abstract class MixinEntityArrow extends Entity {
 
-    public MixinEntityArrow(EntityType<? extends AbstractArrowEntity> type, World worldIn) {
+    public MixinEntityArrow(EntityType<? extends AbstractArrow> type, Level worldIn) {
         super(type, worldIn);
     }
 
-    @Redirect(method = "tick()V", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/AbstractArrowEntity;getIsCritical()Z"))
-    private boolean isCriticalCheck(AbstractArrowEntity self) {
-        return self.getIsCritical() && Config.CLIENT.effects.showArrowTrail.get();
+    @Redirect(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/projectile/AbstractArrowEntity;isCritArrow()Z"))
+    private boolean isCriticalCheck(AbstractArrow self) {
+        return self.isCritArrow() && Config.CLIENT.effects.showArrowTrail.get();
     }
 }

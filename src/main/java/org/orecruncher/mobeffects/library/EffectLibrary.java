@@ -23,13 +23,13 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.client.audio.LocatableSound;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityClassification;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.client.resources.sounds.AbstractSoundInstance;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.sound.PlaySoundEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -40,12 +40,12 @@ import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.lib.logging.IModLog;
 import org.orecruncher.lib.resource.IResourceAccessor;
 import org.orecruncher.lib.resource.ResourceUtils;
-import org.orecruncher.lib.service.ModuleServiceManager;
 import org.orecruncher.lib.service.IModuleService;
+import org.orecruncher.lib.service.ModuleServiceManager;
 import org.orecruncher.lib.validation.MapValidator;
 import org.orecruncher.lib.validation.Validators;
-import org.orecruncher.mobeffects.config.Config;
 import org.orecruncher.mobeffects.MobEffects;
+import org.orecruncher.mobeffects.config.Config;
 import org.orecruncher.mobeffects.library.config.EntityConfig;
 import org.orecruncher.sndctrl.api.acoustics.Library;
 import org.orecruncher.sndctrl.api.sound.SoundBuilder;
@@ -89,7 +89,7 @@ public final class EffectLibrary {
 
     @Nonnull
     private static EntityEffectInfo getEffectInfo(@Nonnull final Entity entity) {
-        if (entity instanceof PlayerEntity)
+        if (entity instanceof Player)
             return playerEffects;
         EntityEffectInfo eei = effects.get(entity.getClass());
         if (eei == null) {
@@ -104,15 +104,17 @@ public final class EffectLibrary {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     public static void soundPlay(@Nonnull PlaySoundEvent e) {
-        final ISound theSound = e.getSound();
+        final SoundInstance theSound = e.getSound();
         if (theSound != null) {
-            final ResourceLocation soundResource = theSound.getSoundLocation();
+            final ResourceLocation soundResource = theSound.getLocation();
             if (blockedSounds.contains(soundResource)) {
-                e.setResultSound(null);
+                e.setSound(null);
+//                e.setResult(null);
             } else {
                 final SoundEvent evt = soundReplace.get(soundResource);
                 if (evt != null) {
-                    e.setResultSound(SoundBuilder.builder(evt).from((LocatableSound) theSound).build());
+                    e.setSound(SoundBuilder.builder(evt).from((AbstractSoundInstance) theSound).build());
+//                    e.setResult(SoundBuilder.builder(evt).from((AbstractSoundInstance) theSound).build());
                 }
             }
         }
@@ -136,7 +138,7 @@ public final class EffectLibrary {
 
             // Seed our configuration with known entities that have defaults
             ForgeRegistries.ENTITIES.forEach(e -> {
-                if (e.getClassification() != EntityClassification.MISC)
+                if (e.getCategory() != MobCategory.MISC)
                     effectConfiguration.put(e.getRegistryName(), DEFAULT);
             });
 

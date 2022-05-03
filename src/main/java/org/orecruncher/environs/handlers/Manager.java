@@ -19,16 +19,16 @@
 package org.orecruncher.environs.handlers;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.profiler.IProfiler;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.orecruncher.environs.config.Config;
 import org.orecruncher.environs.Environs;
+import org.orecruncher.environs.config.Config;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.TickCounter;
 import org.orecruncher.lib.collections.ObjectArray;
@@ -64,7 +64,7 @@ public class Manager {
         // This has to be first!
         register(new CommonStateHandler());
         register(new AreaBlockEffects());
-        register(new BiomeSoundEffects());
+//todo: figure this out        register(new BiomeSoundEffects());
         register(new ParticleSystems());
         register(new AuroraHandler());
         register(new FogHandler());
@@ -98,12 +98,12 @@ public class Manager {
         }
     }
 
-    protected static PlayerEntity getPlayer() {
+    protected static Player getPlayer() {
         return GameUtils.getPlayer();
     }
 
     protected boolean checkReady(@Nonnull final TickEvent.ClientTickEvent event) {
-        if (event.phase == TickEvent.Phase.END || Minecraft.getInstance().isGamePaused())
+        if (event.phase == TickEvent.Phase.END || Minecraft.getInstance().isPaused())
             return false;
         return GameUtils.isInGame();
     }
@@ -112,21 +112,21 @@ public class Manager {
         if (!checkReady(event))
             return;
 
-        final IProfiler profiler = GameUtils.getMC().getProfiler();
-        profiler.startSection("Environs Client Tick");
+        final ProfilerFiller profiler = GameUtils.getMC().getProfiler();
+        profiler.push("Environs Client Tick");
 
         final long tick = TickCounter.getTickCount();
 
         for (final HandlerBase handler : this.effectHandlers) {
-            profiler.startSection(handler.getHandlerName());
+            profiler.push(handler.getHandlerName());
             final long mark = System.nanoTime();
             if (handler.doTick(tick))
                 handler.process(getPlayer());
             handler.updateTimer(System.nanoTime() - mark);
-            profiler.endSection();
+            profiler.pop();
         }
 
-        profiler.endSection();
+        profiler.pop();
     }
 
     @SubscribeEvent

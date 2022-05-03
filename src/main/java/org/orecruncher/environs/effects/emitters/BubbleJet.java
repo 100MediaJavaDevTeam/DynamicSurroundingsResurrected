@@ -18,8 +18,8 @@
 
 package org.orecruncher.environs.effects.emitters;
 
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -27,13 +27,13 @@ import org.orecruncher.lib.GameUtils;
 @OnlyIn(Dist.CLIENT)
 public class BubbleJet extends Jet {
 
-	public BubbleJet(final int strength, final IBlockReader world, final double x, final double y, final double z) {
+	public BubbleJet(final int strength, final BlockGetter world, final double x, final double y, final double z) {
 		super(strength, world, x, y, z);
 	}
 
 	@Override
 	protected void spawnJetParticle() {
-		GameUtils.getMC().particles.addParticle(ParticleTypes.BUBBLE, this.posX, this.posY, this.posZ, 0, 0.5D + this.jetStrength / 10D, 0D);
+		GameUtils.getMC().particleEngine.createParticle(ParticleTypes.BUBBLE, this.posX, this.posY, this.posZ, 0, 0.5D + this.jetStrength / 10D, 0D);
 	}
 
 }

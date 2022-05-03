@@ -18,14 +18,13 @@
 
 package org.orecruncher.environs.scanner;
 
-import java.util.*;
-
-import javax.annotation.Nonnull;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ITag;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
@@ -38,9 +37,10 @@ import org.orecruncher.lib.WorldUtils;
 import org.orecruncher.lib.collections.ObjectArray;
 import org.orecruncher.lib.math.MathStuff;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3i;
-import net.minecraft.world.World;
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Performs area scanning around the player to determine area ceiling coverage.
@@ -54,7 +54,7 @@ public final class CeilingCoverage {
 	private static final float INSIDE_THRESHOLD = 1.0F - 65.0F / 176.0F;
 	private static final Cell[] cells;
 	private static final float TOTAL_POINTS;
-	private static final ObjectArray<ITag<Block>> NON_CEILING = new ObjectArray<>();
+	private static final ObjectArray<Tag<Block>> NON_CEILING = new ObjectArray<>();
 
 	static {
 
@@ -62,7 +62,7 @@ public final class CeilingCoverage {
 		// Build our cell map
 		for (int x = -INSIDE_SURVEY_RANGE; x <= INSIDE_SURVEY_RANGE; x++)
 			for (int z = -INSIDE_SURVEY_RANGE; z <= INSIDE_SURVEY_RANGE; z++)
-				cellList.add(new Cell(new Vector3i(x, 0, z), INSIDE_SURVEY_RANGE));
+				cellList.add(new Cell(new Vec3i(x, 0, z), INSIDE_SURVEY_RANGE));
 
 		// Sort so the highest score cells are first
 		Collections.sort(cellList);
@@ -109,17 +109,17 @@ public final class CeilingCoverage {
 
 	private static final class Cell implements Comparable<Cell> {
 
-		private final Vector3i offset;
+		private final Vec3i offset;
 		private final float points;
-		private final BlockPos.Mutable working;
+		private final BlockPos.MutableBlockPos working;
 
-		public Cell(@Nonnull final Vector3i offset, final int range) {
+		public Cell(@Nonnull final Vec3i offset, final int range) {
 			this.offset = offset;
 			final float xV = range - MathStuff.abs(offset.getX()) + 1;
 			final float zV = range - MathStuff.abs(offset.getZ()) + 1;
 			final float candidate = Math.min(xV, zV);
 			this.points = candidate * candidate;
-			this.working = new BlockPos.Mutable();
+			this.working = new BlockPos.MutableBlockPos();
 		}
 
 		public float potentialPoints() {
@@ -127,17 +127,17 @@ public final class CeilingCoverage {
 		}
 
 		public float score(@Nonnull final BlockPos playerPos) {
-			this.working.setPos(
+			this.working.set(
 					playerPos.getX() + this.offset.getX(),
 					playerPos.getY() + this.offset.getY(),
 					playerPos.getZ() + this.offset.getZ()
 			);
 
-			final World world = GameUtils.getWorld();
+			final Level world = GameUtils.getWorld();
 			final int playerHeight = Math.max(playerPos.getY() + 1, 0);
 
 			// Get the precipitation height
-			this.working.setPos(WorldUtils.getPrecipitationHeight(world, this.working));
+			this.working.set(WorldUtils.getPrecipitationHeight(world, this.working));
 
 			// Scan down looking for blocks that are considered "cover"
 			while (this.working.getY() > playerHeight) {
@@ -171,12 +171,12 @@ public final class CeilingCoverage {
 
 		private boolean actsAsCeiling(@Nonnull final BlockState state) {
 			// If it doesn't block movement it doesn't count as a ceiling.
-			if (!state.getMaterial().blocksMovement())
+			if (!state.getMaterial().blocksMotion())
 				return false;
 
 			// Test the block tags in our NON_CEILING set to see if any match
 			final Block block = state.getBlock();
-			for (final ITag<Block> tag : NON_CEILING) {
+			for (final Tag<Block> tag : NON_CEILING) {
 				if (tag.contains(block))
 					return false;
 			}

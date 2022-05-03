@@ -18,16 +18,16 @@
 
 package org.orecruncher.sndctrl.mixins;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import org.orecruncher.lib.world.ClientBlockUpdateHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(ClientWorld.class)
+@Mixin(ClientLevel.class)
 public class MixinClientWorld {
 
     /**
@@ -40,9 +40,9 @@ public class MixinClientWorld {
      * @param flags    Update flags
      * @param ci       Ignored
      */
-    @Inject(method = "notifyBlockUpdate(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/block/BlockState;I)V", at = @At("RETURN"))
+    @Inject(method = "sendBlockUpdated", at = @At("RETURN"))
     public void blockUpdateCallback(BlockPos pos, BlockState oldState, BlockState newState, int flags, CallbackInfo ci) {
         if (oldState != newState)
-            ClientBlockUpdateHandler.blockUpdateCallback((ClientWorld) ((Object) this), pos, newState);
+            ClientBlockUpdateHandler.blockUpdateCallback((ClientLevel) ((Object) this), pos, newState);
     }
 }

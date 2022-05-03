@@ -18,15 +18,14 @@
 
 package org.orecruncher.mobeffects.footsteps;
 
-import java.util.Map;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.util.StringUtil;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.util.StringUtils;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public enum Substrate {
@@ -51,6 +50,6 @@ public enum Substrate {
 
 	@Nonnull
 	public static Substrate get(@Nullable final String name) {
-		return StringUtils.isNullOrEmpty(name) ? Substrate.NORMAL : lookup.get(name);
+		return StringUtil.isNullOrEmpty(name) ? Substrate.NORMAL : lookup.get(name);
 	}
 }

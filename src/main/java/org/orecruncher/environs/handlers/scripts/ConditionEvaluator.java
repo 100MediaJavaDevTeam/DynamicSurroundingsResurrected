@@ -18,7 +18,7 @@
 
 package org.orecruncher.environs.handlers.scripts;
 
-import net.minecraft.util.StringUtils;
+import net.minecraft.util.StringUtil;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.scripting.ExecutionContext;
@@ -54,7 +54,7 @@ public final class ConditionEvaluator {
     }
 
     public Object eval(@Nonnull final String conditions) {
-        if (StringUtils.isNullOrEmpty(conditions))
+        if (StringUtil.isNullOrEmpty(conditions))
             return true;
         final Optional<Object> result = this.context.eval(conditions);
         return result.orElse(false);

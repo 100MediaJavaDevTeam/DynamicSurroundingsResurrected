@@ -18,14 +18,14 @@
 
 package org.orecruncher.mobeffects.effects.particles;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector2f;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.World;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.WorldUtils;
@@ -45,10 +45,10 @@ public class FootprintMote extends AgeableMote {
     // Basic layout of the footprint
     private static final float WIDTH = 0.125F;
     private static final float LENGTH = WIDTH * 2.0F;
-    private static final Vector2f FIRST_POINT = new Vector2f(-WIDTH, LENGTH);
-    private static final Vector2f SECOND_POINT = new Vector2f(WIDTH, LENGTH);
-    private static final Vector2f THIRD_POINT = new Vector2f(WIDTH, -LENGTH);
-    private static final Vector2f FOURTH_POINT = new Vector2f(-WIDTH, -LENGTH);
+    private static final Vec2 FIRST_POINT = new Vec2(-WIDTH, LENGTH);
+    private static final Vec2 SECOND_POINT = new Vec2(WIDTH, LENGTH);
+    private static final Vec2 THIRD_POINT = new Vec2(WIDTH, -LENGTH);
+    private static final Vec2 FOURTH_POINT = new Vec2(-WIDTH, -LENGTH);
 
     // Micro Y adjuster to avoid z-fighting when rendering
     // multiple overlapping prints.
@@ -61,12 +61,12 @@ public class FootprintMote extends AgeableMote {
     protected final float texV1, texV2;
     protected final float scale;
 
-    protected final Vector2f firstPoint;
-    protected final Vector2f secondPoint;
-    protected final Vector2f thirdPoint;
-    protected final Vector2f fourthPoint;
+    protected final Vec2 firstPoint;
+    protected final Vec2 secondPoint;
+    protected final Vec2 thirdPoint;
+    protected final Vec2 fourthPoint;
 
-    public FootprintMote(@Nonnull final FootprintStyle style, @Nonnull final IBlockReader world, final double x,
+    public FootprintMote(@Nonnull final FootprintStyle style, @Nonnull final BlockGetter world, final double x,
                          final double y, final double z, final float rotation, final float scale, final boolean isRight) {
         super(world, x, y, z);
 
@@ -83,9 +83,9 @@ public class FootprintMote extends AgeableMote {
         // Make sure that the down position is calculated from the display position!
         final float fraction = (float) (y - (int) y);
         if (this.isSnowLayer || fraction <= 0.0625F) {
-            this.downPos = new BlockPos(this.posX, this.posY, this.posZ).down();
+            this.downPos = new BlockPos(this.posX, this.posY, this.posZ).below();
         } else {
-            this.downPos = this.position.toImmutable();
+            this.downPos = this.position.immutable();
         }
 
         float u1 = style.ordinal() * TEXEL_WIDTH + 1 / 256F;
@@ -109,8 +109,8 @@ public class FootprintMote extends AgeableMote {
     @Override
     protected boolean advanceAge() {
         // Footprints age faster when raining
-        if (world instanceof World && ((World) world).isRaining())
-            this.age += (WorldUtils.getRainStrength((World) world, 1F) * 100F) / 25;
+        if (world instanceof Level && ((Level) world).isRaining())
+            this.age += (WorldUtils.getRainStrength((Level) world, 1F) * 100F) / 25;
         return super.advanceAge();
     }
 
@@ -126,7 +126,7 @@ public class FootprintMote extends AgeableMote {
     }
 
     @Override
-    public void renderParticle(@Nonnull final IVertexBuilder buffer, @Nonnull final ActiveRenderInfo info, float partialTicks) {
+    public void renderParticle(@Nonnull final VertexConsumer buffer, @Nonnull final Camera info, float partialTicks) {
 
         float f = (this.age + partialTicks) / ((float) this.maxAge + 1);
         f *= f;

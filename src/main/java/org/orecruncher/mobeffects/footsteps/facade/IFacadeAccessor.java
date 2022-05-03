@@ -18,17 +18,17 @@
 
 package org.orecruncher.mobeffects.footsteps.facade;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
 interface IFacadeAccessor {
@@ -56,5 +56,5 @@ interface IFacadeAccessor {
 	 */
 	@Nullable
 	BlockState getBlockState(@Nonnull final LivingEntity entity, @Nonnull final BlockState state,
-							 @Nonnull final IBlockReader world, @Nonnull final Vector3d pos, @Nullable final Direction side);
+							 @Nonnull final BlockGetter world, @Nonnull final Vec3 pos, @Nullable final Direction side);
 }

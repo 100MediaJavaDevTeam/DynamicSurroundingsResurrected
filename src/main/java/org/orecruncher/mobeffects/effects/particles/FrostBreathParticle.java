@@ -18,11 +18,13 @@
 
 package org.orecruncher.mobeffects.effects.particles;
 
-import net.minecraft.client.particle.*;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -33,66 +35,66 @@ import javax.annotation.Nonnull;
 import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
-public class FrostBreathParticle extends SpriteTexturedParticle {
-    private final IAnimatedSprite field_217583_C;
+public class FrostBreathParticle extends TextureSheetParticle {
+    private final SpriteSet sprites;
 
     public FrostBreathParticle(@Nonnull final LivingEntity entity) {
-        super((ClientWorld) entity.getEntityWorld(), 0, 0, 0, 0.0D, 0.0D, 0.0D);
+        super((ClientLevel) entity.getCommandSenderWorld(), 0, 0, 0, 0.0D, 0.0D, 0.0D);
 
         final Random rand = XorShiftRandom.current();
 
         // Reuse the cloud sheet
-        this.field_217583_C = GameUtils.getMC().particles.sprites.get(ParticleTypes.CLOUD.getRegistryName());
+        this.sprites = GameUtils.getMC().particleEngine.spriteSets.get(ParticleTypes.CLOUD.getRegistryName());
 
-        final Vector3d origin = ParticleUtils.getBreathOrigin(entity);
-        final Vector3d trajectory = ParticleUtils.getLookTrajectory(entity);
+        final Vec3 origin = ParticleUtils.getBreathOrigin(entity);
+        final Vec3 trajectory = ParticleUtils.getLookTrajectory(entity);
 
-        this.setPosition(origin.x, origin.y, origin.z);
-        this.prevPosX = origin.x;
-        this.prevPosY = origin.y;
-        this.prevPosZ = origin.z;
+        this.setPos(origin.x, origin.y, origin.z);
+        this.xo = origin.x;
+        this.yo = origin.y;
+        this.zo = origin.z;
 
-        this.motionX = trajectory.x * 0.01D;
-        this.motionY = trajectory.y * 0.01D;
-        this.motionZ = trajectory.z * 0.01D;
+        this.xd = trajectory.x * 0.01D;
+        this.yd = trajectory.y * 0.01D;
+        this.zd = trajectory.z * 0.01D;
 
-        this.setAlphaF(0.2F);
+        this.setAlpha(0.2F);
         float f1 = 1.0F - (float) (rand.nextDouble() * (double) 0.3F);
-        this.particleRed = f1;
-        this.particleGreen = f1;
-        this.particleBlue = f1;
-        this.particleScale *= 1.875F * (entity.isChild() ? 0.125F : 0.25F);
+        this.rCol = f1;
+        this.gCol = f1;
+        this.bCol = f1;
+        this.quadSize *= 1.875F * (entity.isBaby() ? 0.125F : 0.25F);
         int i = (int) (8.0D / (rand.nextDouble() * 0.8D + 0.3D));
-        this.maxAge = (int) MathStuff.max((float) i * 2.5F, 1.0F);
-        this.canCollide = false;
-        this.selectSpriteWithAge(this.field_217583_C);
+        this.lifetime = (int) MathStuff.max((float) i * 2.5F, 1.0F);
+        this.hasPhysics = false;
+        this.setSpriteFromAge(this.sprites);
     }
 
     @Nonnull
-    public IParticleRenderType getRenderType() {
-        return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    public float getScale(float p_217561_1_) {
-        return this.particleScale * MathStuff.clamp1(((float) this.age + p_217561_1_) / (float) this.maxAge * 32.0F);
+    public float getQuadSize(float p_217561_1_) {
+        return this.quadSize * MathStuff.clamp1(((float) this.age + p_217561_1_) / (float) this.lifetime * 32.0F);
     }
 
     public void tick() {
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
-        if (this.age++ >= this.maxAge) {
-            this.setExpired();
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
+        if (this.age++ >= this.lifetime) {
+            this.remove();
         } else {
-            this.selectSpriteWithAge(this.field_217583_C);
-            this.move(this.motionX, this.motionY, this.motionZ);
-            this.motionX *= 0.96F;
-            this.motionY *= 0.96F;
-            this.motionZ *= 0.96F;
+            this.setSpriteFromAge(this.sprites);
+            this.move(this.xd, this.yd, this.zd);
+            this.xd *= 0.96F;
+            this.yd *= 0.96F;
+            this.zd *= 0.96F;
 
             if (this.onGround) {
-                this.motionX *= 0.7F;
-                this.motionZ *= 0.7F;
+                this.xd *= 0.7F;
+                this.zd *= 0.7F;
             }
 
         }

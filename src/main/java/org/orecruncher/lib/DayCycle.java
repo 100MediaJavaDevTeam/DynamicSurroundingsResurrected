@@ -18,7 +18,7 @@
 
 package org.orecruncher.lib;
 
-import net.minecraft.world.IWorld;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.sndctrl.SoundControl;
@@ -47,27 +47,27 @@ public enum DayCycle {
         this.localizeString = SoundControl.MOD_ID + ".format." + localName;
     }
 
-    public static boolean isDaytime(@Nonnull final IWorld world) {
+    public static boolean isDaytime(@Nonnull final LevelAccessor world) {
         return getCycle(world) == DayCycle.DAYTIME;
     }
 
-    public static boolean isNighttime(@Nonnull final IWorld world) {
+    public static boolean isNighttime(@Nonnull final LevelAccessor world) {
         return getCycle(world) == DayCycle.NIGHTTIME;
     }
 
-    public static boolean isSunrise(@Nonnull final IWorld world) {
+    public static boolean isSunrise(@Nonnull final LevelAccessor world) {
         return getCycle(world) == DayCycle.SUNRISE;
     }
 
-    public static boolean isSunset(@Nonnull final IWorld world) {
+    public static boolean isSunset(@Nonnull final LevelAccessor world) {
         return getCycle(world) == DayCycle.SUNSET;
     }
 
-    public static DayCycle getCycle(@Nonnull final IWorld world) {
-        if (world.getDimensionType().getHasCeiling() || !world.getDimensionType().hasSkyLight())
+    public static DayCycle getCycle(@Nonnull final LevelAccessor world) {
+        if (world.dimensionType().hasCeiling() || !world.dimensionType().hasSkyLight())
             return DayCycle.NO_SKY;
 
-        final float angle = world.func_242415_f(0);
+        final float angle = world.getTimeOfDay(0);
 
         if (angle > DAYTIME_THRESHOLD)
             return DayCycle.DAYTIME;
@@ -80,15 +80,15 @@ public enum DayCycle {
         return DayCycle.DAYTIME;
     }
 
-    public static float getMoonPhaseFactor(@Nonnull final IWorld world) {
-        return world.getMoonFactor();
+    public static float getMoonPhaseFactor(@Nonnull final LevelAccessor world) {
+        return world.getMoonBrightness();
     }
 
-    public static boolean isAuroraVisible(@Nonnull final IWorld world) {
+    public static boolean isAuroraVisible(@Nonnull final LevelAccessor world) {
         return getCycle(world).isAuroraVisible();
     }
 
-    public static boolean isAuroraInvisible(@Nonnull final IWorld world) {
+    public static boolean isAuroraInvisible(@Nonnull final LevelAccessor world) {
         return !getCycle(world).isAuroraVisible();
     }
 

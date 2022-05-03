@@ -19,20 +19,24 @@
 package org.orecruncher.sndctrl.audio;
 
 import com.google.common.base.MoreObjects;
+import com.mojang.blaze3d.audio.Library;
+import com.mojang.blaze3d.audio.Listener;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.client.audio.*;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.ChannelAccess;
+import net.minecraft.client.sounds.SoundEngine;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.openal.*;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.compat.ModEnvironment;
 import org.orecruncher.lib.logging.IModLog;
-import org.orecruncher.sndctrl.config.Config;
 import org.orecruncher.sndctrl.SoundControl;
 import org.orecruncher.sndctrl.api.sound.ISoundInstance;
 import org.orecruncher.sndctrl.audio.handlers.SoundFXProcessor;
+import org.orecruncher.sndctrl.config.Config;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -58,21 +62,21 @@ public final class SoundUtils {
 
     private static int MAX_SOUNDS = 0;
     private static int SOUND_LIMIT = 255; // 0;
-    private static final Map<String, SoundCategory> categoryMapper;
+    private static final Map<String, SoundSource> categoryMapper;
 
     // Since the pieces of the Minecraft sound system are effectively singletons, cache these values for reuse.
-    private static final Map<ISound, ChannelManager.Entry> playing;
-    private static final Map<ISound, Integer> delayed;
+    private static final Map<SoundInstance, ChannelAccess.ChannelHandle> playing;
+    private static final Map<SoundInstance, Integer> delayed;
     private static final Listener listener;
 
     static {
         categoryMapper = new Object2ObjectOpenHashMap<>();
-        for (final SoundCategory sc : SoundCategory.values())
+        for (final SoundSource sc : SoundSource.values())
             categoryMapper.put(sc.getName(), sc);
 
-        final SoundEngine engine = GameUtils.getSoundHander().sndManager;
-        playing = engine.playingSoundsChannel;
-        delayed = engine.delayedSounds;
+        final SoundEngine engine = GameUtils.getSoundHander().soundEngine;
+        playing = engine.instanceToChannel;
+        delayed = engine.queuedSounds;
         listener = engine.listener;
     }
 
@@ -92,17 +96,17 @@ public final class SoundUtils {
     }
 
     @Nonnull
-    static Map<ISound, ChannelManager.Entry> getPlayingSounds() {
+    static Map<SoundInstance, ChannelAccess.ChannelHandle> getPlayingSounds() {
         return playing;
     }
 
     @Nonnull
-    static Map<ISound, Integer> getDelayedSounds() {
+    static Map<SoundInstance, Integer> getDelayedSounds() {
         return delayed;
     }
 
     @Nullable
-    public static SoundCategory getSoundCategory(@Nonnull final String name) {
+    public static SoundSource getSoundCategory(@Nonnull final String name) {
         return categoryMapper.get(Objects.requireNonNull(name));
     }
 
@@ -117,9 +121,9 @@ public final class SoundUtils {
      * @param sound Sound instance to check for a volume block
      * @return true of the sound would be volume blocked; false otherwise
      */
-    public static boolean isSoundVolumeBlocked(@Nonnull final ISound sound) {
+    public static boolean isSoundVolumeBlocked(@Nonnull final SoundInstance sound) {
         Objects.requireNonNull(sound);
-        return getMasterGain() <= 0F || (!sound.canBeSilent() && sound.getVolume() <= 0F);
+        return getMasterGain() <= 0F || (!sound.canStartSilent() && sound.getVolume() <= 0F);
     }
 
     /**
@@ -130,15 +134,15 @@ public final class SoundUtils {
      * @param pad      Additional distance to add when evaluating
      * @return true if the sound is within the attenuation distance; false otherwise
      */
-    public static boolean inRange(@Nonnull final Vector3d listener, @Nonnull final ISound sound, final int pad) {
-        if (sound.isGlobal() || sound.getAttenuationType() == ISound.AttenuationType.NONE)
+    public static boolean inRange(@Nonnull final Vec3 listener, @Nonnull final SoundInstance sound, final int pad) {
+        if (sound.isRelative() || sound.getAttenuation() == SoundInstance.Attenuation.NONE)
             return true;
         int distSq = sound.getSound().getAttenuationDistance() + pad;
         distSq *= distSq;
-        return listener.squareDistanceTo(sound.getX(), sound.getY(), sound.getZ()) < distSq;
+        return listener.distanceToSqr(sound.getX(), sound.getY(), sound.getZ()) < distSq;
     }
 
-    public static boolean inRange(@Nonnull final Vector3d listener, @Nonnull final ISound sound) {
+    public static boolean inRange(@Nonnull final Vec3 listener, @Nonnull final SoundInstance sound) {
         return inRange(listener, sound, 0);
     }
 
@@ -149,7 +153,7 @@ public final class SoundUtils {
      * @return Debug string
      */
     @Nonnull
-    public static String debugString(@Nullable final ISound sound) {
+    public static String debugString(@Nullable final SoundInstance sound) {
 
         if (sound == null)
             return "null";
@@ -159,17 +163,17 @@ public final class SoundUtils {
 
         //@formatter:off
         return MoreObjects.toStringHelper(sound)
-                .addValue(sound.getSoundLocation().toString())
-                .addValue(sound.getCategory().toString())
-                .addValue(sound.getAttenuationType().toString())
+                .addValue(sound.getLocation().toString())
+                .addValue(sound.getSource().toString())
+                .addValue(sound.getAttenuation().toString())
                 .add("v", sound.getVolume())
                 .add("p", sound.getPitch())
                 .add("x", sound.getX())
                 .add("y", sound.getY())
                 .add("z", sound.getZ())
                 .add("distance", sound.getSound().getAttenuationDistance())
-                .add("streaming", sound.getSound().isStreaming())
-                .add("global", sound.isGlobal())
+                .add("streaming", sound.getSound().shouldStream())
+                .add("global", sound.isRelative())
                 .toString();
         //@formatter:on
     }
@@ -180,11 +184,11 @@ public final class SoundUtils {
      *
      * @param soundSystem The sound system instance being initialized
      */
-    public static void initialize(@Nonnull final SoundSystem soundSystem) {
+    public static void initialize(@Nonnull final Library soundSystem) {
 
         try {
 
-            final long device = soundSystem.device;
+            final long device = soundSystem.currentDevice;
 
             boolean hasFX = false;
             if (doEnhancedSounds()) {
@@ -267,7 +271,7 @@ public final class SoundUtils {
         return true;
     }
 
-    public static void deinitialize(@Nonnull final SoundSystem soundSystem) {
+    public static void deinitialize(@Nonnull final Library soundSystem) {
         SoundFXProcessor.deinitialize();
     }
 

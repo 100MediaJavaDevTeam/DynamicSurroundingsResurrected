@@ -18,7 +18,7 @@
 
 package org.orecruncher.environs.library;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.misc.IMixinBlockData;

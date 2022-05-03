@@ -18,9 +18,9 @@
 
 package org.orecruncher.mobeffects.effects;
 
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.mobeffects.MobEffects;
@@ -45,15 +45,15 @@ public class EntityBowEffect extends AbstractEntityEffect {
     @Override
     public void update() {
         final LivingEntity entity = getEntity();
-        final ItemStack currentStack = entity.getActiveItemStack();
+        final ItemStack currentStack = entity.getUseItem();
         if (!currentStack.isEmpty()) {
-            if (!ItemStack.areItemStacksEqual(currentStack, this.lastActiveStack)) {
+            if (!ItemStack.matches(currentStack, this.lastActiveStack)) {
                 final ItemData data = ItemLibrary.getItemData(currentStack);
                 if (data == ItemLibrary.BOW || data == ItemLibrary.CROSSBOW || data == ItemLibrary.SHIELD) {
                     if (isActivePlayer(entity))
                         data.playUseSound();
                     else
-                        data.playUseSound(entity.getPosition());
+                        data.playUseSound(entity.blockPosition());
                 }
 
                 this.lastActiveStack = currentStack;

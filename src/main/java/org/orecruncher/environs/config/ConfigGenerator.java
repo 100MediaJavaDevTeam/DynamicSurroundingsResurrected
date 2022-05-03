@@ -18,10 +18,10 @@
 
 package org.orecruncher.environs.config;
 
-import me.shedaniel.clothconfig2.forge.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.forge.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.forge.impl.builders.*;
-import net.minecraft.util.text.TextFormatting;
+import me.shedaniel.clothconfig2.api.ConfigBuilder;
+import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.effects.particles.RippleStyle;
@@ -35,9 +35,9 @@ public class ConfigGenerator {
     @Nonnull
     public static SubCategoryBuilder generate(@Nonnull final ConfigBuilder builder, @Nonnull final ConfigEntryBuilder entryBuilder) {
 
-        SubCategoryBuilder modCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.modname", TextFormatting.GOLD, false);
+        SubCategoryBuilder modCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.modname", ChatFormatting.GOLD, false);
 
-        SubCategoryBuilder subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.logging", TextFormatting.YELLOW, false);
+        SubCategoryBuilder subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.logging", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,
@@ -50,7 +50,7 @@ public class ConfigGenerator {
 
         modCategory.add(subCategory.build());
 
-        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.biomes", TextFormatting.YELLOW, false);
+        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.biomes", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createInteger(
                         builder,
@@ -64,7 +64,7 @@ public class ConfigGenerator {
 
         modCategory.add(subCategory.build());
 
-        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.effects", TextFormatting.YELLOW, false);
+        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.effects", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,
@@ -124,7 +124,7 @@ public class ConfigGenerator {
 
         modCategory.add(subCategory.build());
 
-        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.aurora", TextFormatting.YELLOW, false);
+        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.aurora", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,
@@ -137,7 +137,7 @@ public class ConfigGenerator {
 
         modCategory.add(subCategory.build());
 
-        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.fog", TextFormatting.YELLOW, false);
+        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.fog", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,
@@ -175,7 +175,7 @@ public class ConfigGenerator {
 
         modCategory.add(subCategory.build());
 
-        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.sound", TextFormatting.YELLOW, false);
+        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "environs.cfg.sound", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createIntegerSlider(
                         builder,

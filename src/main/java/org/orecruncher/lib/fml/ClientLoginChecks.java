@@ -18,9 +18,9 @@
 
 package org.orecruncher.lib.fml;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.util.Util;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.Util;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -48,14 +48,14 @@ public class ClientLoginChecks {
 
     @SubscribeEvent
     public static void onLogin(@Nonnull final ClientPlayerNetworkEvent.LoggedInEvent event) {
-        final ClientPlayerEntity player = event.getPlayer();
+        final LocalPlayer player = event.getPlayer();
         if (player != null) {
             Lib.LOGGER.info("Player login: %s", event.getPlayer().getName().getString());
 
             for (final ICallbackHandler callback : handlers) {
-                final ITextComponent msg = callback.onClientLogin(event.getPlayer());
+                final Component msg = callback.onClientLogin(event.getPlayer());
                 if (msg != null)
-                    event.getPlayer().sendMessage(msg, Util.DUMMY_UUID);
+                    event.getPlayer().sendMessage(msg, Util.NIL_UUID);
             }
         }
     }
@@ -70,6 +70,6 @@ public class ClientLoginChecks {
          * @return Text message to display to the player, if any
          */
         @Nullable
-        ITextComponent onClientLogin(@Nonnull final ClientPlayerEntity player);
+        Component onClientLogin(@Nonnull final LocalPlayer player);
     }
 }

@@ -22,8 +22,11 @@ import com.google.gson.reflect.TypeToken;
 import it.unimi.dsi.fastutil.objects.Object2ReferenceAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
-import net.minecraft.item.*;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -31,11 +34,8 @@ import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.lib.logging.IModLog;
 import org.orecruncher.lib.resource.IResourceAccessor;
 import org.orecruncher.lib.resource.ResourceUtils;
-import org.orecruncher.lib.service.ModuleServiceManager;
 import org.orecruncher.lib.service.IModuleService;
-import org.orecruncher.lib.validation.ListValidator;
-import org.orecruncher.lib.validation.MapValidator;
-import org.orecruncher.lib.validation.Validators;
+import org.orecruncher.lib.service.ModuleServiceManager;
 import org.orecruncher.mobeffects.MobEffects;
 import org.orecruncher.sndctrl.library.Primitives;
 
@@ -57,7 +57,7 @@ public final class ItemLibrary {
     public static final ItemData CRYSTAL = new ItemData.ArmorItemData("CRYSTAL", Constants.CRYSTAL_ARMOR_EQUIP, Constants.CRYSTAL_ARMOR, Constants.CRYSTAL_FOOT_ARMOR, 2);
     public static final ItemData PLATE = new ItemData.ArmorItemData("PLATE", Constants.PLATE_ARMOR_EQUIP, Constants.HEAVY_ARMOR, Constants.HEAVY_FOOT_ARMOR, 3);
     public static final ItemData SHIELD = new ItemData("SHIELD", Constants.TOOL_SWING, Constants.SHIELD_USE, Constants.SHIELD_EQUIP);
-    public static final ItemData SWORD = new ItemData("SWORD", Constants.SWORD_SWING, Constants.NONE, Constants.SWORD_EQUIP);
+    public static final ItemData SWORD = new ItemData("SWORD", Constants.SWORD_SWING, Constants.SWORD_SWING, Constants.SWORD_EQUIP);
     public static final ItemData AXE = new ItemData("AXE", Constants.AXE_SWING, Constants.NONE, Constants.AXE_EQUIP);
     public static final ItemData BOW = new ItemData("BOW", Constants.TOOL_SWING, Constants.BOW_PULL, Constants.BOW_EQUIP);
     public static final ItemData CROSSBOW = new ItemData("CROSSBOW", Constants.TOOL_SWING, Constants.BOW_PULL, Constants.BOW_EQUIP);
@@ -118,9 +118,9 @@ public final class ItemLibrary {
         }
 
         // See if it is an armor item.  We can use the equip sound from the material entry.
-        if (item.getItem() instanceof ArmorItem) {
-            final ArmorItem ai = (ArmorItem) item.getItem();
-            final IArmorMaterial material = ai.getArmorMaterial();
+        if (item instanceof ArmorItem) {
+            final ArmorItem ai = (ArmorItem) item;
+            final ArmorMaterial material = ai.getMaterial();
             // Make sure the primitives get created before assigning to an item
             Primitives.getArmorToolbarAcoustic(material);
             Primitives.getArmorAccentAcoustic(material);
@@ -162,7 +162,7 @@ public final class ItemLibrary {
             Matcher match = ITEM_PATTERN.matcher(c);
             if (match.matches()) {
                 final String itemName = match.group(1);
-                if (ResourceLocation.isResouceNameValid(itemName)) {
+                if (ResourceLocation.isValidResourceLocation(itemName)) {
                     final Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemName));
                     if (item != null) {
                         items.put(item, ic);

@@ -18,14 +18,20 @@
 
 package org.orecruncher.lib.shaders;
 
-import net.minecraft.client.shader.ShaderLinkHelper;
-import net.minecraft.client.shader.ShaderLoader;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.resources.IResourceManager;
-import net.minecraft.resources.IResourceManagerReloadListener;
+import com.google.common.collect.Sets;
+import com.mojang.blaze3d.preprocessor.GlslPreprocessor;
+import com.mojang.blaze3d.shaders.Program;
+import com.mojang.blaze3d.shaders.ProgramManager;
+import net.minecraft.FileUtil;
+import net.minecraft.client.renderer.ShaderInstance;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.util.ResourceLocation;
+import org.apache.commons.io.IOUtils;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.Lib;
 
@@ -34,9 +40,11 @@ import javax.annotation.Nullable;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.EnumMap;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -80,8 +88,8 @@ public final class ShaderManager<T extends Enum<T> & IShaderResourceProvider> {
 		if (program == null)
 			return;
 
-		final int programId = program.getProgram();
-		ShaderLinkHelper.func_227804_a_(programId);
+		final int programId = program.getId();
+		ProgramManager.glUseProgram(programId);
 
 		if (callback != null) {
 			callback.accept(new ShaderCallContext(program));
@@ -95,7 +103,7 @@ public final class ShaderManager<T extends Enum<T> & IShaderResourceProvider> {
 
 	public void releaseShader() {
 		if (supported())
-			ShaderLinkHelper.func_227804_a_(0);
+			ProgramManager.glUseProgram(0);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -103,17 +111,17 @@ public final class ShaderManager<T extends Enum<T> & IShaderResourceProvider> {
 		if (!supported())
 			return;
 
-		if (GameUtils.getMC().getResourceManager() instanceof IReloadableResourceManager) {
-			((IReloadableResourceManager) GameUtils.getMC().getResourceManager()).addReloadListener(
-					(IResourceManagerReloadListener) manager -> {
-						this.programs.values().forEach(ShaderLinkHelper::deleteShader);
+		if (GameUtils.getMC().getResourceManager() instanceof ReloadableResourceManager) {
+			((ReloadableResourceManager) GameUtils.getMC().getResourceManager()).registerReloadListener(
+					(ResourceManagerReloadListener) manager -> {
+						this.programs.values().forEach(ProgramManager::releaseProgram);
 						this.programs.clear();
 						loadShaders(manager);
 					});
 		}
 	}
 
-	private void loadShaders(@Nonnull final IResourceManager manager) {
+	private void loadShaders(@Nonnull final ResourceManager manager) {
 		for (final T shader : this.clazz.getEnumConstants()) {
 			final ShaderProgram program = createProgram(manager, shader);
 			if (program != null)
@@ -122,13 +130,13 @@ public final class ShaderManager<T extends Enum<T> & IShaderResourceProvider> {
 	}
 
 	@Nullable
-	private ShaderProgram createProgram(@Nonnull final IResourceManager manager, @Nonnull final T shader) {
+	private ShaderProgram createProgram(@Nonnull final ResourceManager manager, @Nonnull final T shader) {
 		try {
-			final ShaderLoader vert = createShader(manager, shader.getVertex(), ShaderLoader.ShaderType.VERTEX);
-			final ShaderLoader frag = createShader(manager, shader.getFragment(), ShaderLoader.ShaderType.FRAGMENT);
-			final int programId = ShaderLinkHelper.createProgram();
+			final Program vert = createShader(manager, shader.getVertex(), Program.Type.VERTEX);
+			final Program frag = createShader(manager, shader.getFragment(), Program.Type.FRAGMENT);
+			final int programId = ProgramManager.createProgram();
 			final ShaderProgram program = new ShaderProgram(shader.getShaderName(), programId, vert, frag);
-			ShaderLinkHelper.linkProgram(program);
+			ProgramManager.linkShader(program);
 			program.setUniforms(shader.getUniforms());
 			return program;
 		} catch (IOException ex) {
@@ -137,9 +145,51 @@ public final class ShaderManager<T extends Enum<T> & IShaderResourceProvider> {
 		return null;
 	}
 
-	private static ShaderLoader createShader(@Nonnull final IResourceManager manager, @Nonnull final ResourceLocation loc, @Nonnull final ShaderLoader.ShaderType shaderType) throws IOException {
+	private static Program createShader(@Nonnull final ResourceManager manager, @Nonnull final ResourceLocation loc, @Nonnull final Program.Type shaderType) throws IOException {
 		try (InputStream is = new BufferedInputStream(manager.getResource(loc).getInputStream())) {
-			return ShaderLoader.func_216534_a(shaderType, loc.toString(), is, shaderType.name().toLowerCase(Locale.ROOT));
+			return Program.compileShader(shaderType, loc.toString(), is, shaderType.name().toLowerCase(Locale.ROOT),new GlslPreprocessor() {
+				private final Set<String> importedPaths = Sets.newHashSet();
+
+				public String applyImport(boolean p_173374_, String p_173375_) {
+
+					String s = "environs:shaders/" + loc.getPath() + shaderType.getExtension();
+					final String s1 = FileUtil.getFullResourcePath(s);
+					p_173375_ = FileUtil.normalizeResourcePath((p_173374_ ? s1 : "environs:shaders/") + p_173375_);
+					if (!this.importedPaths.add(p_173375_)) {
+						return null;
+					} else {
+						ResourceLocation resourcelocation1 = new ResourceLocation(p_173375_);
+
+						try {
+							Resource resource1 = manager.getResource(resourcelocation1);
+
+							String s2;
+							try {
+								s2 = IOUtils.toString(resource1.getInputStream(), StandardCharsets.UTF_8);
+							} catch (Throwable throwable1) {
+								if (resource1 != null) {
+									try {
+										resource1.close();
+									} catch (Throwable throwable) {
+										throwable1.addSuppressed(throwable);
+									}
+								}
+
+								throw throwable1;
+							}
+
+							if (resource1 != null) {
+								resource1.close();
+							}
+
+							return s2;
+						} catch (IOException ioexception) {
+//							ShaderInstance.LOGGER.error("Could not open GLSL import {}: {}", p_173375_, ioexception.getMessage());
+							return "#error " + ioexception.getMessage();
+						}
+					}
+				}
+			});
 		}
 	}
 }

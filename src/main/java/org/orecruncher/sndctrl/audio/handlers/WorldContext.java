@@ -19,13 +19,13 @@
 package org.orecruncher.sndctrl.audio.handlers;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -42,19 +42,19 @@ public final class WorldContext {
     /**
      * Reference to the client side PlayerEntity
      */
-    public final PlayerEntity player;
+    public final Player player;
     /**
      * Reference to the player's world
      */
-    public final IWorldReader world;
+    public final LevelReader world;
     /**
      * Position of the player.
      */
-    public final Vector3d playerPosition;
+    public final Vec3 playerPosition;
     /**
      * Position of the player's eyes.
      */
-    public final Vector3d playerEyePosition;
+    public final Vec3 playerEyePosition;
     /**
      * Block position of the player.
      */
@@ -78,7 +78,7 @@ public final class WorldContext {
 
     public WorldContext() {
         if (GameUtils.isInGame()) {
-            final World w = GameUtils.getWorld();
+            final Level w = GameUtils.getWorld();
             this.world = w;
             assert world != null;
 
@@ -86,12 +86,12 @@ public final class WorldContext {
             assert this.player != null;
 
             this.isPrecipitating = w.isRaining();
-            this.playerPosition = this.player.getPositionVec();
+            this.playerPosition = this.player.position();
             this.playerEyePosition = this.player.getEyePosition(1F);
             this.playerPos = new BlockPos(this.playerPosition);
             this.playerEyePos = new BlockPos(this.playerEyePosition);
 
-            final Fluid fs = this.player.world.getFluidState(this.playerEyePos).getFluid();
+            final Fluid fs = this.player.level.getFluidState(this.playerEyePos).getType();
             final ResourceLocation name = fs.getRegistryName();
             if (name != null)
                 this.auralDampening = AudioEffectLibrary.getFluidCoeffcient(name);
@@ -106,8 +106,8 @@ public final class WorldContext {
             this.player = null;
             this.world = null;
             this.isPrecipitating = false;
-            this.playerPosition = Vector3d.ZERO;
-            this.playerEyePosition = Vector3d.ZERO;
+            this.playerPosition = Vec3.ZERO;
+            this.playerEyePosition = Vec3.ZERO;
             this.playerPos = BlockPos.ZERO;
             this.playerEyePos = BlockPos.ZERO;
             this.auralDampening = 0;

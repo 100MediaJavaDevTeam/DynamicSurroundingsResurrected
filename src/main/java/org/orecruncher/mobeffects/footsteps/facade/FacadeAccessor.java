@@ -18,22 +18,20 @@
 
 package org.orecruncher.mobeffects.footsteps.facade;
 
-import java.lang.reflect.Method;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import org.orecruncher.mobeffects.MobEffects;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
-import net.minecraft.block.Block;
-import net.minecraft.util.math.BlockPos;
-import org.orecruncher.mobeffects.MobEffects;
+import java.lang.reflect.Method;
 
 @OnlyIn(Dist.CLIENT)
 class FacadeAccessor implements IFacadeAccessor {
@@ -70,7 +68,7 @@ class FacadeAccessor implements IFacadeAccessor {
 	@Override
 	@Nullable
 	public BlockState getBlockState(@Nonnull final LivingEntity entity, @Nonnull final BlockState state,
-									@Nonnull final IBlockReader world, @Nonnull final Vector3d pos, @Nullable final Direction side) {
+									@Nonnull final BlockGetter world, @Nonnull final Vec3 pos, @Nullable final Direction side) {
 		if (isValid())
 			try {
 				if (instanceOf(state.getBlock()))
@@ -85,10 +83,10 @@ class FacadeAccessor implements IFacadeAccessor {
 	}
 
 	protected Method getMethod(@Nonnull final String method) throws Throwable {
-		return this.IFacadeClass.getMethod(method, IBlockReader.class, BlockPos.class, Direction.class);
+		return this.IFacadeClass.getMethod(method, BlockGetter.class, BlockPos.class, Direction.class);
 	}
 
-	protected BlockState call(@Nonnull final BlockState state,@Nonnull final IBlockReader world,
+	protected BlockState call(@Nonnull final BlockState state,@Nonnull final BlockGetter world,
 			@Nonnull final BlockPos pos, @Nullable final Direction side) throws Throwable {
 		return (BlockState) this.accessor.invoke(state.getBlock(), world, pos, side);
 	}

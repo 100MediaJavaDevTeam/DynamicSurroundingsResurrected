@@ -18,12 +18,12 @@
 
 package org.orecruncher.environs.effects;
 
-import net.minecraft.block.AbstractFurnaceBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.core.BlockPos;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.AbstractFurnaceBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.effects.emitters.Jet;
@@ -42,13 +42,13 @@ public abstract class JetEffect extends BlockEffect {
 
     public static final Predicate<BlockState> FLUID_PREDICATE = (state) -> !state.getFluidState().isEmpty();
 
-    public static final Predicate<BlockState> LAVA_PREDICATE = (state) -> state.getFluidState().isTagged(FluidTags.LAVA);
+    public static final Predicate<BlockState> LAVA_PREDICATE = (state) -> state.getFluidState().is(FluidTags.LAVA);
 
-    public static final Predicate<BlockState> WATER_PREDICATE = (state) -> state.getFluidState().isTagged(FluidTags.WATER);
+    public static final Predicate<BlockState> WATER_PREDICATE = (state) -> state.getFluidState().is(FluidTags.WATER);
 
     public static final Predicate<BlockState> SOLID_PREDICATE = (state) -> state.getMaterial().isSolid();
 
-    public static final Predicate<BlockState> LIT_FURNACE = (state) -> state.getBlock() instanceof AbstractFurnaceBlock && state.get(AbstractFurnaceBlock.LIT);
+    public static final Predicate<BlockState> LIT_FURNACE = (state) -> state.getBlock() instanceof AbstractFurnaceBlock && state.getValue(AbstractFurnaceBlock.LIT);
 
     public static final Predicate<BlockState> HOTBLOCK_PREDICATE = (state) ->
             LAVA_PREDICATE.test(state)
@@ -59,22 +59,22 @@ public abstract class JetEffect extends BlockEffect {
         super(chance);
     }
 
-    public static int countVerticalBlocks(@Nonnull final IBlockReader provider, @Nonnull final BlockPos pos,
+    public static int countVerticalBlocks(@Nonnull final BlockGetter provider, @Nonnull final BlockPos pos,
                                           @Nonnull final Predicate<BlockState> predicate, final int step) {
         int count = 0;
-        final BlockPos.Mutable mutable = pos.toMutable();
+        final BlockPos.MutableBlockPos mutable = pos.mutable();
         for (; count < MAX_STRENGTH && predicate.test(provider.getBlockState(mutable)); count++)
             mutable.setY(mutable.getY() + step);
         return MathStuff.clamp(count, 0, MAX_STRENGTH);
     }
 
-    public static int countCubeBlocks(@Nonnull final IBlockReader provider, @Nonnull final BlockPos pos,
+    public static int countCubeBlocks(@Nonnull final BlockGetter provider, @Nonnull final BlockPos pos,
                                       @Nonnull final Predicate<BlockState> predicate, final boolean fastFirst) {
         int blockCount = 0;
         for (int k = -1; k <= 1; k++)
             for (int j = -1; j <= 1; j++)
                 for (int i = -1; i <= 1; i++) {
-                    final BlockState state = provider.getBlockState(pos.add(i, j, k));
+                    final BlockState state = provider.getBlockState(pos.offset(i, j, k));
                     if (predicate.test(state)) {
                         if (fastFirst)
                             return 1;
@@ -85,7 +85,7 @@ public abstract class JetEffect extends BlockEffect {
     }
 
     @Override
-    public boolean canTrigger(@Nonnull final IBlockReader provider, @Nonnull final BlockState state,
+    public boolean canTrigger(@Nonnull final BlockGetter provider, @Nonnull final BlockState state,
                               @Nonnull final BlockPos pos, @Nonnull final Random random) {
         if (alwaysExecute() || random.nextInt(getChance()) == 0) {
             return ParticleSystems.okToSpawn(pos) && ConditionEvaluator.INSTANCE.check(getConditions());

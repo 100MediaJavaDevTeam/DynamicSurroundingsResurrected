@@ -18,12 +18,11 @@
 
 package org.orecruncher.environs.effects.particles;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.world.IBlockReader;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
 import org.orecruncher.environs.config.Config;
 import org.orecruncher.lib.biomes.BiomeUtilities;
 import org.orecruncher.lib.gui.Color;
@@ -43,7 +42,7 @@ public class MoteWaterRipple extends AgeableMote {
 	protected float texU1, texU2;
 	protected float texV1, texV2;
 
-	public MoteWaterRipple(final IBlockReader world, final double x, final double y, final double z) {
+	public MoteWaterRipple(final BlockGetter world, final double x, final double y, final double z) {
 		super(world, x, y, z);
 
 		final RippleStyle style = Config.CLIENT.effects.waterRippleStyle.get();
@@ -62,7 +61,7 @@ public class MoteWaterRipple extends AgeableMote {
 
 		this.posY -= 0.2D;
 
-		final Color waterColor = BiomeUtilities.getColorForLiquid(world, this.position.down());
+		final Color waterColor = BiomeUtilities.getColorForLiquid(world, this.position.below());
 		this.red = waterColor.red();
 		this.green = waterColor.green();
 		this.blue = waterColor.blue();
@@ -93,7 +92,7 @@ public class MoteWaterRipple extends AgeableMote {
 	}
 
 	@Override
-	public void renderParticle(@Nonnull IVertexBuilder buffer, @Nonnull ActiveRenderInfo info, float partialTicks) {
+	public void renderParticle(@Nonnull VertexConsumer buffer, @Nonnull Camera info, float partialTicks) {
 
 		final float x = this.renderX(info, partialTicks);
 		final float y = this.renderY(info, partialTicks);

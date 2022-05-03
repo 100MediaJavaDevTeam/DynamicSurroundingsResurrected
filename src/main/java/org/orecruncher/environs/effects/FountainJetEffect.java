@@ -18,9 +18,9 @@
 
 package org.orecruncher.environs.effects;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.effects.emitters.FountainJet;
@@ -44,13 +44,13 @@ public class FountainJetEffect extends JetEffect {
     }
 
     @Override
-    public boolean canTrigger(@Nonnull final IBlockReader provider, @Nonnull final BlockState state,
+    public boolean canTrigger(@Nonnull final BlockGetter provider, @Nonnull final BlockState state,
                               @Nonnull final BlockPos pos, @Nonnull final Random random) {
-        return WorldUtils.isAirBlock(provider, pos.up()) && super.canTrigger(provider, state, pos, random);
+        return WorldUtils.isAirBlock(provider, pos.above()) && super.canTrigger(provider, state, pos, random);
     }
 
     @Override
-    public void doEffect(@Nonnull final IBlockReader provider, @Nonnull final BlockState state,
+    public void doEffect(@Nonnull final BlockGetter provider, @Nonnull final BlockState state,
                          @Nonnull final BlockPos pos, @Nonnull final Random random) {
         final Jet effect = new FountainJet(5, provider, pos.getX() + 0.5D, pos.getY() + 1.1D,
                 pos.getZ() + 0.5D, state);

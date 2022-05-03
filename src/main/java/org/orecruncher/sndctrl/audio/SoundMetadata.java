@@ -19,9 +19,9 @@
 package org.orecruncher.sndctrl.audio;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.StringUtils;
@@ -37,12 +37,12 @@ import java.util.Objects;
 @OnlyIn(Dist.CLIENT)
 public final class SoundMetadata {
 
-    private static final ITextComponent NO_STRING = StringTextComponent.EMPTY;
+    private static final Component NO_STRING = TextComponent.EMPTY;
 
-    private final ITextComponent title;
-    private final ITextComponent caption;
+    private final Component title;
+    private final Component caption;
     private final ISoundCategory category;
-    private final List<ITextComponent> credits;
+    private final List<Component> credits;
 
     public SoundMetadata() {
         this.title = NO_STRING;
@@ -54,8 +54,8 @@ public final class SoundMetadata {
     public SoundMetadata(@Nonnull final SoundMetadataConfig cfg) {
         Objects.requireNonNull(cfg);
 
-        this.title = StringUtils.isEmpty(cfg.title) ? NO_STRING : new TranslationTextComponent(cfg.title);
-        this.caption = StringUtils.isEmpty(cfg.caption) ? NO_STRING : new TranslationTextComponent(cfg.caption);
+        this.title = StringUtils.isEmpty(cfg.title) ? NO_STRING : new TranslatableComponent(cfg.title);
+        this.caption = StringUtils.isEmpty(cfg.caption) ? NO_STRING : new TranslatableComponent(cfg.caption);
         this.category = Category.getCategory(cfg.category).orElse(Category.NEUTRAL);
 
         if (cfg.credits == null || cfg.credits.size() == 0) {
@@ -66,7 +66,7 @@ public final class SoundMetadata {
                 if (StringUtils.isEmpty(s))
                     this.credits.add(NO_STRING);
                 else
-                    this.credits.add(new StringTextComponent(s));
+                    this.credits.add(new TextComponent(s));
             }
         }
     }
@@ -77,7 +77,7 @@ public final class SoundMetadata {
      * @return Configured title, or EMPTY if not present.
      */
     @Nonnull
-    public ITextComponent getTitle() {
+    public Component getTitle() {
         return this.title;
     }
 
@@ -87,7 +87,7 @@ public final class SoundMetadata {
      * @return Configured caption, or EMPTY if not present.
      */
     @Nonnull
-    public ITextComponent getCaption() {
+    public Component getCaption() {
         return this.caption;
     }
 
@@ -97,7 +97,7 @@ public final class SoundMetadata {
      * @return List containing 0 or more strings describing the sound credits.
      */
     @Nonnull
-    public List<ITextComponent> getCredits() {
+    public List<Component> getCredits() {
         return this.credits;
     }
 

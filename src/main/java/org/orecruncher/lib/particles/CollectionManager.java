@@ -18,17 +18,17 @@
 
 package org.orecruncher.lib.particles;
 
-import net.minecraft.client.particle.IParticleRenderType;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.orecruncher.lib.collections.ObjectArray;
 import org.orecruncher.lib.events.DiagnosticEvent;
-import org.orecruncher.sndctrl.config.Config;
 import org.orecruncher.sndctrl.SoundControl;
+import org.orecruncher.sndctrl.config.Config;
 
 import javax.annotation.Nonnull;
 
@@ -41,7 +41,7 @@ public final class CollectionManager {
     private static final ObjectArray<ParticleCollectionHelper> helpers = new ObjectArray<>();
 
     @Nonnull
-    public static IParticleCollection create(@Nonnull final String name, @Nonnull final IParticleRenderType renderType) {
+    public static IParticleCollection create(@Nonnull final String name, @Nonnull final ParticleRenderType renderType) {
         final ParticleCollectionHelper helper = new ParticleCollectionHelper(name, renderType);
         synchronized (helpers) {
             helpers.add(helper);
@@ -51,7 +51,7 @@ public final class CollectionManager {
 
     @SubscribeEvent
     public static void onWorldUnload(@Nonnull final WorldEvent.Unload event) {
-        if (event.getWorld() instanceof ClientWorld) {
+        if (event.getWorld() instanceof ClientLevel) {
             helpers.forEach(ParticleCollectionHelper::clear);
         }
     }
@@ -60,7 +60,7 @@ public final class CollectionManager {
     public static void diagnostics(@Nonnull final DiagnosticEvent event) {
         if (Config.CLIENT.logging.enableLogging.get()) {
             helpers.forEach(h -> {
-                event.getLeft().add(TextFormatting.AQUA + h.toString());
+                event.getLeft().add(ChatFormatting.AQUA + h.toString());
                 h.getRenderTimer().ifPresent(event::addRenderTimer);
                 h.getTickTimer().ifPresent(event::addRenderTimer);
             });

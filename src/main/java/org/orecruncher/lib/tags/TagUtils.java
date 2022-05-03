@@ -19,9 +19,12 @@
 package org.orecruncher.lib.tags;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.Block;
-import net.minecraft.tags.*;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagCollection;
+import net.minecraft.tags.TagContainer;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -37,9 +40,9 @@ public final class TagUtils {
 
     }
 
-    private static ITagCollectionSupplier supplier;
+    private static TagContainer supplier;
 
-    public static void setTagManager(@Nonnull final ITagCollectionSupplier manager) {
+    public static void setTagManager(@Nonnull final TagContainer manager) {
         supplier = manager;
     }
 
@@ -48,32 +51,29 @@ public final class TagUtils {
     }
 
     @Nullable
-    public static ITag<Block> getBlockTag(@Nonnull final String name) {
+    public static Tag<Block> getBlockTag(@Nonnull final String name) {
         return getBlockTag(new ResourceLocation(name));
     }
 
     @Nullable
-    public static ITag<Block> getBlockTag(@Nonnull final ResourceLocation res) {
-        if (supplier == null)
-            return null;
-        return supplier.getBlockTags().get(res);
+    public static Tag<Block> getBlockTag(@Nonnull final ResourceLocation res) {
+
+        return BlockTags.getAllTags().getTag(res);
     }
 
     public static Stream<String> dumpBlockTags() {
-        if (supplier == null)
-            return ImmutableList.<String>of().stream();
 
-        final ITagCollection<Block> collection = supplier.getBlockTags();
+        final TagCollection<Block> collection = BlockTags.getAllTags();
 
-        return collection.getRegisteredTags().stream().map(loc -> {
+        return collection.getAvailableTags().stream().map(loc -> {
             final StringBuilder builder = new StringBuilder();
             builder.append(loc.toString()).append(" -> ");
-            final ITag<Block> tag = collection.get(loc);
+            final Tag<Block> tag = collection.getTag(loc);
             final String text;
             if (tag == null) {
                 text = "<NULL>";
             } else {
-                text = tag.getAllElements().stream().map(l -> l.getRegistryName().toString()).collect(Collectors.joining(","));
+                text = tag.getValues().stream().map(l -> l.getRegistryName().toString()).collect(Collectors.joining(","));
             }
             builder.append(text);
             return builder.toString();

@@ -19,9 +19,9 @@
 package org.orecruncher.mobeffects.library;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.tuple.Pair;
@@ -47,9 +47,9 @@ public final class BlockAcousticMap {
 
 	public BlockAcousticMap(@Nonnull final Function<BlockState, IAcoustic> resolver) {
 		this.resolver = resolver;
-		put(BlockStateMatcher.create(Blocks.AIR.getDefaultState()), Constants.NOT_EMITTER);
-		put(BlockStateMatcher.create(Blocks.CAVE_AIR.getDefaultState()), Constants.NOT_EMITTER);
-		put(BlockStateMatcher.create(Blocks.VOID_AIR.getDefaultState()), Constants.NOT_EMITTER);
+		put(BlockStateMatcher.create(Blocks.AIR.defaultBlockState()), Constants.NOT_EMITTER);
+		put(BlockStateMatcher.create(Blocks.CAVE_AIR.defaultBlockState()), Constants.NOT_EMITTER);
+		put(BlockStateMatcher.create(Blocks.VOID_AIR.defaultBlockState()), Constants.NOT_EMITTER);
 	}
 
 	/**

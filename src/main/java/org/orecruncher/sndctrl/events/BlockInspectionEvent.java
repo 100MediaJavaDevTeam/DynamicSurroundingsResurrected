@@ -18,10 +18,10 @@
 
 package org.orecruncher.sndctrl.events;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.Event;
@@ -34,12 +34,12 @@ import java.util.List;
 public class BlockInspectionEvent extends Event {
 
     public final List<String> data = new ArrayList<>();
-    public final BlockRayTraceResult rayTrace;
-    public final World world;
+    public final BlockHitResult rayTrace;
+    public final Level world;
     public final BlockState state;
     public final BlockPos pos;
 
-    public BlockInspectionEvent(@Nonnull final BlockRayTraceResult trace, @Nonnull final World world, @Nonnull final BlockState state, @Nonnull final BlockPos pos) {
+    public BlockInspectionEvent(@Nonnull final BlockHitResult trace, @Nonnull final Level world, @Nonnull final BlockState state, @Nonnull final BlockPos pos) {
         this.rayTrace = trace;
         this.world = world;
         this.state = state;

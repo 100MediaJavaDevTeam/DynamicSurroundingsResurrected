@@ -18,8 +18,10 @@
 
 package org.orecruncher.lib.gui;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.util.text.*;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.StringSplitter;
+import net.minecraft.client.gui.Font;
+import net.minecraft.network.chat.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -43,14 +45,14 @@ public class GuiHelpers {
      * @param formatting Formatting to apply to each line
      * @return Collection of ITextComponents for the given key
      */
-    public static Collection<ITextComponent> getTrimmedTextCollection(@Nonnull final String key, final int width, @Nullable final TextFormatting... formatting) {
+    public static Collection<Component> getTrimmedTextCollection(@Nonnull final String key, final int width, @Nullable final ChatFormatting... formatting) {
         final Style style = prefixHelper(formatting);
-        return GameUtils.getMC().fontRenderer.getCharacterManager()
-                .func_238362_b_(
-                        new TranslationTextComponent(key),
+        return GameUtils.getMC().font.getSplitter()
+                .splitLines(
+                        new TranslatableComponent(key),
                         width,
                         style)
-                .stream().map(e -> new StringTextComponent(e.getString()))
+                .stream().map(e -> new TextComponent(e.getString()))
                 .collect(Collectors.toList());
     }
 
@@ -63,25 +65,25 @@ public class GuiHelpers {
      * @param formatting Formatting to apply to the text
      * @return ITextComponent fitting the criteria specified
      */
-    public static ITextComponent getTrimmedText(@Nonnull final String key, final int width, @Nullable final TextFormatting... formatting) {
+    public static Component getTrimmedText(@Nonnull final String key, final int width, @Nullable final ChatFormatting... formatting) {
         final Style style = prefixHelper(formatting);
-        final ITextComponent text = new TranslationTextComponent(key);
-        final FontRenderer fr = GameUtils.getMC().fontRenderer;
-        final CharacterManager cm = fr.getCharacterManager();
-        if (fr.getStringPropertyWidth(text) > width) {
-            final int ellipsesWidth = fr.getStringWidth(ELLIPSES);
+        final Component text = new TranslatableComponent(key);
+        final Font fr = GameUtils.getMC().font;
+        final StringSplitter cm = fr.getSplitter();
+        if (fr.width(text) > width) {
+            final int ellipsesWidth = fr.width(ELLIPSES);
             final int trueWidth = width - ellipsesWidth;
-            final ITextProperties str = cm.func_238358_a_(text, trueWidth, style);
-            return new StringTextComponent(str.getString() + ELLIPSES);
+            final FormattedText str = cm.headByWidth(text, trueWidth, style);
+            return new TextComponent(str.getString() + ELLIPSES);
         }
-        final ITextProperties str = cm.func_238358_a_(text, width, style);
-        return new StringTextComponent(str.getString());
+        final FormattedText str = cm.headByWidth(text, width, style);
+        return new TextComponent(str.getString());
     }
 
-    private static Style prefixHelper(@Nullable final TextFormatting[] formatting) {
+    private static Style prefixHelper(@Nullable final ChatFormatting[] formatting) {
         final Style style;
         if (formatting != null && formatting.length > 0)
-            style = Style.EMPTY.createStyleFromFormattings(formatting);
+            style = Style.EMPTY.applyFormats(formatting);
         else
             style = Style.EMPTY;
         return style;

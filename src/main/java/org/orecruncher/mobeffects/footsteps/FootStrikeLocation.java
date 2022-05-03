@@ -18,41 +18,40 @@
 
 package org.orecruncher.mobeffects.footsteps;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
 import org.orecruncher.mobeffects.footsteps.facade.FacadeHelper;
 import org.orecruncher.mobeffects.library.FootstepLibrary;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
 public final class FootStrikeLocation {
 
 	private final LivingEntity entity;
-	private final Vector3d strike;
+	private final Vec3 strike;
 	private final BlockPos stepPos;
 
 	public FootStrikeLocation(@Nonnull final LivingEntity entity, final double x, final double y, final double z) {
-		this(entity, new Vector3d(x, y, z));
+		this(entity, new Vec3(x, y, z));
 	}
 
-	public FootStrikeLocation(@Nonnull final LivingEntity entity, @Nonnull final Vector3d loc) {
+	public FootStrikeLocation(@Nonnull final LivingEntity entity, @Nonnull final Vec3 loc) {
 		this.entity = entity;
 		this.strike = loc;
 		this.stepPos = new BlockPos(loc);
 	}
 
-	protected FootStrikeLocation(@Nonnull final LivingEntity entity, @Nonnull final Vector3d loc,
+	protected FootStrikeLocation(@Nonnull final LivingEntity entity, @Nonnull final Vec3 loc,
 			@Nonnull final BlockPos pos) {
 		this.entity = entity;
 		this.strike = loc;
@@ -77,31 +76,31 @@ public final class FootStrikeLocation {
 	}
 
 	@Nonnull
-	public Vector3d getStrikePosition() {
+	public Vec3 getStrikePosition() {
 		return this.strike;
 	}
 
-	public Vector3d north() {
+	public Vec3 north() {
 		return offset(Direction.NORTH, 1);
 	}
 
-	public Vector3d south() {
+	public Vec3 south() {
 		return offset(Direction.SOUTH, 1);
 	}
 
-	public Vector3d east() {
+	public Vec3 east() {
 		return offset(Direction.EAST, 1);
 	}
 
-	public Vector3d west() {
+	public Vec3 west() {
 		return offset(Direction.WEST, 1);
 	}
 
-	public Vector3d up() {
+	public Vec3 up() {
 		return offset(Direction.UP, 1);
 	}
 
-	public Vector3d down() {
+	public Vec3 down() {
 		return offset(Direction.DOWN, 1);
 	}
 
@@ -109,10 +108,10 @@ public final class FootStrikeLocation {
 	 * Offsets this strike position n blocks in the given direction
 	 */
 	@Nonnull
-	public Vector3d offset(@Nonnull final Direction facing, final float n) {
+	public Vec3 offset(@Nonnull final Direction facing, final float n) {
 		return n == 0 ? this.strike
-				: new Vector3d(this.strike.x + facing.getXOffset() * n, this.strike.y + facing.getYOffset() * n,
-						this.strike.z + facing.getZOffset() * n);
+				: new Vec3(this.strike.x + facing.getStepX() * n, this.strike.y + facing.getStepY() * n,
+						this.strike.z + facing.getStepZ() * n);
 	}
 
 	/**
@@ -124,8 +123,8 @@ public final class FootStrikeLocation {
 	 *         be generated
 	 */
 	@Nullable
-	protected Vector3d footprintPosition() {
-		final World world = this.entity.getEntityWorld();
+	protected Vec3 footprintPosition() {
+		final Level world = this.entity.getCommandSenderWorld();
 
 		// The foot strike is just inside the block that was stepped on.
 		BlockState state = world.getBlockState(this.stepPos);
@@ -135,7 +134,7 @@ public final class FootStrikeLocation {
 			return null;
 
 		// Check the block above - it could be a snow layer or carpet
-		BlockPos feetPos = this.stepPos.up();
+		BlockPos feetPos = this.stepPos.above();
 		BlockState upState = world.getBlockState(feetPos);
 		if (upState.getMaterial() != Material.AIR) {
 			state = upState;
@@ -149,15 +148,15 @@ public final class FootStrikeLocation {
 			return null;
 
 		final VoxelShape shape = state.getCollisionShape(world, feetPos);
-		final double boundingY = state.getShape(world, feetPos).getEnd(Direction.Axis.Y);
-		final double collisionY = shape.isEmpty() ? 0 : shape.getEnd(Direction.Axis.Y);
+		final double boundingY = state.getShape(world, feetPos).max(Direction.Axis.Y);
+		final double collisionY = shape.isEmpty() ? 0 : shape.max(Direction.Axis.Y);
 		final double maxYblock = feetPos.getY() + Math.max(boundingY, collisionY);
 		// Should we get the max of strike.Y and maxYblock?
-		return new Vector3d(this.strike.getX(), maxYblock, this.strike.getZ());
+		return new Vec3(this.strike.x(), maxYblock, this.strike.z());
 	}
 
 	protected boolean hasFootstepImprint(@Nonnull final BlockState state, @Nonnull final BlockPos pos) {
-		final BlockState footstepState = FacadeHelper.resolveState(this.entity, state, this.entity.getEntityWorld(), Vector3d.copyCentered(pos), Direction.UP);
+		final BlockState footstepState = FacadeHelper.resolveState(this.entity, state, this.entity.getCommandSenderWorld(), Vec3.atCenterOf(pos), Direction.UP);
 		return FootstepLibrary.hasFootprint(footstepState);
 	}
 }

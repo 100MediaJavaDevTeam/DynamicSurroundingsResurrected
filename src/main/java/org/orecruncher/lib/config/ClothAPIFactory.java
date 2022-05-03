@@ -18,16 +18,16 @@
 
 package org.orecruncher.lib.config;
 
-import me.shedaniel.clothconfig2.forge.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.forge.api.ConfigCategory;
-import me.shedaniel.clothconfig2.forge.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.forge.gui.entries.*;
-import me.shedaniel.clothconfig2.forge.impl.builders.*;
+import me.shedaniel.clothconfig2.api.ConfigBuilder;
+import me.shedaniel.clothconfig2.api.ConfigCategory;
+import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.gui.entries.*;
+import me.shedaniel.clothconfig2.impl.builders.*;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.DialogTexts;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.*;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -45,15 +45,15 @@ import java.util.stream.Collectors;
 @OnlyIn(Dist.CLIENT)
 public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, Screen> {
 
-    private final ITextComponent title;
+    private final Component title;
     private final Runnable save;
     private final ResourceLocation background;
 
-    public ClothAPIFactory(@Nonnull final ITextComponent title, @Nonnull final Runnable save) {
+    public ClothAPIFactory(@Nonnull final Component title, @Nonnull final Runnable save) {
         this(title, save, null);
     }
 
-    public ClothAPIFactory(@Nonnull final ITextComponent title, @Nonnull final Runnable save, @Nullable final ResourceLocation background) {
+    public ClothAPIFactory(@Nonnull final Component title, @Nonnull final Runnable save, @Nullable final ResourceLocation background) {
         this.title = title;
         this.save = save;
         this.background = background;
@@ -81,31 +81,31 @@ public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, S
     }
 
     public static ConfigCategory createCategory(@Nonnull final ConfigBuilder builder, @Nonnull final String translationKey) {
-        return builder.getOrCreateCategory(transformText(translationKey, TextFormatting.GOLD));
+        return builder.getOrCreateCategory(transformText(translationKey, ChatFormatting.GOLD));
     }
 
     public static SubCategoryBuilder createSubCategory(@Nonnull final ConfigEntryBuilder entryBuilder, @Nonnull final String translationKey, final boolean expanded) {
         return createSubCategory(entryBuilder, translationKey, null, expanded);
     }
 
-    public static SubCategoryBuilder createSubCategory(@Nonnull final ConfigEntryBuilder entryBuilder, @Nonnull final String translationKey, @Nullable final TextFormatting color, final boolean expanded) {
-        final ITextComponent label = transformText(translationKey, color);
+    public static SubCategoryBuilder createSubCategory(@Nonnull final ConfigEntryBuilder entryBuilder, @Nonnull final String translationKey, @Nullable final ChatFormatting color, final boolean expanded) {
+        final Component label = transformText(translationKey, color);
 
-        final List<ITextComponent> toolTip = new ArrayList<>();
+        final List<Component> toolTip = new ArrayList<>();
         toolTip.add(label);
-        final List<ITextProperties> lines = GameUtils.getMC().fontRenderer.getCharacterManager().func_238362_b_(new TranslationTextComponent(translationKey + ".tooltip"), ConfigProperty.TOOLTIP_WIDTH, Style.EMPTY);
-        for (final ITextProperties l : lines) {
-            toolTip.add(new StringTextComponent(l.getString()));
+        final List<FormattedText> lines = GameUtils.getMC().font.getSplitter().splitLines(new TranslatableComponent(translationKey + ".tooltip"), ConfigProperty.TOOLTIP_WIDTH, Style.EMPTY);
+        for (final FormattedText l : lines) {
+            toolTip.add(new TextComponent(l.getString()));
         }
 
         return entryBuilder.startSubCategory(label)
-                .setTooltip(toolTip.toArray(new ITextComponent[0]))
+                .setTooltip(toolTip.toArray(new Component[0]))
                 .setExpanded(expanded);
     }
 
     public static StringListEntry createString(@Nonnull final ConfigBuilder builder, @Nonnull final ForgeConfigSpec.ConfigValue<String> value) {
         final ConfigProperty property = ConfigProperty.getPropertyInfo(value);
-        final ITextComponent name = property.getConfigName();
+        final Component name = property.getConfigName();
         final StringFieldBuilder result = builder.entryBuilder()
                 .startStrField(name, value.get())
                 .setTooltip(property.getTooltip())
@@ -120,12 +120,12 @@ public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, S
 
     public static BooleanListEntry createBoolean(@Nonnull final ConfigBuilder builder, @Nonnull final ForgeConfigSpec.BooleanValue value) {
         final ConfigProperty property = ConfigProperty.getPropertyInfo(value);
-        final ITextComponent name = property.getConfigName();
+        final Component name = property.getConfigName();
         final BooleanToggleBuilder result = builder.entryBuilder()
                 .startBooleanToggle(name, value.get())
                 .setTooltip(property.getTooltip())
                 .setDefaultValue(value.get())
-                .setYesNoTextSupplier(DialogTexts::optionsEnabled)
+                .setYesNoTextSupplier(CommonComponents::optionStatus)
                 .setSaveConsumer(value::set);
 
         if (property.getNeedsWorldRestart())
@@ -136,7 +136,7 @@ public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, S
 
     public static IntegerListEntry createInteger(@Nonnull final ConfigBuilder builder, @Nonnull final ForgeConfigSpec.IntValue value) {
         final ConfigProperty property = ConfigProperty.getPropertyInfo(value);
-        final ITextComponent name = property.getConfigName();
+        final Component name = property.getConfigName();
         final int min = property.<Integer>getMinValue();
         final int max = property.<Integer>getMaxValue();
         final IntFieldBuilder result = builder.entryBuilder()
@@ -153,9 +153,9 @@ public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, S
         return result.build();
     }
 
-    public static StringListListEntry createStringList(@Nonnull final ConfigBuilder builder, @Nonnull final ForgeConfigSpec.ConfigValue<List<? extends String>> value, @Nullable final Function<String, Optional<ITextComponent>> validator) {
+    public static StringListListEntry createStringList(@Nonnull final ConfigBuilder builder, @Nonnull final ForgeConfigSpec.ConfigValue<List<? extends String>> value, @Nullable final Function<String, Optional<Component>> validator) {
         final ConfigProperty property = ConfigProperty.getPropertyInfo(value);
-        final ITextComponent name = property.getConfigName();
+        final Component name = property.getConfigName();
         final List<String> list = value.get().stream().map(Object::toString).collect(Collectors.toList());
         final List<String> defaults = new ArrayList<>(list);
         final StringListBuilder result = builder.entryBuilder()
@@ -175,7 +175,7 @@ public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, S
 
     public static <T extends Enum<T>> EnumListEntry<T> createEnumList(@Nonnull final ConfigBuilder builder, @Nonnull Class<T> clazz, @Nonnull final ForgeConfigSpec.EnumValue<T> value) {
         final ConfigProperty property = ConfigProperty.getPropertyInfo(value);
-        final ITextComponent name = property.getConfigName();
+        final Component name = property.getConfigName();
         final EnumSelectorBuilder<T> result = builder.entryBuilder()
                 .startEnumSelector(name, clazz, value.get())
                 .setTooltip(property.getTooltip())
@@ -190,7 +190,7 @@ public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, S
 
     public static IntegerSliderEntry createIntegerSlider(@Nonnull final ConfigBuilder builder, @Nonnull final ForgeConfigSpec.IntValue value) {
         final ConfigProperty property = ConfigProperty.getPropertyInfo(value);
-        final ITextComponent name = property.getConfigName();
+        final Component name = property.getConfigName();
         final int min = property.<Integer>getMinValue();
         final int max = property.<Integer>getMaxValue();
         final IntSliderBuilder result = builder.entryBuilder()
@@ -205,11 +205,11 @@ public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, S
         return result.build();
     }
 
-    private static ITextComponent transformText(@Nonnull final String key, @Nullable final TextFormatting color) {
-        ITextComponent result = new TranslationTextComponent(key);
+    private static Component transformText(@Nonnull final String key, @Nullable final ChatFormatting color) {
+        Component result = new TranslatableComponent(key);
         if (color != null) {
-            final String text = color + new TranslationTextComponent(key).getString();
-            result = new StringTextComponent(text);
+            final String text = color + new TranslatableComponent(key).getString();
+            result = new TextComponent(text);
         }
         return result;
     }

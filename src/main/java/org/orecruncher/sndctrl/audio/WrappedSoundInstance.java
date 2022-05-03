@@ -18,12 +18,12 @@
 
 package org.orecruncher.sndctrl.audio;
 
-import net.minecraft.client.audio.ITickableSound;
-import net.minecraft.client.audio.Sound;
-import net.minecraft.client.audio.SoundEventAccessor;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.client.resources.sounds.Sound;
+import net.minecraft.client.resources.sounds.TickableSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.client.sounds.WeighedSoundEvents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.sndctrl.api.sound.ISoundCategory;
@@ -37,7 +37,7 @@ import java.util.Objects;
  * Base class for special sounds that aggregate the true sound being played.
  */
 @OnlyIn(Dist.CLIENT)
-public class WrappedSoundInstance implements ISoundInstance, ITickableSound {
+public class WrappedSoundInstance implements ISoundInstance, TickableSoundInstance {
 
     @Nonnull
     protected final ISoundInstance sound;
@@ -55,14 +55,14 @@ public class WrappedSoundInstance implements ISoundInstance, ITickableSound {
     }
 
     @Override
-    public boolean isDonePlaying() {
+    public boolean isStopped() {
         return getState().isTerminal();
     }
 
     @Override
     public void tick() {
-        if (this.sound instanceof ITickableSound)
-            ((ITickableSound) this.sound).tick();
+        if (this.sound instanceof TickableSoundInstance)
+            ((TickableSoundInstance) this.sound).tick();
     }
 
     @Nonnull
@@ -88,14 +88,14 @@ public class WrappedSoundInstance implements ISoundInstance, ITickableSound {
 
     @Nonnull
     @Override
-    public ResourceLocation getSoundLocation() {
-        return this.sound.getSoundLocation();
+    public ResourceLocation getLocation() {
+        return this.sound.getLocation();
     }
 
     @Nullable
     @Override
-    public SoundEventAccessor createAccessor(SoundHandler handler) {
-        return this.sound.createAccessor(handler);
+    public WeighedSoundEvents resolve(SoundManager handler) {
+        return this.sound.resolve(handler);
     }
 
     @Nonnull
@@ -106,8 +106,8 @@ public class WrappedSoundInstance implements ISoundInstance, ITickableSound {
 
     @Nonnull
     @Override
-    public SoundCategory getCategory() {
-        return this.sound.getCategory();
+    public SoundSource getSource() {
+        return this.sound.getSource();
     }
 
     @Nonnull
@@ -117,18 +117,18 @@ public class WrappedSoundInstance implements ISoundInstance, ITickableSound {
     }
 
     @Override
-    public boolean canRepeat() {
-        return this.sound.canRepeat();
+    public boolean isLooping() {
+        return this.sound.isLooping();
     }
 
     @Override
-    public boolean isGlobal() {
-        return this.sound.isGlobal();
+    public boolean isRelative() {
+        return this.sound.isRelative();
     }
 
     @Override
-    public int getRepeatDelay() {
-        return this.sound.getRepeatDelay();
+    public int getDelay() {
+        return this.sound.getDelay();
     }
 
     @Override
@@ -158,7 +158,7 @@ public class WrappedSoundInstance implements ISoundInstance, ITickableSound {
 
     @Nonnull
     @Override
-    public AttenuationType getAttenuationType() {
-        return this.sound.getAttenuationType();
+    public Attenuation getAttenuation() {
+        return this.sound.getAttenuation();
     }
 }

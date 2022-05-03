@@ -18,12 +18,12 @@
 
 package org.orecruncher.dsurround.gui;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.dsurround.config.Config;
@@ -33,22 +33,22 @@ import org.orecruncher.lib.GameUtils;
 @Mod.EventBusSubscriber(modid = DynamicSurroundings.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class Keys {
 
-    private static KeyBinding lightLevelHUD;
-    private static KeyBinding chunkBorders;
+    private static KeyMapping lightLevelHUD;
+    private static KeyMapping chunkBorders;
 
     public static void register() {
         if ((Config.CLIENT.logging.flagMask.get() & Config.Flags.ALLOW_CHUNK_BORDER_HUD) != 0) {
-            lightLevelHUD = new KeyBinding(
+            lightLevelHUD = new KeyMapping(
                     "dsurround.text.lightlevel.toggle",
-                    InputMappings.INPUT_INVALID.getKeyCode(),
+                    InputConstants.UNKNOWN.getValue(),
                     "dsurround.text.controls.group");
             ClientRegistry.registerKeyBinding(lightLevelHUD);
         }
 
         if ((Config.CLIENT.logging.flagMask.get() & Config.Flags.ALLOW_LIGHTLEVEL_HUD) != 0) {
-            chunkBorders = new KeyBinding(
+            chunkBorders = new KeyMapping(
                     "dsurround.text.chunkborders.toggle",
-                    InputMappings.INPUT_INVALID.getKeyCode(),
+                    InputConstants.UNKNOWN.getValue(),
                     "dsurround.text.controls.group");
             ClientRegistry.registerKeyBinding(chunkBorders);
         }
@@ -56,13 +56,13 @@ public class Keys {
 
     @SubscribeEvent
     public static void keyPressed(InputEvent.KeyInputEvent event) {
-        if (GameUtils.getMC().currentScreen == null && GameUtils.getPlayer() != null) {
-            if (lightLevelHUD != null && lightLevelHUD.isPressed()) {
+        if (GameUtils.getMC().screen == null && GameUtils.getPlayer() != null) {
+            if (lightLevelHUD != null && lightLevelHUD.consumeClick()) {
                 LightLevelHUD.toggleDisplay();
             }
 
-            if (chunkBorders != null && chunkBorders.isPressed()) {
-                GameUtils.getMC().debugRenderer.toggleChunkBorders();
+            if (chunkBorders != null && chunkBorders.consumeClick()) {
+                GameUtils.getMC().debugRenderer.switchRenderChunkborder();
             }
         }
     }

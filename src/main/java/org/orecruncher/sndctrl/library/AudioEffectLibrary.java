@@ -21,25 +21,25 @@ package org.orecruncher.sndctrl.library;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.material.Material;
-import net.minecraft.tags.ITag;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.Tag;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.lib.MaterialUtils;
-import org.orecruncher.lib.tags.TagUtils;
 import org.orecruncher.lib.blockstate.BlockStateMatcherMap;
 import org.orecruncher.lib.fml.ForgeUtils;
 import org.orecruncher.lib.logging.IModLog;
 import org.orecruncher.lib.math.MathStuff;
 import org.orecruncher.lib.resource.IResourceAccessor;
 import org.orecruncher.lib.resource.ResourceUtils;
-import org.orecruncher.lib.service.ModuleServiceManager;
 import org.orecruncher.lib.service.IModuleService;
+import org.orecruncher.lib.service.ModuleServiceManager;
+import org.orecruncher.lib.tags.TagUtils;
 import org.orecruncher.sndctrl.SoundControl;
 import org.orecruncher.sndctrl.misc.IMixinAudioEffectData;
 
@@ -120,7 +120,7 @@ public final class AudioEffectLibrary {
         if (result == null || result < 0) {
             result = materialOcclusion.getFloat(state.getMaterial());
             if (result < 0) {
-                result = state.getMaterial().isOpaque() ? DEFAULT_OPAQUE_OCCLUSION : DEFAULT_TRANSLUCENT_OCCLUSION;
+                result = state.getMaterial().isSolidBlocking() ? DEFAULT_OPAQUE_OCCLUSION : DEFAULT_TRANSLUCENT_OCCLUSION;
             }
         }
 
@@ -155,10 +155,10 @@ public final class AudioEffectLibrary {
             } else if (name.startsWith(TAG_PREFIX)) {
                 // Tag entry
                 final String tagName = name.substring(1);
-                final ITag<Block> tag = TagUtils.getBlockTag(tagName);
+                final Tag<Block> tag = TagUtils.getBlockTag(tagName);
                 if (tag != null) {
-                    for (final Block block : tag.getAllElements()) {
-                        for (final BlockState state : block.getStateContainer().getValidStates())
+                    for (final Block block : tag.getValues()) {
+                        for (final BlockState state : block.getStateDefinition().getPossibleStates())
                             blockStateOcclusionMap.put(state, kvp.getValue());
                     }
                 } else {
@@ -196,10 +196,10 @@ public final class AudioEffectLibrary {
             } else if (name.startsWith(TAG_PREFIX)) {
                 // Tag entry
                 final String tagName = name.substring(1);
-                final ITag<Block> tag = TagUtils.getBlockTag(tagName);
+                final Tag<Block> tag = TagUtils.getBlockTag(tagName);
                 if (tag != null) {
-                    for (final Block block : tag.getAllElements()) {
-                        for (final BlockState state : block.getStateContainer().getValidStates())
+                    for (final Block block : tag.getValues()) {
+                        for (final BlockState state : block.getStateDefinition().getPossibleStates())
                             blockStateReflectMap.put(state, val);
                     }
                 } else {
@@ -258,7 +258,7 @@ public final class AudioEffectLibrary {
             // Occlusion setup
             materialOcclusion.defaultReturnValue(-1F);
             for (final Material mat : MaterialUtils.getMaterials())
-                materialOcclusion.put(mat, mat.isOpaque() ? DEFAULT_OPAQUE_OCCLUSION : DEFAULT_TRANSLUCENT_OCCLUSION);
+                materialOcclusion.put(mat, mat.isSolidBlocking() ? DEFAULT_OPAQUE_OCCLUSION : DEFAULT_TRANSLUCENT_OCCLUSION);
             blockStateOcclusionMap.setDefaultValue(() -> -1F);
 
             // Reflection setup

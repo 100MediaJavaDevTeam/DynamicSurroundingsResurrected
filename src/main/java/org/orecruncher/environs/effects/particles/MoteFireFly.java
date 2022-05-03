@@ -18,11 +18,10 @@
 
 package org.orecruncher.environs.effects.particles;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.world.IBlockReader;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -40,8 +39,8 @@ public class MoteFireFly extends AnimatedMote {
 
     private boolean doRender;
 
-    public MoteFireFly(@Nonnull final IBlockReader world, final double x, final double y, final double z) {
-        super(GameUtils.getMC().particles.sprites.get(ParticleTypes.FIREWORK.getRegistryName()), world, x, y, z, 0, 0, 0);
+    public MoteFireFly(@Nonnull final BlockGetter world, final double x, final double y, final double z) {
+        super(GameUtils.getMC().particleEngine.spriteSets.get(ParticleTypes.FIREWORK.getRegistryName()), world, x, y, z, 0, 0, 0);
 
         this.motionX = RANDOM.nextGaussian() * XZ_MOTION_DELTA;
         this.motionZ = RANDOM.nextGaussian() * XZ_MOTION_DELTA;
@@ -68,7 +67,7 @@ public class MoteFireFly extends AnimatedMote {
     }
 
     @Override
-    public void renderParticle(@Nonnull IVertexBuilder buffer, @Nonnull ActiveRenderInfo info, float partialTicks) {
+    public void renderParticle(@Nonnull VertexConsumer buffer, @Nonnull Camera info, float partialTicks) {
         if (this.doRender)
             super.renderParticle(buffer, info, partialTicks);
     }

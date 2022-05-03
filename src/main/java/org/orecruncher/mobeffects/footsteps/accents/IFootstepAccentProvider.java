@@ -18,16 +18,15 @@
 
 package org.orecruncher.mobeffects.footsteps.accents;
 
-import javax.annotation.Nonnull;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import net.minecraft.util.math.BlockPos;
 import org.orecruncher.lib.collections.ObjectArray;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
+
+import javax.annotation.Nonnull;
 
 /**
  * Interface for objects that provide additional accents to acoustics when

@@ -18,15 +18,15 @@
 
 package org.orecruncher.environs.effects.particles;
 
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class MoteRainSplash extends MoteWaterSpray {
 
-	public MoteRainSplash(final IBlockReader world, final double x, final double y, final double z) {
+	public MoteRainSplash(final BlockGetter world, final double x, final double y, final double z) {
 		super(world, x, y, z, 0, 0, 0);
 
 		// Setup motion
@@ -34,8 +34,8 @@ public class MoteRainSplash extends MoteWaterSpray {
 		this.motionY = (RANDOM.nextDouble() * 2.0D - 1.0D) * 0.4000000059604645D;
 		this.motionZ = (RANDOM.nextDouble() * 2.0D - 1.0D) * 0.4000000059604645D;
 		final float f = (float) (RANDOM.nextDouble() + RANDOM.nextDouble() + 1.0D) * 0.15F;
-		final float f1 = MathHelper
-				.sqrt(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+		final float f1 = Mth
+				.sqrt((float) (this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ));
 		this.motionX = this.motionX / f1 * f * 0.4000000059604645D;
 		this.motionY = this.motionY / f1 * f * 0.4000000059604645D + 0.10000000149011612D;
 		this.motionZ = this.motionZ / f1 * f * 0.4000000059604645D;

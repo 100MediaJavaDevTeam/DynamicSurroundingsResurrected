@@ -18,8 +18,8 @@
 
 package org.orecruncher.lib;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.LanguageMap;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.locale.Language;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -34,11 +34,11 @@ public final class Localization {
 
     @Nonnull
     public static String format(@Nonnull final String fmt, @Nullable final Object... args) {
-        return I18n.format(fmt, args);
+        return I18n.get(fmt, args);
     }
 
     @Nonnull
     public static String load(@Nonnull final String fmt) {
-        return LanguageMap.getInstance().func_230503_a_(fmt);
+        return Language.getInstance().getOrDefault(fmt);
     }
 }

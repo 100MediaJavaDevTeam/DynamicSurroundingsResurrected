@@ -18,12 +18,12 @@
 
 package org.orecruncher.environs.library;
 
-import javax.annotation.Nonnull;
-
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
 
 @OnlyIn(Dist.CLIENT)
 public class WTFFakeBiomeAdapter extends FakeBiomeAdapter {
@@ -33,8 +33,8 @@ public class WTFFakeBiomeAdapter extends FakeBiomeAdapter {
 	}
 
 	@Override
-	public Biome.RainType getPrecipitationType() {
-		return Biome.RainType.NONE;
+	public Biome.Precipitation getPrecipitationType() {
+		return Biome.Precipitation.NONE;
 	}
 
 	@Override

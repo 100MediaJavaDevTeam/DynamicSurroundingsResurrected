@@ -18,9 +18,9 @@
 
 package org.orecruncher.lib.effects;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.profiler.IProfiler;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
@@ -32,12 +32,12 @@ import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.Lib;
 import org.orecruncher.lib.collections.ObjectArray;
-import org.orecruncher.lib.events.DiagnosticEvent;
-import org.orecruncher.lib.math.LoggingTimerEMA;
-import org.orecruncher.sndctrl.config.Config;
 import org.orecruncher.lib.effects.entity.CapabilityEntityFXData;
 import org.orecruncher.lib.effects.entity.IEntityFX;
+import org.orecruncher.lib.events.DiagnosticEvent;
+import org.orecruncher.lib.math.LoggingTimerEMA;
 import org.orecruncher.sndctrl.api.effects.AbstractEntityEffect;
+import org.orecruncher.sndctrl.config.Config;
 import org.orecruncher.sndctrl.library.EntityEffectLibrary;
 
 import javax.annotation.Nonnull;
@@ -87,16 +87,16 @@ public final class EntityEffectHandler {
     public static void onLivingUpdate(@Nonnull final LivingEvent.LivingUpdateEvent event) {
         try {
             final LivingEntity entity = event.getEntityLiving();
-            if (entity != null && entity.getEntityWorld().isRemote) {
+            if (entity != null && entity.getCommandSenderWorld().isClientSide) {
 
-                final IProfiler profiler = GameUtils.getMC().getProfiler();
-                profiler.startSection("MobEffects Living Update");
+                final ProfilerFiller profiler = GameUtils.getMC().getProfiler();
+                profiler.push("MobEffects Living Update");
                 final long start = System.nanoTime();
 
-                entity.getCapability(CapabilityEntityFXData.FX_INFO).ifPresent(cap -> {
+                CapabilityEntityFXData.getFxInfo(entity).ifPresent(cap -> {
                     final int range = Config.CLIENT.effects.effectRange.get();
                     final int effectDistSq = range * range;
-                    final boolean inRange = entity.getDistanceSq(GameUtils.getPlayer()) <= effectDistSq;
+                    final boolean inRange = entity.distanceToSqr(GameUtils.getPlayer()) <= effectDistSq;
                     final EntityEffectManager mgr = cap.get();
                     if (mgr != null && !inRange) {
                         cap.clear();
@@ -108,7 +108,7 @@ public final class EntityEffectHandler {
                 });
 
                 nanos += System.nanoTime() - start;
-                profiler.endSection();
+                profiler.pop();
             }
         } catch(@Nonnull final Throwable t) {
             Lib.LOGGER.error(t, "Error ticking entity %s!");
@@ -116,9 +116,9 @@ public final class EntityEffectHandler {
     }
 
     private static void clearHandlers() {
-        final Iterable<Entity> entities = GameUtils.getWorld().getAllEntities();
+        final Iterable<Entity> entities = GameUtils.getWorld().entitiesForRendering();
         for (final Entity e : entities) {
-            e.getCapability(CapabilityEntityFXData.FX_INFO).ifPresent(IEntityFX::clear);
+            CapabilityEntityFXData.getFxInfo(e).ifPresent(IEntityFX::clear);
         }
     }
 
@@ -129,7 +129,7 @@ public final class EntityEffectHandler {
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void onEntityJoin(@Nonnull final EntityJoinWorldEvent event) {
-        if (event.getWorld().isRemote) {
+        if (event.getWorld().isClientSide) {
             if (GameUtils.getPlayer() == event.getEntity())
                 clearHandlers();
         }

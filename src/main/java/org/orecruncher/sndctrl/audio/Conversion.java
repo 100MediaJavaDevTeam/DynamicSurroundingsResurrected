@@ -18,13 +18,12 @@
 
 package org.orecruncher.sndctrl.audio;
 
-import net.minecraft.client.audio.AudioStreamBuffer;
-import net.minecraft.client.audio.IAudioStream;
+import com.mojang.blaze3d.audio.SoundBuffer;
+import net.minecraft.client.sounds.AudioStream;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import javax.sound.sampled.AudioFormat;
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -38,8 +37,8 @@ public final class Conversion {
      * @param inputStream The audio stream that is to be played
      * @return An IAudioStream that is in mono format
      */
-    public static IAudioStream convert(@Nonnull final IAudioStream inputStream) {
-        final AudioFormat format = inputStream.getAudioFormat();
+    public static AudioStream convert(@Nonnull final AudioStream inputStream) {
+        final AudioFormat format = inputStream.getFormat();
         if (format.getChannels() == 1)
             return inputStream;
 
@@ -52,9 +51,9 @@ public final class Conversion {
      * @param buffer Audio stream buffer to convert
      * @return Converted audio buffer
      */
-    public static AudioStreamBuffer convert(@Nonnull final AudioStreamBuffer buffer) {
+    public static SoundBuffer convert(@Nonnull final SoundBuffer buffer) {
 
-        final AudioFormat format = buffer.audioFormat;
+        final AudioFormat format = buffer.format;
 
         // If it is already mono return original buffer
         if (format.getChannels() == 1)
@@ -76,7 +75,7 @@ public final class Conversion {
                 format.getFrameRate(),
                 bigendian);
 
-        final ByteBuffer source = buffer.inputBuffer;
+        final ByteBuffer source = buffer.data;
         if (source == null) {
             return buffer;
         }
@@ -98,28 +97,28 @@ public final class Conversion {
             }
         }
         // Patch up the old object
-        buffer.audioFormat = monoformat;
-        buffer.inputBuffer.rewind();
-        buffer.inputBuffer.limit(sourceLength >> 1);
+        buffer.format = monoformat;
+        buffer.data.rewind();
+        buffer.data.limit(sourceLength >> 1);
         return buffer;
     }
 
-    private static class MonoStream implements IAudioStream {
+    private static class MonoStream implements AudioStream {
 
-        private final IAudioStream source;
+        private final AudioStream source;
 
-        public MonoStream(@Nonnull final IAudioStream source) {
+        public MonoStream(@Nonnull final AudioStream source) {
             this.source = source;
         }
 
         @Override
-        public AudioFormat getAudioFormat() {
-            return this.source.getAudioFormat();
+        public AudioFormat getFormat() {
+            return this.source.getFormat();
         }
 
         @Override
-        public ByteBuffer readOggSoundWithCapacity(int size) throws IOException {
-            return this.source.readOggSoundWithCapacity(size);
+        public ByteBuffer read(int size) throws IOException {
+            return this.source.read(size);
         }
 
         @Override

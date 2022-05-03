@@ -18,25 +18,24 @@
 
 package org.orecruncher.environs.handlers;
 
-import javax.annotation.Nonnull;
-
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.profiler.IProfiler;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.util.profiling.ProfilerFiller;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.orecruncher.environs.config.Config;
 import org.orecruncher.environs.Environs;
+import org.orecruncher.environs.config.Config;
 import org.orecruncher.environs.shaders.ShaderPrograms;
-import org.orecruncher.lib.GameUtils;
 import org.orecruncher.environs.shaders.aurora.AuroraFactory;
 import org.orecruncher.environs.shaders.aurora.AuroraUtils;
 import org.orecruncher.environs.shaders.aurora.IAurora;
+import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.events.DiagnosticEvent;
 import org.orecruncher.lib.logging.IModLog;
-
 import org.orecruncher.lib.math.LoggingTimerEMA;
+
+import javax.annotation.Nonnull;
 
 @OnlyIn(Dist.CLIENT)
 public final class AuroraHandler extends HandlerBase {
@@ -83,7 +82,7 @@ public final class AuroraHandler extends HandlerBase {
 	}
 
 	@Override
-	public void process(@Nonnull final PlayerEntity player) {
+	public void process(@Nonnull final Player player) {
 
 		// Process the current aurora
 		if (this.current != null) {
@@ -116,7 +115,7 @@ public final class AuroraHandler extends HandlerBase {
 		this.dimensionId = CommonState.getDimensionId();
 	}
 
-	private void doRender(@Nonnull final MatrixStack matrixStack, final float partialTick) {
+	private void doRender(@Nonnull final PoseStack matrixStack, final float partialTick) {
 		this.render.begin();
 		if (this.current != null) {
 			this.current.render(matrixStack, partialTick);
@@ -129,12 +128,12 @@ public final class AuroraHandler extends HandlerBase {
 	 * @param matrixStack Matrix stack of the current environment
 	 * @param partialTick Partial tick, duh
 	 */
-	public static void renderHook(@Nonnull final MatrixStack matrixStack, final float partialTick) {
+	public static void renderHook(@Nonnull final PoseStack matrixStack, final float partialTick) {
 		if (handler != null) {
-			final IProfiler profiler = GameUtils.getMC().getProfiler();
-			profiler.startSection("Aurora Render");
+			final ProfilerFiller profiler = GameUtils.getMC().getProfiler();
+			profiler.push("Aurora Render");
 			handler.doRender(matrixStack, partialTick);
-			profiler.endSection();
+			profiler.pop();
 		}
 	}
 

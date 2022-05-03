@@ -18,15 +18,14 @@
 
 package org.orecruncher.environs.effects.particles;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.fluid.Fluids;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.world.IBlockReader;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.Camera;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
 import org.orecruncher.lib.biomes.BiomeUtilities;
 import org.orecruncher.lib.gui.Color;
 import org.orecruncher.lib.particles.MotionMote;
@@ -47,7 +46,7 @@ public class MoteWaterSpray extends MotionMote {
 	protected final float texU1, texU2;
 	protected final float texV1, texV2;
 
-	public MoteWaterSpray(final IBlockReader world, final double x, final double y, final double z, final double dX,
+	public MoteWaterSpray(final BlockGetter world, final double x, final double y, final double z, final double dX,
 						  final double dY, final double dZ) {
 
 		super(world, x, y, z, dX, dY, dZ);
@@ -81,13 +80,13 @@ public class MoteWaterSpray extends MotionMote {
 	}
 
 	@Override
-	public void renderParticle(@Nonnull IVertexBuilder buffer, @Nonnull ActiveRenderInfo info, float partialTicks) {
+	public void renderParticle(@Nonnull VertexConsumer buffer, @Nonnull Camera info, float partialTicks) {
 
 		final float x = renderX(info, partialTicks);
 		final float y = renderY(info, partialTicks);
 		final float z = renderZ(info, partialTicks);
 
-		Quaternion quaternion = info.getRotation();
+		Quaternion quaternion = info.rotation();
 
 		Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
 		vector3f1.transform(quaternion);
@@ -104,10 +103,10 @@ public class MoteWaterSpray extends MotionMote {
 			vector3f.add(x, y, z);
 		}
 
-		drawVertex(buffer, avector3f[0].getX(), avector3f[0].getY(), avector3f[0].getZ(), this.texU2, this.texV2);
-		drawVertex(buffer, avector3f[1].getX(), avector3f[1].getY(), avector3f[1].getZ(), this.texU2, this.texV1);
-		drawVertex(buffer, avector3f[2].getX(), avector3f[2].getY(), avector3f[2].getZ(), this.texU1, this.texV1);
-		drawVertex(buffer, avector3f[3].getX(), avector3f[3].getY(), avector3f[3].getZ(), this.texU1, this.texV2);
+		drawVertex(buffer, avector3f[0].x(), avector3f[0].y(), avector3f[0].z(), this.texU2, this.texV2);
+		drawVertex(buffer, avector3f[1].x(), avector3f[1].y(), avector3f[1].z(), this.texU2, this.texV1);
+		drawVertex(buffer, avector3f[2].x(), avector3f[2].y(), avector3f[2].z(), this.texU1, this.texV1);
+		drawVertex(buffer, avector3f[3].x(), avector3f[3].y(), avector3f[3].z(), this.texU1, this.texV2);
 	}
 
 }

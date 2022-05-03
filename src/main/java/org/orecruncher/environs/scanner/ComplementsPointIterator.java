@@ -18,12 +18,12 @@
 
 package org.orecruncher.environs.scanner;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * For 2 Cuboid objects of equal dimensions displaced in space (c1,c2) that

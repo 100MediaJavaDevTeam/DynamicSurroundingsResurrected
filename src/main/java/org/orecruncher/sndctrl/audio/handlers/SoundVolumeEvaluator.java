@@ -19,8 +19,8 @@
 package org.orecruncher.sndctrl.audio.handlers;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -44,18 +44,18 @@ public final class SoundVolumeEvaluator {
 
     // Callbacks from other mods where volume can be scaled.  Goal is to get mods to use this callback rather than
     // replacing the sound during sound play.
-    private static final ObjectArray<Function<ISound, Float>> volumeScaleCallbacks = new ObjectArray<>();
+    private static final ObjectArray<Function<SoundInstance, Float>> volumeScaleCallbacks = new ObjectArray<>();
 
     private SoundVolumeEvaluator() {
     }
 
-    public static void register(@Nonnull final Function<ISound, Float> callback) {
+    public static void register(@Nonnull final Function<SoundInstance, Float> callback) {
         volumeScaleCallbacks.add(callback);
     }
 
-    private static float getVolumeScaleFromMods(@Nonnull final ISound sound) {
+    private static float getVolumeScaleFromMods(@Nonnull final SoundInstance sound) {
         float result = SoundProcessor.getVolumeScale(sound);
-        for (final Function<ISound, Float> callback : volumeScaleCallbacks) {
+        for (final Function<SoundInstance, Float> callback : volumeScaleCallbacks) {
             try {
                 result = MathStuff.min(result, callback.apply(sound));
                 if (result == 0F)
@@ -67,7 +67,7 @@ public final class SoundVolumeEvaluator {
         return MathStuff.clamp(result, 0, 4F);
     }
 
-    private static float getCategoryVolumeScale(@Nonnull final ISound sound) {
+    private static float getCategoryVolumeScale(@Nonnull final SoundInstance sound) {
         final Optional<ISoundInstance> si = Utilities.safeCast(sound, ISoundInstance.class);
         if (si.isPresent()) {
             final ISoundCategory sc = si.get().getSoundCategory();
@@ -75,14 +75,14 @@ public final class SoundVolumeEvaluator {
         }
 
         // Master category already controlled by master gain so ignore
-        final SoundCategory category = sound.getCategory();
-        return category == SoundCategory.MASTER ? 1F : GameUtils.getGameSettings().getSoundLevel(category);
+        final SoundSource category = sound.getSource();
+        return category == SoundSource.MASTER ? 1F : GameUtils.getGameSettings().getSoundSourceVolume(category);
     }
 
     /**
      * This guy is hooked by a Mixin to replace getClampedVolume() in Minecraft code.
      */
-    public static float getClampedVolume(@Nonnull final ISound sound) {
+    public static float getClampedVolume(@Nonnull final SoundInstance sound) {
         // No special handling on CONFIG sounds
         if (sound instanceof ISoundInstance) {
             final ISoundCategory sc = ((ISoundInstance) sound).getSoundCategory();

@@ -18,16 +18,15 @@
 
 package org.orecruncher.environs.handlers;
 
-import javax.annotation.Nonnull;
-
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.Environs;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
-import org.orecruncher.sndctrl.api.acoustics.IAcousticFactory;
 import org.orecruncher.sndctrl.api.sound.IFadableSoundInstance;
 import org.orecruncher.sndctrl.audio.AudioEngine;
 import org.orecruncher.sndctrl.audio.SoundState;
+
+import javax.annotation.Nonnull;
 
 /*
  * Emitters are used to produce sounds that are continuous
@@ -111,7 +110,7 @@ public final class BackgroundAcousticEmitter {
 	}
 
 	public boolean isDonePlaying() {
-		return this.done || this.activeSound.isDonePlaying();
+		return this.done || this.activeSound.isStopped();
 	}
 
 	public void stop() {

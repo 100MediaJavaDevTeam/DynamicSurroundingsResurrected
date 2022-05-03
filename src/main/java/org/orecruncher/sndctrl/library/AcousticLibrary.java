@@ -19,9 +19,9 @@
 package org.orecruncher.sndctrl.library;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.StringUtils;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.StringUtil;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.dsurround.DynamicSurroundings;
@@ -30,7 +30,10 @@ import org.orecruncher.lib.resource.IResourceAccessor;
 import org.orecruncher.lib.resource.ResourceUtils;
 import org.orecruncher.sndctrl.SoundControl;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
-import org.orecruncher.sndctrl.audio.acoustic.*;
+import org.orecruncher.sndctrl.audio.acoustic.AcousticCompiler;
+import org.orecruncher.sndctrl.audio.acoustic.NullAcoustic;
+import org.orecruncher.sndctrl.audio.acoustic.SimpleAcoustic;
+import org.orecruncher.sndctrl.audio.acoustic.SimultaneousAcoustic;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -103,7 +106,7 @@ public final class AcousticLibrary {
     @Nonnull
     private static IAcoustic parseDefinition(@Nullable ResourceLocation acousticName, @Nullable String definition, @Nullable final Function<ResourceLocation, IAcoustic> acousticGenerator) {
         IAcoustic result;
-        if (!StringUtils.isNullOrEmpty(definition)) {
+        if (!StringUtil.isNullOrEmpty(definition)) {
             if (acousticName == null)
                 acousticName = ADHOC;
             final String nameSpace = acousticName.getNamespace();
@@ -174,9 +177,9 @@ public final class AcousticLibrary {
 
     @Nonnull
     public static ResourceLocation resolveResource(@Nonnull final String defaultDomain, @Nonnull final String name) {
-        if (StringUtils.isNullOrEmpty(name))
+        if (StringUtil.isNullOrEmpty(name))
             throw new IllegalArgumentException("Sound name is null or empty");
-        if (StringUtils.isNullOrEmpty(defaultDomain))
+        if (StringUtil.isNullOrEmpty(defaultDomain))
             throw new IllegalArgumentException("Default domain is null or empty");
 
         ResourceLocation res;
@@ -212,7 +215,7 @@ public final class AcousticLibrary {
 
     @Nonnull
     private static IAcoustic generateAcoustic(@Nonnull final SoundEvent evt) {
-        IAcoustic result = compiled.get(evt.getName().toString());
+        IAcoustic result = compiled.get(evt.getLocation().toString());
         if (result == null) {
             result = new SimpleAcoustic(evt);
         }

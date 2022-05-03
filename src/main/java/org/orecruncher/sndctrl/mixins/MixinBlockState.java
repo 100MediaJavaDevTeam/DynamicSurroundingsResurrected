@@ -18,7 +18,7 @@
 
 package org.orecruncher.sndctrl.mixins;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import org.orecruncher.sndctrl.library.AudioEffectLibrary;
 import org.orecruncher.sndctrl.misc.IMixinAudioEffectData;
 import org.spongepowered.asm.mixin.Mixin;

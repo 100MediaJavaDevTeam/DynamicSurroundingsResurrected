@@ -18,12 +18,12 @@
 
 package org.orecruncher.lib;
 
-import net.minecraft.client.GameSettings;
+import net.minecraft.client.CameraType;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.client.settings.PointOfView;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.Options;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -38,14 +38,14 @@ public final class GameUtils {
     // Client methods
     @OnlyIn(Dist.CLIENT)
     @Nullable
-    public static PlayerEntity getPlayer() {
+    public static Player getPlayer() {
         return getMC().player;
     }
 
     @OnlyIn(Dist.CLIENT)
     @Nullable
-    public static ClientWorld getWorld() {
-        return getMC().world;
+    public static ClientLevel getWorld() {
+        return getMC().level;
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -56,19 +56,19 @@ public final class GameUtils {
 
     @OnlyIn(Dist.CLIENT)
     @Nonnull
-    public static GameSettings getGameSettings() {
-        return getMC().gameSettings;
+    public static Options getGameSettings() {
+        return getMC().options;
     }
 
     @OnlyIn(Dist.CLIENT)
     public static boolean displayDebug() {
-        return getGameSettings().showDebugInfo;
+        return getGameSettings().renderDebug;
     }
 
     @OnlyIn(Dist.CLIENT)
     @Nonnull
-    public static SoundHandler getSoundHander() {
-        return getMC().getSoundHandler();
+    public static SoundManager getSoundHander() {
+        return getMC().getSoundManager();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -78,11 +78,11 @@ public final class GameUtils {
 
     @OnlyIn(Dist.CLIENT)
     public static boolean isThirdPersonView() {
-        return getGameSettings().getPointOfView() != PointOfView.FIRST_PERSON;
+        return getGameSettings().getCameraType() != CameraType.FIRST_PERSON;
     }
 
     @OnlyIn(Dist.CLIENT)
     public static boolean isFirstPersonView() {
-        return getGameSettings().getPointOfView() == PointOfView.FIRST_PERSON;
+        return getGameSettings().getCameraType() == CameraType.FIRST_PERSON;
     }
 }

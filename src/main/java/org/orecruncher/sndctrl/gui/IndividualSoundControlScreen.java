@@ -18,13 +18,13 @@
 
 package org.orecruncher.sndctrl.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -32,6 +32,7 @@ import org.orecruncher.lib.GameUtils;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 public class IndividualSoundControlScreen extends Screen {
@@ -55,18 +56,18 @@ public class IndividualSoundControlScreen extends Screen {
 
     private static final int TOOLTIP_Y_OFFSET = 30;
 
-    private static final ITextComponent SAVE = new TranslationTextComponent("gui.done");
-    private static final ITextComponent CANCEL = new TranslationTextComponent("gui.cancel");
+    private static final Component SAVE = new TranslatableComponent("gui.done");
+    private static final Component CANCEL = new TranslatableComponent("gui.cancel");
 
     protected final Screen parent;
     protected final boolean enablePlay;
-    protected TextFieldWidget searchField;
+    protected EditBox searchField;
     protected IndividualSoundControlList soundConfigList;
     protected Button save;
     protected Button cancel;
 
     protected IndividualSoundControlScreen(@Nullable final Screen parent, final boolean enablePlay) {
-        super(new TranslationTextComponent("sndctrl.text.soundconfig.title"));
+        super(new TranslatableComponent("sndctrl.text.soundconfig.title"));
         this.parent = parent;
         this.enablePlay = enablePlay;
     }
@@ -74,23 +75,23 @@ public class IndividualSoundControlScreen extends Screen {
     @Override
     protected void init() {
 
-        GameUtils.getMC().keyboardListener.enableRepeatEvents(true);
+        GameUtils.getMC().keyboardHandler.setSendRepeatsToGui(true);
 
         // Setup search bar
         final int searchBarLeftMargin = (this.width - SEARCH_BAR_WIDTH) / 2;
         final int searchBarY = TOP_OFFSET + HEADER_HEIGHT - SEARCH_BAR_HEIGHT;
-        this.searchField = new TextFieldWidget(
+        this.searchField = new EditBox(
                 this.font,
                 searchBarLeftMargin,
                 searchBarY,
                 SEARCH_BAR_WIDTH,
                 SEARCH_BAR_HEIGHT,
                 this.searchField,   // Copy existing data over
-                StringTextComponent.EMPTY);
+                TextComponent.EMPTY);
 
         this.searchField.setResponder((filter) -> this.soundConfigList.setSearchFilter(() -> filter, false));
 
-        this.children.add(this.searchField);
+        this.addRenderableWidget(this.searchField);
 
         // Setup the list control
         final int topY = TOP_OFFSET + HEADER_HEIGHT + SELECTION_HEIGHT_OFFSET;
@@ -105,10 +106,10 @@ public class IndividualSoundControlScreen extends Screen {
                 SELECTION_WIDTH,
                 SELECTION_HEIGHT,
                 this.enablePlay,
-                () -> this.searchField.getText(),
+                () -> this.searchField.getValue(),
                 this.soundConfigList);
 
-        this.children.add(this.soundConfigList);
+        this.addRenderableWidget(this.soundConfigList);
 
         // Set the control buttons at the bottom
         final int controlMargin = (this.width - CONTROL_WIDTH) / 2;
@@ -120,7 +121,7 @@ public class IndividualSoundControlScreen extends Screen {
                 BUTTON_HEIGHT,
                 SAVE,
                 this::save);
-        this.addButton(this.save);
+        this.addRenderableWidget(this.save);
 
         this.cancel = new Button(
                 controlMargin + BUTTON_WIDTH + BUTTON_SPACING,
@@ -129,9 +130,9 @@ public class IndividualSoundControlScreen extends Screen {
                 BUTTON_HEIGHT,
                 CANCEL,
                 this::cancel);
-        this.addButton(this.cancel);
+        this.addRenderableWidget(this.cancel);
 
-        this.setFocusedDefault(this.searchField);
+        this.setInitialFocus(this.searchField);
     }
 
     public void tick() {
@@ -147,15 +148,15 @@ public class IndividualSoundControlScreen extends Screen {
         return super.keyPressed(keyCode, scanCode, modifiers) || this.searchField.keyPressed(keyCode, scanCode, modifiers);
     }
 
-    public void closeScreen() {
-        GameUtils.getMC().displayGuiScreen(this.parent);
+    public void onClose() {
+        GameUtils.getMC().setScreen(this.parent);
     }
 
     public boolean charTyped(char codePoint, int modifiers) {
         return this.searchField.charTyped(codePoint, modifiers);
     }
 
-    public void render(@Nonnull final MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(@Nonnull final PoseStack matrixStack, int mouseX, int mouseY, float partialTicks) {
         this.renderDirtBackground(0);
         //this.renderBackground(matrixStack);
         this.soundConfigList.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -166,8 +167,8 @@ public class IndividualSoundControlScreen extends Screen {
         if (this.soundConfigList.isMouseOver(mouseX, mouseY)) {
             final IndividualSoundControlListEntry entry = this.soundConfigList.getEntryAt(mouseX, mouseY);
             if (entry != null) {
-                final List<ITextComponent> toolTip = entry.getToolTip(mouseX, mouseY);
-                this.renderWrappedToolTip(matrixStack, toolTip, mouseX, mouseY + TOOLTIP_Y_OFFSET, GameUtils.getMC().fontRenderer);
+                final List<Component> toolTip = entry.getToolTip(mouseX, mouseY);
+                this.renderTooltip(matrixStack, toolTip, Optional.empty(), mouseX, mouseY + TOOLTIP_Y_OFFSET, GameUtils.getMC().font);
             }
         }
     }
@@ -177,13 +178,13 @@ public class IndividualSoundControlScreen extends Screen {
     protected void save(@Nonnull final Button button) {
         // Gather the changes and push to underlying routine for parsing and packaging
         this.soundConfigList.saveChanges();
+        this.removed();
         this.onClose();
-        this.closeScreen();
     }
 
     protected void cancel(@Nonnull final Button button) {
         // Just discard - no processing
+        this.removed();
         this.onClose();
-        this.closeScreen();
     }
 }

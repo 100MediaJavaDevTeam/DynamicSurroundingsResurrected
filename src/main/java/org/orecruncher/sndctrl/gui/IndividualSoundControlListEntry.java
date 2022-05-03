@@ -18,22 +18,23 @@
 
 package org.orecruncher.sndctrl.gui;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-import net.minecraft.client.audio.SoundHandler;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.widget.Widget;
-import net.minecraft.client.gui.widget.button.Button;
-import net.minecraft.client.gui.widget.list.AbstractOptionList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.TranslationTextComponent;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ContainerObjectSelectionList;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.fml.client.gui.widget.Slider;
+import net.minecraftforge.client.gui.widget.Slider;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.fml.ForgeUtils;
 import org.orecruncher.lib.gui.ColorPalette;
@@ -54,26 +55,26 @@ import java.util.List;
 import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
-public class IndividualSoundControlListEntry extends AbstractOptionList.Entry<IndividualSoundControlListEntry> implements Slider.ISlider, AutoCloseable {
+public class IndividualSoundControlListEntry extends ContainerObjectSelectionList.Entry<IndividualSoundControlListEntry> implements Slider.ISlider, AutoCloseable {
 
     private static final int SLIDER_WIDTH = 100;
     private static final int BUTTON_WIDTH = 60;
     private static final int TOOLTIP_WIDTH = 300;
-    private static final Button.IPressable NULL_PRESSABLE = (b) -> {};
-    private static final ITextComponent CULL_ON = new TranslationTextComponent("sndctrl.text.soundconfig.cull");
-    private static final ITextComponent CULL_OFF = new TranslationTextComponent("sndctrl.text.soundconfig.nocull");
-    private static final ITextComponent BLOCK_ON = new TranslationTextComponent("sndctrl.text.soundconfig.block");
-    private static final ITextComponent BLOCK_OFF = new TranslationTextComponent("sndctrl.text.soundconfig.noblock");
-    private static final ITextComponent PLAY = new TranslationTextComponent("sndctrl.text.soundconfig.play");
-    private static final ITextComponent STOP = new TranslationTextComponent("sndctrl.text.soundconfig.stop");
-    private static final ITextComponent VANILLA_CREDIT = new TranslationTextComponent("sndctrl.text.tooltip.vanilla");
-    private static final ITextComponent SLIDER_SUFFIX = new StringTextComponent("%");
+    private static final Button.OnPress NULL_PRESSABLE = (b) -> {};
+    private static final Component CULL_ON = new TranslatableComponent("sndctrl.text.soundconfig.cull");
+    private static final Component CULL_OFF = new TranslatableComponent("sndctrl.text.soundconfig.nocull");
+    private static final Component BLOCK_ON = new TranslatableComponent("sndctrl.text.soundconfig.block");
+    private static final Component BLOCK_OFF = new TranslatableComponent("sndctrl.text.soundconfig.noblock");
+    private static final Component PLAY = new TranslatableComponent("sndctrl.text.soundconfig.play");
+    private static final Component STOP = new TranslatableComponent("sndctrl.text.soundconfig.stop");
+    private static final Component VANILLA_CREDIT = new TranslatableComponent("sndctrl.text.tooltip.vanilla");
+    private static final Component SLIDER_SUFFIX = new TextComponent("%");
 
-    private static final TextFormatting[] CODING = new TextFormatting[] {TextFormatting.ITALIC, TextFormatting.AQUA};
-    private static final Collection<ITextComponent> VOLUME_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.volume.help", TOOLTIP_WIDTH, CODING);
-    private static final Collection<ITextComponent> PLAY_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.play.help", TOOLTIP_WIDTH, CODING);
-    private static final Collection<ITextComponent> CULL_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.cull.help", TOOLTIP_WIDTH, CODING);
-    private static final Collection<ITextComponent> BLOCK_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.block.help", TOOLTIP_WIDTH, CODING);
+    private static final ChatFormatting[] CODING = new ChatFormatting[] {ChatFormatting.ITALIC, ChatFormatting.AQUA};
+    private static final Collection<Component> VOLUME_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.volume.help", TOOLTIP_WIDTH, CODING);
+    private static final Collection<Component> PLAY_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.play.help", TOOLTIP_WIDTH, CODING);
+    private static final Collection<Component> CULL_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.cull.help", TOOLTIP_WIDTH, CODING);
+    private static final Collection<Component> BLOCK_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.block.help", TOOLTIP_WIDTH, CODING);
 
     private static final int CONTROL_SPACING = 3;
 
@@ -83,9 +84,9 @@ public class IndividualSoundControlListEntry extends AbstractOptionList.Entry<In
     private final Button cullButton;
     private final Button playButton;
 
-    private final List<Widget> children = new ArrayList<>();
+    private final List<AbstractWidget> children = new ArrayList<>();
 
-    private List<ITextComponent> defaultTooltip;
+    private List<Component> defaultTooltip;
 
     private ISoundInstance soundPlay;
 
@@ -97,7 +98,7 @@ public class IndividualSoundControlListEntry extends AbstractOptionList.Entry<In
                 0,
                 SLIDER_WIDTH,
                 0,
-                StringTextComponent.EMPTY,
+                TextComponent.EMPTY,
                 SLIDER_SUFFIX,
                 0,
                 400,
@@ -135,7 +136,7 @@ public class IndividualSoundControlListEntry extends AbstractOptionList.Entry<In
                 this::play) {
 
             @Override
-            public void playDownSound(@Nonnull final SoundHandler ignore) {
+            public void playDownSound(@Nonnull final SoundManager ignore) {
                 // Suppress the button click to avoid conflicting with the sound play
             }
         };
@@ -146,16 +147,16 @@ public class IndividualSoundControlListEntry extends AbstractOptionList.Entry<In
 
     @Override
     @Nonnull
-    public List<? extends IGuiEventListener> getEventListeners() {
+    public List<? extends GuiEventListener> children() {
         return this.children;
     }
 
     @Override
-    public void render(@Nonnull final MatrixStack matrixStack, int index, int rowTop, int rowLeft, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean mouseOver, float partialTick_) {
-        final FontRenderer font = GameUtils.getMC().fontRenderer;
-        final float labelY = rowTop + (rowHeight - font.FONT_HEIGHT) / 2F;
+    public void render(@Nonnull final PoseStack matrixStack, int index, int rowTop, int rowLeft, int rowWidth, int rowHeight, int mouseX, int mouseY, boolean mouseOver, float partialTick_) {
+        final Font font = GameUtils.getMC().font;
+        final float labelY = rowTop + (rowHeight - font.lineHeight) / 2F;
         final String text = this.config.getLocation().toString();
-        font.drawString(matrixStack, text, (float) rowLeft, labelY, ColorPalette.WHITE.rgb());
+        font.draw(matrixStack, text, (float) rowLeft, labelY, ColorPalette.WHITE.rgb());
 
         // Need to position the other controls appropriately
         int rightMargin = rowLeft + rowWidth;
@@ -178,7 +179,7 @@ public class IndividualSoundControlListEntry extends AbstractOptionList.Entry<In
         this.cullButton.setHeight(rowHeight);
         this.cullButton.y = rowTop;
 
-        for (final Widget w : this.children)
+        for (final AbstractWidget w : this.children)
             w.render(matrixStack, mouseX, mouseY, partialTick_);
     }
 
@@ -233,23 +234,23 @@ public class IndividualSoundControlListEntry extends AbstractOptionList.Entry<In
     }
 
     @Nonnull
-    protected List<ITextComponent> getToolTip(final int mouseX, final int mouseY) {
+    protected List<Component> getToolTip(final int mouseX, final int mouseY) {
         if (this.defaultTooltip == null) {
             this.defaultTooltip = new ArrayList<>();
             final ResourceLocation loc = this.config.getLocation();
 
             final String modName = ForgeUtils.getModDisplayName(loc.getNamespace());
-            this.defaultTooltip.add(new StringTextComponent(TextFormatting.GOLD + modName));
+            this.defaultTooltip.add(new TextComponent(ChatFormatting.GOLD + modName));
 
-            this.defaultTooltip.add(new StringTextComponent(TextFormatting.GRAY + loc.toString()));
+            this.defaultTooltip.add(new TextComponent(ChatFormatting.GRAY + loc.toString()));
 
             final SoundMetadata meta = SoundLibrary.getSoundMetadata(loc);
-            final ITextComponent title = meta.getTitle();
-            if (title != StringTextComponent.EMPTY)
+            final Component title = meta.getTitle();
+            if (title != TextComponent.EMPTY)
                 this.defaultTooltip.add(title);
             final ISoundCategory category = meta.getCategory();
             if (category != Category.NEUTRAL) {
-                this.defaultTooltip.add(new TranslationTextComponent("sndctrl.text.tooltip.category").append(category.getTextComponent()));
+                this.defaultTooltip.add(new TranslatableComponent("sndctrl.text.tooltip.category").append(category.getTextComponent()));
             }
 
             if (modName.equals("Minecraft"))
@@ -258,7 +259,7 @@ public class IndividualSoundControlListEntry extends AbstractOptionList.Entry<In
                 this.defaultTooltip.addAll(meta.getCredits());
         }
 
-        final List<ITextComponent> result = new ArrayList<>(this.defaultTooltip);
+        final List<Component> result = new ArrayList<>(this.defaultTooltip);
 
         if (this.volume.isMouseOver(mouseX, mouseY)) {
             result.addAll(VOLUME_HELP);
@@ -282,4 +283,8 @@ public class IndividualSoundControlListEntry extends AbstractOptionList.Entry<In
         return this.config;
     }
 
+    @Override
+    public List<? extends NarratableEntry> narratables() {
+        return null;
+    }
 }

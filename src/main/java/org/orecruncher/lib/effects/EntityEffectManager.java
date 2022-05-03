@@ -18,25 +18,22 @@
 
 package org.orecruncher.lib.effects;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.annotation.Nonnull;
-
-import net.minecraft.client.GameSettings;
+import com.google.common.collect.ImmutableList;
+import net.minecraft.client.CameraType;
+import net.minecraft.client.Options;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.settings.PointOfView;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.collections.ObjectArray;
-
-import com.google.common.collect.ImmutableList;
-
 import org.orecruncher.sndctrl.api.effects.AbstractEntityEffect;
 import org.orecruncher.sndctrl.api.effects.IEntityEffectManager;
+
+import javax.annotation.Nonnull;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * An EntityEffectManager is responsible for managing the effects that are
@@ -74,7 +71,7 @@ public class EntityEffectManager implements IEntityEffectManager {
 			return;
 		this.isActive = isEntityAlive();
 		if (this.activeEffects != null) {
-			this.rangeToPlayer = this.subject.getDistanceSq(thePlayer());
+			this.rangeToPlayer = this.subject.distanceToSqr(thePlayer());
 			for (final AbstractEntityEffect eff : this.activeEffects)
 				if (this.isActive || eff.receiveLastCall())
 					eff.update();
@@ -148,8 +145,8 @@ public class EntityEffectManager implements IEntityEffectManager {
 	 */
 	@Override
 	public boolean isFirstPersonView() {
-		final GameSettings settings = GameUtils.getGameSettings();
-		return settings.getPointOfView() == PointOfView.FIRST_PERSON;
+		final Options settings = GameUtils.getGameSettings();
+		return settings.getCameraType() == CameraType.FIRST_PERSON;
 	}
 
 	/**
@@ -159,7 +156,7 @@ public class EntityEffectManager implements IEntityEffectManager {
 	 */
 	@Override
 	public void addParticle(@Nonnull final Particle particle) {
-		GameUtils.getMC().particles.addEffect(particle);
+		GameUtils.getMC().particleEngine.add(particle);
 	}
 
 	/**
@@ -170,8 +167,8 @@ public class EntityEffectManager implements IEntityEffectManager {
 	 */
 	@Override
 	public boolean isActivePlayer(@Nonnull final LivingEntity player) {
-		final PlayerEntity ep = thePlayer();
-		return ep.getEntityId() == player.getEntityId();
+		final Player ep = thePlayer();
+		return ep.getId() == player.getId();
 	}
 
 	/**
@@ -181,7 +178,7 @@ public class EntityEffectManager implements IEntityEffectManager {
 	 */
 	@Override
 	@Nonnull
-	public PlayerEntity thePlayer() {
+	public Player thePlayer() {
 		return GameUtils.getPlayer();
 	}
 

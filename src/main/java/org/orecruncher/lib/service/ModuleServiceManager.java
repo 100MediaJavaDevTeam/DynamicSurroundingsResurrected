@@ -18,18 +18,16 @@
 
 package org.orecruncher.lib.service;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.resources.IReloadableResourceManager;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.server.packs.resources.ReloadableResourceManager;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.resource.IResourceType;
-import net.minecraftforge.resource.ISelectiveResourceReloadListener;
-import net.minecraftforge.resource.VanillaResourceType;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.Singleton;
@@ -42,11 +40,10 @@ import org.orecruncher.lib.tags.TagUtils;
 import javax.annotation.Nonnull;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = DynamicSurroundings.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public final class ModuleServiceManager implements ISelectiveResourceReloadListener {
+public final class ModuleServiceManager implements ResourceManagerReloadListener {
 
     private static final IModLog LOGGER = DynamicSurroundings.LOGGER.createChild(ModuleServiceManager.class);
 
@@ -59,8 +56,8 @@ public final class ModuleServiceManager implements ISelectiveResourceReloadListe
     private boolean reloadFired = false;
 
     private ModuleServiceManager() {
-        final IResourceManager resourceManager = GameUtils.getMC().getResourceManager();
-        ((IReloadableResourceManager) resourceManager).addReloadListener(this);
+        final ResourceManager resourceManager = GameUtils.getMC().getResourceManager();
+        ((ReloadableResourceManager) resourceManager).registerReloadListener(this);
     }
 
     public static ModuleServiceManager instance() {
@@ -81,7 +78,7 @@ public final class ModuleServiceManager implements ISelectiveResourceReloadListe
      */
     private void reload() {
         ForgeUtils.getEnabledResourcePacks().forEach(p -> {
-            LOGGER.debug("Resource pack '%s'", p.getName());
+            LOGGER.debug("Resource pack '%s'", p.getId());
             LOGGER.debug("+  %s", p.getTitle().getString());
             LOGGER.debug("+  %s", p.getDescription().getString());
         });
@@ -89,21 +86,14 @@ public final class ModuleServiceManager implements ISelectiveResourceReloadListe
         this.services.forEach(IModuleService::log);
     }
 
-    /**
-     * Resource manager callback when resources change.  This can happen when a player alters the resource pack
-     * list.
-     *
-     * @param resourceManager   Ignored
-     * @param resourcePredicate Used to test which resource type is being reloaded
-     */
     @Override
-    public void onResourceManagerReload(@Nonnull final IResourceManager resourceManager, @Nonnull final Predicate<IResourceType> resourcePredicate) {
+    public void onResourceManagerReload(@Nonnull final ResourceManager resourceManager/*, @Nonnull final Predicate<IResourceType> resourcePredicate*/) {
         // Reload based on sounds
-        if (resourcePredicate.test(VanillaResourceType.SOUNDS)) {
+//        if (resourcePredicate.test(VanillaResourceType.SOUNDS)) {
             reportStatus("Received Resource reload callback");
             ResourceUtils.clearCache();
             this.reload();
-        }
+//        }
     }
 
     private boolean readyForReload() {
@@ -137,8 +127,8 @@ public final class ModuleServiceManager implements ISelectiveResourceReloadListe
 
     @SubscribeEvent
     public static void entityJoinWorld(@Nonnull final EntityJoinWorldEvent event) {
-        final PlayerEntity player = GameUtils.getPlayer();
-        if (player != null && player.getEntityWorld().isRemote() && player.getEntityId() == event.getEntity().getEntityId()) {
+        final Player player = GameUtils.getPlayer();
+        if (player != null && player.getCommandSenderWorld().isClientSide() && player.getId() == event.getEntity().getId()) {
             instance().joinWorld(event);
         }
     }
@@ -150,28 +140,17 @@ public final class ModuleServiceManager implements ISelectiveResourceReloadListe
     }
 
     @SubscribeEvent
-    public static void onLoad(@Nonnull final TagsUpdatedEvent.VanillaTagTypes event) {
+    public static void onLoad(@Nonnull final TagsUpdatedEvent event) {
         instance().load(event);
     }
 
-    private void load(@Nonnull final TagsUpdatedEvent.VanillaTagTypes event) {
+    private void load(@Nonnull final TagsUpdatedEvent event) {
         this.vanillaTagsEventFired = true;
         TagUtils.setTagManager(event.getTagManager());
-        reportStatus("TagsUpdatedEvent.VanillaTagTypes fired");
         this.reloadIfReady();
     }
 
-    @SubscribeEvent
-    public static void load(@Nonnull final TagsUpdatedEvent.CustomTagTypes event) {
-        instance().onLoad(event);
-    }
 
-    private void onLoad(@Nonnull final TagsUpdatedEvent.CustomTagTypes event) {
-        this.customTagsEventFired = true;
-        TagUtils.setTagManager(event.getTagManager());
-        reportStatus("TagsUpdatedEvent.CustomTagTypes fired");
-        this.reloadIfReady();
-    }
 
     /**
      * Causes the service stop phase to be invoked when a player logs out

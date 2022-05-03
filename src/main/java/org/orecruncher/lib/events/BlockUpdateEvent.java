@@ -19,7 +19,7 @@
 package org.orecruncher.lib.events;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.Event;
@@ -57,6 +57,6 @@ public class BlockUpdateEvent extends Event {
         for (int i = -1; i < 2; i++)
             for (int j = -1; j < 2; j++)
                 for (int k = -1; k < 2; k++)
-                    result.add(center.add(i, j, k));
+                    result.add(center.offset(i, j, k));
     }
 }

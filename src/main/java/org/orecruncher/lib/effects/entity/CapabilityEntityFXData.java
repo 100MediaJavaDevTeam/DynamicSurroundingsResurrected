@@ -18,57 +18,51 @@
 
 package org.orecruncher.lib.effects.entity;
 
-import javax.annotation.Nonnull;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
+import dev._100media.capabilitysyncer.core.CapabilityAttacher;
+import dev._100media.capabilitysyncer.example.player.ExamplePlayerCapability;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.orecruncher.lib.capability.NullStorage;
-import org.orecruncher.lib.capability.SimpleProvider;
+import org.jetbrains.annotations.Nullable;
 import org.orecruncher.sndctrl.SoundControl;
 
-@OnlyIn(Dist.CLIENT)
-public class CapabilityEntityFXData {
+import javax.annotation.Nonnull;
 
-	@SuppressWarnings("ConstantConditions")
-	@CapabilityInject(IEntityFX.class)
-	@Nonnull
-	public static final Capability<IEntityFX> FX_INFO = null;
+@OnlyIn(Dist.CLIENT)
+public class CapabilityEntityFXData extends CapabilityAttacher {
+	private static final Class<IEntityFX> CAPABILITY_CLASS = IEntityFX.class;
+	public static final Capability<IEntityFX> FX_INFO_CAPABILITY = getCapability(new CapabilityToken<>() {});
 	public static final ResourceLocation CAPABILITY_ID = new ResourceLocation(SoundControl.MOD_ID, "entityfx");
 
-	@OnlyIn(Dist.CLIENT)
 	public static void register() {
-		CapabilityManager.INSTANCE.register(IEntityFX.class, new NullStorage<>(), EntityFXData::new);
+		CapabilityAttacher.registerCapability(CAPABILITY_CLASS);
+		CapabilityAttacher.registerEntityAttacher(LivingEntity.class, CapabilityEntityFXData::attach, CapabilityEntityFXData::getFxInfo);
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	@Nonnull
-	public static ICapabilityProvider createProvider(final IEntityFX data) {
-		return new SimpleProvider<>(FX_INFO, null, data);
+	@Nullable
+	public static IEntityFX getFxInfoUnwrap(Entity entity) {
+		return getFxInfo(entity).orElse(null);
 	}
 
-	@Mod.EventBusSubscriber(modid = SoundControl.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
-	public static class EventHandler {
-		@SubscribeEvent
-		public static void attachCapabilities(@Nonnull final AttachCapabilitiesEvent<Entity> event) {
-			final World world = event.getObject().getEntityWorld();
-			// Check for null - some mods do no honor the contract
-			if (world != null && world.isRemote && event.getObject() instanceof LivingEntity) {
-				final EntityFXData info = new EntityFXData();
-				event.addCapability(CAPABILITY_ID, createProvider(info));
-			}
+	public static LazyOptional<IEntityFX> getFxInfo(Entity entity) {
+		return entity.getCapability(FX_INFO_CAPABILITY);
+	}
+
+	@SuppressWarnings("ConstantConditions")
+	private static void attach(AttachCapabilitiesEvent<Entity> event, LivingEntity livingEntity) {
+		// Check for null - some mods do not honor the contract
+		if (livingEntity.level != null && livingEntity.level.isClientSide) {
+			genericAttachCapability(event, new EntityFXData(livingEntity), FX_INFO_CAPABILITY, CAPABILITY_ID, false);
 		}
 	}
-
 }

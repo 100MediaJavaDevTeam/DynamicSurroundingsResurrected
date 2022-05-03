@@ -19,23 +19,21 @@
 package org.orecruncher.environs;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.IParticleFactory;
-import net.minecraft.particles.BasicParticleType;
-import net.minecraft.particles.ParticleTypes;
+import net.minecraft.client.particle.ParticleProvider;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.ExtensionPoint;
+import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.network.FMLNetworkConstants;
-import org.apache.commons.lang3.tuple.Pair;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.environs.config.Config;
 import org.orecruncher.environs.handlers.Manager;
@@ -62,7 +60,7 @@ public final class Environs {
     public Environs() {
 
         // Since we are 100% client side
-        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.DISPLAYTEST, () -> Pair.of(() -> FMLNetworkConstants.IGNORESERVERONLY, (a, b) -> true));
+        ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, ()->new IExtensionPoint.DisplayTest(()->"ANY", (remote, isServer)-> true));
 
         if (FMLEnvironment.dist == Dist.CLIENT) {
             // Various event bus registrations
@@ -82,7 +80,7 @@ public final class Environs {
     private void clientSetup(@Nonnull final FMLClientSetupEvent event) {
         // Disable Particles if configured to do so
         if (Config.CLIENT.effects.disableUnderwaterParticles.get())
-            Minecraft.getInstance().particles.registerFactory(ParticleTypes.UNDERWATER, (IParticleFactory<BasicParticleType>) null);
+            Minecraft.getInstance().particleEngine.register(ParticleTypes.UNDERWATER, (ParticleProvider<SimpleParticleType>) null);
     }
 
     private void enqueueIMC(final InterModEnqueueEvent event) {

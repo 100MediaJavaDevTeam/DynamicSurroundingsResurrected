@@ -17,13 +17,13 @@
  */
 package org.orecruncher.sndctrl.gui;
 
-import net.minecraft.client.settings.KeyBinding;
-import net.minecraft.client.util.InputMappings;
+import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.sndctrl.SoundControl;
@@ -31,21 +31,21 @@ import org.orecruncher.sndctrl.SoundControl;
 @Mod.EventBusSubscriber(modid = SoundControl.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class Keys {
 
-    private static KeyBinding quickVolumeGui;
-    private static KeyBinding soundConfigGui;
+    private static KeyMapping quickVolumeGui;
+    private static KeyMapping soundConfigGui;
 
     public static void register() {
-        quickVolumeGui = new KeyBinding(
+        quickVolumeGui = new KeyMapping(
                 "sndctrl.text.quickvolumemenu.open",
-                InputMappings.INPUT_INVALID.getKeyCode(),
+                InputConstants.UNKNOWN.getValue(),
                 "dsurround.text.controls.group");
-        quickVolumeGui.setKeyModifierAndCode(KeyModifier.CONTROL, InputMappings.getInputByName("key.keyboard.v"));
+        quickVolumeGui.setKeyModifierAndCode(KeyModifier.CONTROL, InputConstants.getKey("key.keyboard.v"));
 
-        soundConfigGui = new KeyBinding(
+        soundConfigGui = new KeyMapping(
                 "sndctrl.text.soundconfig.open",
-                InputMappings.INPUT_INVALID.getKeyCode(),
+                InputConstants.UNKNOWN.getValue(),
                 "dsurround.text.controls.group");
-        soundConfigGui.setKeyModifierAndCode(KeyModifier.CONTROL, InputMappings.getInputByName("key.keyboard.i"));
+        soundConfigGui.setKeyModifierAndCode(KeyModifier.CONTROL, InputConstants.getKey("key.keyboard.i"));
 
         ClientRegistry.registerKeyBinding(quickVolumeGui);
         ClientRegistry.registerKeyBinding(soundConfigGui);
@@ -53,14 +53,14 @@ public class Keys {
 
     @SubscribeEvent
     public static void keyPressed(InputEvent.KeyInputEvent event) {
-        if (GameUtils.getMC().currentScreen == null && GameUtils.getPlayer() != null) {
-            if (quickVolumeGui.isPressed()) {
-                GameUtils.getMC().displayGuiScreen(new QuickVolumeScreen());
-            } else if (soundConfigGui.isPressed()) {
-                final boolean singlePlayer = GameUtils.getMC().getCurrentAction().equals("singleplayer");
-                GameUtils.getMC().displayGuiScreen(new IndividualSoundControlScreen(null, singlePlayer));
+        if (GameUtils.getMC().screen == null && GameUtils.getPlayer() != null) {
+            if (quickVolumeGui.consumeClick()) {
+                GameUtils.getMC().setScreen(new QuickVolumeScreen());
+            } else if (soundConfigGui.consumeClick()) {
+                final boolean singlePlayer = GameUtils.getMC().getSingleplayerServer().isPublished();
+                GameUtils.getMC().setScreen(new IndividualSoundControlScreen(null, singlePlayer));
                 if (singlePlayer)
-                    GameUtils.getMC().getSoundHandler().pause();
+                    GameUtils.getMC().getSoundManager().pause();
             }
         }
     }

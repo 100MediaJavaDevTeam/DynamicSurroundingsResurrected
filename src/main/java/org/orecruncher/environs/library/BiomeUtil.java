@@ -18,7 +18,7 @@
 
 package org.orecruncher.environs.library;
 
-import net.minecraft.world.biome.Biome;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.misc.IMixinBiomeData;

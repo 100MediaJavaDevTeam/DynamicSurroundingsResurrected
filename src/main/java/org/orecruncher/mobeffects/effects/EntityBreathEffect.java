@@ -18,13 +18,13 @@
 
 package org.orecruncher.mobeffects.effects;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -56,7 +56,7 @@ public class EntityBreathEffect extends AbstractEntityEffect {
     @Override
     public void intitialize(@Nonnull final IEntityEffectManager state) {
         super.intitialize(state);
-        this.seed = MurmurHash3.hash(getEntity().getEntityId()) & 0xFFFF;
+        this.seed = MurmurHash3.hash(getEntity().getId()) & 0xFFFF;
     }
 
     @Override
@@ -65,9 +65,9 @@ public class EntityBreathEffect extends AbstractEntityEffect {
         if (isBreathVisible(entity)) {
             final int c = (int) (TickCounter.getTickCount() + this.seed);
             final BlockPos headPos = getHeadPosition(entity);
-            final BlockState state = entity.getEntityWorld().getBlockState(headPos);
+            final BlockState state = entity.getCommandSenderWorld().getBlockState(headPos);
             if (showWaterBubbles(state)) {
-                final int air = entity.getAir();
+                final int air = entity.getAirSupply();
                 if (air > 0) {
                     final int interval = c % 3;
                     if (interval == 0) {
@@ -89,16 +89,16 @@ public class EntityBreathEffect extends AbstractEntityEffect {
     }
 
     protected boolean isBreathVisible(@Nonnull final LivingEntity entity) {
-        final PlayerEntity player = GameUtils.getPlayer();
+        final Player player = GameUtils.getPlayer();
         if (entity == player) {
-            return !(player.isSpectator() || GameUtils.getGameSettings().hideGUI);
+            return !(player.isSpectator() || GameUtils.getGameSettings().hideGui);
         }
-        return !entity.isInvisibleToPlayer(player) && player.canEntityBeSeen(entity);
+        return !entity.isInvisibleTo(player) && player.hasLineOfSight(entity);
     }
 
     protected BlockPos getHeadPosition(@Nonnull final LivingEntity entity) {
-        final double d0 = entity.getPosY() + entity.getEyeHeight();
-        return new BlockPos(entity.getPosX(), d0, entity.getPosZ());
+        final double d0 = entity.getY() + entity.getEyeHeight();
+        return new BlockPos(entity.getX(), d0, entity.getZ());
     }
 
     protected boolean showWaterBubbles(@Nonnull final BlockState headBlock) {
@@ -107,7 +107,7 @@ public class EntityBreathEffect extends AbstractEntityEffect {
 
     protected boolean showFrostBreath(final LivingEntity entity, @Nonnull final BlockState headBlock, @Nonnull final BlockPos pos) {
         if (headBlock.getMaterial() == Material.AIR) {
-            final World world = entity.getEntityWorld();
+            final Level world = entity.getCommandSenderWorld();
             return WorldUtils.isColdTemperature(WorldUtils.getTemperatureAt(world, pos));
         }
         return false;

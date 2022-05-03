@@ -18,8 +18,9 @@
 
 package org.orecruncher.environs.handlers;
 
-import it.unimi.dsi.fastutil.objects.*;
-import net.minecraft.entity.player.PlayerEntity;
+import it.unimi.dsi.fastutil.objects.Reference2FloatOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Reference2IntMap;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -82,7 +83,7 @@ public class BiomeSoundEffects extends HandlerBase {
     }
 
     @Override
-    public void process(@Nonnull final PlayerEntity player) {
+    public void process(@Nonnull final Player player) {
         this.emitters.forEach(BackgroundAcousticEmitter::tick);
         if ((TickCounter.getTickCount() % SCAN_INTERVAL) == 0) {
             this.biomes.tick();
@@ -100,7 +101,7 @@ public class BiomeSoundEffects extends HandlerBase {
         clearSounds();
     }
 
-    private void handleBiomeSounds(@Nonnull final PlayerEntity player) {
+    private void handleBiomeSounds(@Nonnull final Player player) {
         this.biomes.tick();
         WORK_MAP.clear();
 

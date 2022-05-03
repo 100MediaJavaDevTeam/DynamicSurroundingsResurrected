@@ -18,16 +18,15 @@
 
 package org.orecruncher.environs.scanner;
 
-import java.util.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import net.minecraft.block.BlockState;
-import net.minecraft.world.IBlockReader;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraft.util.math.BlockPos;
+import java.util.Random;
 
 /**
  * Scans the area around the player in a continuous pattern.
@@ -64,8 +63,8 @@ public abstract class CuboidScanner extends Scanner {
 	}
 
 	protected BlockPos[] getMinMaxPointsForVolume(@Nonnull final BlockPos pos) {
-		BlockPos min = pos.add(-this.xRange, -this.yRange, -this.zRange);
-		final BlockPos max = pos.add(this.xRange, this.yRange, this.zRange);
+		BlockPos min = pos.offset(-this.xRange, -this.yRange, -this.zRange);
+		final BlockPos max = pos.offset(this.xRange, this.yRange, this.zRange);
 
 		if (min.getY() < 0)
 			min = new BlockPos(min.getX(), 0, min.getZ());
@@ -159,7 +158,7 @@ public abstract class CuboidScanner extends Scanner {
 	protected void updateScan(@Nonnull final Cuboid newVolume, @Nonnull final Cuboid oldVolume,
 			@Nonnull final Cuboid intersect) {
 
-		final IBlockReader provider = this.locus.getWorld();
+		final BlockGetter provider = this.locus.getWorld();
 
 		if (doBlockUnscan()) {
 			final ComplementsPointIterator newOutOfRange = new ComplementsPointIterator(oldVolume, intersect);
@@ -188,7 +187,7 @@ public abstract class CuboidScanner extends Scanner {
 
 	@Override
 	@Nullable
-	protected BlockPos nextPos(@Nonnull final BlockPos.Mutable workingPos, @Nonnull final Random rand) {
+	protected BlockPos nextPos(@Nonnull final BlockPos.MutableBlockPos workingPos, @Nonnull final Random rand) {
 
 		if (this.scanFinished)
 			return null;

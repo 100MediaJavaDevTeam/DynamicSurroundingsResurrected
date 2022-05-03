@@ -18,11 +18,11 @@
 
 package org.orecruncher.lib.fml;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.resources.ResourcePackInfo;
-import net.minecraft.resources.ResourcePackType;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.biome.Biome;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.ModContainer;
@@ -34,7 +34,10 @@ import org.orecruncher.lib.GameUtils;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -90,8 +93,8 @@ public final class ForgeUtils {
 
     @OnlyIn(Dist.CLIENT)
     @Nonnull
-    public static Collection<ResourcePackInfo> getEnabledResourcePacks() {
-        return GameUtils.getMC().getResourcePackList().getEnabledPacks();
+    public static Collection<Pack> getEnabledResourcePacks() {
+        return GameUtils.getMC().getResourcePackRepository().getSelectedPacks();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -99,7 +102,7 @@ public final class ForgeUtils {
     public static List<String> getResourcePackIdList() {
         return getEnabledResourcePacks()
                 .stream()
-                .flatMap(e -> e.getResourcePack().getResourceNamespaces(ResourcePackType.CLIENT_RESOURCES).stream())
+                .flatMap(e -> e.open().getNamespaces(PackType.CLIENT_RESOURCES).stream())
                 .collect(Collectors.toList());
     }
 
@@ -111,7 +114,7 @@ public final class ForgeUtils {
     @Nonnull
     public static Collection<BlockState> getBlockStates() {
         return StreamSupport.stream(ForgeRegistries.BLOCKS.spliterator(), false)
-                .map(block -> block.getStateContainer().getValidStates())
+                .map(block -> block.getStateDefinition().getPossibleStates())
                 .flatMap(Collection::stream)
                 .collect(Collectors.toList());
     }

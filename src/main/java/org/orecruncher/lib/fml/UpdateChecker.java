@@ -18,9 +18,9 @@
 
 package org.orecruncher.lib.fml;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.VersionChecker;
@@ -56,20 +56,20 @@ public class UpdateChecker extends Checker {
         if (!mod.isPresent())
             return null;
         final CheckResult result = VersionChecker.getResult(mod.get());
-        if (result.status != Status.OUTDATED)
+        if (result.status() != Status.OUTDATED)
             return null;
-        final String t = result.target != null ? result.target.toString() : "UNKNOWN";
-        final String u = result.url != null ? result.url : "UNKNOWN";
-        return I18n.format(this.messageId, mod.get().getDisplayName(), t, u);
+        final String t = result.target() != null ? result.target().toString() : "UNKNOWN";
+        final String u = result.url() != null ? result.url() : "UNKNOWN";
+        return I18n.get(this.messageId, mod.get().getDisplayName(), t, u);
     }
 
     @Nullable
     @Override
-    public ITextComponent onClientLogin(@Nonnull final ClientPlayerEntity player) {
+    public Component onClientLogin(@Nonnull final LocalPlayer player) {
         final String updateMessage = getUpdateMessage(this.modId);
         if (updateMessage != null) {
             try {
-                return ITextComponent.Serializer.getComponentFromJson(updateMessage);
+                return Component.Serializer.fromJson(updateMessage);
             } catch (@Nonnull final Throwable t) {
                 t.printStackTrace();
             }

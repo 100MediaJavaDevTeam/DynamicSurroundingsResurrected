@@ -18,11 +18,11 @@
 
 package org.orecruncher.environs.fog;
 
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.util.CubicSampler;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeManager;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
@@ -54,19 +54,19 @@ public class BiomeFogRangeCalculator extends VanillaFogRangeCalculator {
     @Nonnull
     public FogResult calculate(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
 
-        final ClientWorld world = GameUtils.getWorld();
+        final ClientLevel world = GameUtils.getWorld();
         assert world != null;
 
         final BiomeManager biomemanager = world.getBiomeManager();
-        final Vector3d origin = GameUtils.getMC().gameRenderer.getActiveRenderInfo().getProjectedView().subtract(2.0D, 2.0D, 2.0D).scale(0.25D);
-        final Vector3d visibilitySurvey = CubicSampler.func_240807_a_(origin, (x, y, z) -> {
-            final Biome b = biomemanager.getBiomeAtPosition(x, y, z);
+        final Vec3 origin = GameUtils.getMC().gameRenderer.getMainCamera().getPosition().subtract(2.0D, 2.0D, 2.0D).scale(0.25D);
+        final Vec3 visibilitySurvey = CubicSampler.gaussianSampleVec3(origin, (x, y, z) -> {
+            final Biome b = biomemanager.getNoiseBiomeAtQuart(x, y, z);
             final BiomeInfo info = BiomeUtil.getBiomeData(b);
-            return new Vector3d(info.getVisibility(), 0, 0);
+            return new Vec3(info.getVisibility(), 0, 0);
         });
 
         // Lower values means less visibility
-        final double visibility = visibilitySurvey.getX();
+        final double visibility = visibilitySurvey.x();
         final double farPlaneDistance = visibility * event.getFarPlaneDistance();
         final double farPlaneDistanceScaleBiome = 0.1D * (1D - visibility) + FogResult.DEFAULT_PLANE_SCALE * visibility;
 

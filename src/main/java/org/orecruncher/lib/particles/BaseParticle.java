@@ -18,10 +18,10 @@
 
 package org.orecruncher.lib.particles;
 
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.entity.EntityRendererManager;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -33,17 +33,17 @@ import java.util.Random;
 @OnlyIn(Dist.CLIENT)
 public abstract class BaseParticle extends Particle {
 
-    protected static final EntityRendererManager manager = GameUtils.getMC().getRenderManager();
+    protected static final EntityRenderDispatcher manager = GameUtils.getMC().getEntityRenderDispatcher();
     protected static final Random RANDOM = XorShiftRandom.current();
 
-    protected BaseParticle(@Nonnull final World worldIn, final double posXIn, final double posYIn,
+    protected BaseParticle(@Nonnull final Level worldIn, final double posXIn, final double posYIn,
                            final double posZIn) {
-        super((ClientWorld) worldIn, posXIn, posYIn, posZIn);
+        super((ClientLevel) worldIn, posXIn, posYIn, posZIn);
     }
 
-    public BaseParticle(@Nonnull final World worldIn, final double xCoordIn, final double yCoordIn,
+    public BaseParticle(@Nonnull final Level worldIn, final double xCoordIn, final double yCoordIn,
                         final double zCoordIn, final double xSpeedIn, final double ySpeedIn, final double zSpeedIn) {
-        super((ClientWorld) worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
+        super((ClientLevel) worldIn, xCoordIn, yCoordIn, zCoordIn, xSpeedIn, ySpeedIn, zSpeedIn);
     }
 
 }

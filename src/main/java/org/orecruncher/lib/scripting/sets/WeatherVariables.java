@@ -18,8 +18,8 @@
 
 package org.orecruncher.lib.scripting.sets;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -33,8 +33,8 @@ public class WeatherVariables extends VariableSet<IWeatherVariables> implements 
 
     private final LazyVariable<Float> temperature = new LazyVariable<>(() -> {
         if (GameUtils.isInGame()) {
-            final World world = GameUtils.getWorld();
-            final BlockPos pos = GameUtils.getPlayer().getPosition();
+            final Level world = GameUtils.getWorld();
+            final BlockPos pos = GameUtils.getPlayer().blockPosition();
             return WorldUtils.getTemperatureAt(world, pos);
         }
         return 0F;
@@ -57,7 +57,7 @@ public class WeatherVariables extends VariableSet<IWeatherVariables> implements 
     @Override
     public void update() {
         if (GameUtils.isInGame()) {
-            final World world = GameUtils.getWorld();
+            final Level world = GameUtils.getWorld();
             this.rainIntensity = WorldUtils.getRainStrength(world, 1F);
             this.thunderIndensity = WorldUtils.getThunderStrength(world, 1F);
             this.isRaining = WorldUtils.isRaining(world);

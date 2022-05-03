@@ -18,16 +18,19 @@
 
 package org.orecruncher.environs.handlers;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.StringUtils;
 import org.orecruncher.environs.library.BiomeInfo;
 import org.orecruncher.environs.library.BiomeLibrary;
 import org.orecruncher.environs.library.DimensionInfo;
-import org.orecruncher.lib.*;
+import org.orecruncher.lib.DayCycle;
+import org.orecruncher.lib.GameUtils;
+import org.orecruncher.lib.MinecraftClock;
+import org.orecruncher.lib.TickCounter;
 import org.orecruncher.lib.seasons.Season;
 
 @OnlyIn(Dist.CLIENT)
@@ -52,7 +55,7 @@ public final class CommonState {
     String dimensionName = StringUtils.EMPTY;
     DimensionInfo dimInfo = DimensionInfo.NONE;
     BlockPos playerPosition = BlockPos.ZERO;
-    Vector3d playerEyePosition = Vector3d.ZERO;
+    Vec3 playerEyePosition = Vec3.ZERO;
     float biomeTemperature = 0F;
 
     boolean inside;
@@ -97,7 +100,7 @@ public final class CommonState {
         return instance.playerPosition;
     }
 
-    public static Vector3d getPlayerEyePosition() { return instance.playerEyePosition; }
+    public static Vec3 getPlayerEyePosition() { return instance.playerEyePosition; }
 
     public static float getCurrentTemperature() {
         return instance.biomeTemperature;
@@ -139,7 +142,7 @@ public final class CommonState {
         return instance.clock;
     }
 
-    public static IWorldReader getBlockReader() {
+    public static LevelReader getBlockReader() {
         return GameUtils.getWorld();
     }
 }

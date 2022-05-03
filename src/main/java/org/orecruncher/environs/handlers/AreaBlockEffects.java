@@ -18,12 +18,14 @@
 
 package org.orecruncher.environs.handlers;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.orecruncher.environs.config.Config;
-import org.orecruncher.environs.scanner.*;
+import org.orecruncher.environs.scanner.AlwaysOnBlockEffectScanner;
+import org.orecruncher.environs.scanner.ClientPlayerLocus;
+import org.orecruncher.environs.scanner.RandomBlockEffectScanner;
 import org.orecruncher.lib.events.BlockUpdateEvent;
 import org.orecruncher.lib.events.DiagnosticEvent;
 import org.orecruncher.lib.math.LoggingTimerEMA;
@@ -46,7 +48,7 @@ class AreaBlockEffects extends HandlerBase {
     }
 
     @Override
-    public void process(@Nonnull final PlayerEntity player) {
+    public void process(@Nonnull final Player player) {
         this.nearEffects.tick();
         this.farEffects.tick();
         this.alwaysOn.tick();

@@ -18,11 +18,11 @@
 
 package org.orecruncher.lib.blockstate;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.state.Property;
-import net.minecraft.state.StateContainer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.orecruncher.lib.Lib;
 import org.orecruncher.lib.blockstate.BlockStateParser.ParseResult;
@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 
 public final class BlockStateMatcher {
 
-    public static final BlockStateMatcher AIR = new BlockStateMatcher(Blocks.AIR.getDefaultState());
+    public static final BlockStateMatcher AIR = new BlockStateMatcher(Blocks.AIR.defaultBlockState());
 
     // All instances will have this defined
     @Nonnull
@@ -84,9 +84,9 @@ public final class BlockStateMatcher {
     @Nonnull
     public static BlockStateMatcher create(@Nonnull final ParseResult result) {
         final Block block = result.getBlock();
-        final BlockState defaultState = block.getDefaultState();
-        final StateContainer<Block, BlockState> container = block.getStateContainer();
-        if (container.getValidStates().size() == 1) {
+        final BlockState defaultState = block.defaultBlockState();
+        final StateDefinition<Block, BlockState> container = block.getStateDefinition();
+        if (container.getPossibleStates().size() == 1) {
             // Easy case - it's always an identical match because there are no other properties
             return new BlockStateMatcher(defaultState);
         }
@@ -104,7 +104,7 @@ public final class BlockStateMatcher {
             final String s = entry.getKey();
             final Property<?> prop = container.getProperty(s);
             if (prop != null) {
-                final Optional<?> optional = prop.parseValue(entry.getValue());
+                final Optional<?> optional = prop.getValue(entry.getValue());
                 if (optional.isPresent()) {
                     props.put(prop, (Comparable<?>) optional.get());
                 } else {
@@ -124,9 +124,9 @@ public final class BlockStateMatcher {
     @Nonnull
     private static <T extends Comparable<T>> String getAllowedValues(@Nonnull final Block block, @Nonnull final String propName) {
         @SuppressWarnings("unchecked")
-        final Property<T> prop = (Property<T>) block.getStateContainer().getProperty(propName);
+        final Property<T> prop = (Property<T>) block.getStateDefinition().getProperty(propName);
         if (prop != null) {
-            return prop.getAllowedValues().stream().map(prop::getName).collect(Collectors.joining(","));
+            return prop.getPossibleValues().stream().map(prop::getName).collect(Collectors.joining(","));
         }
         return "Invalid property " + propName;
     }

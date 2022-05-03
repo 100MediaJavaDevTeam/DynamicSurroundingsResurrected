@@ -18,24 +18,23 @@
 
 package org.orecruncher.lib;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
-import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
-import net.minecraft.world.gen.Heightmap;
-import net.minecraft.world.storage.IWorldInfo;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.storage.LevelData;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.compat.ModEnvironment;
 import org.orecruncher.lib.reflection.BooleanField;
-//import sereneseasons.season.SeasonHooks;
 
 import javax.annotation.Nonnull;
 import java.lang.reflect.Method;
@@ -43,7 +42,7 @@ import java.lang.reflect.Method;
 @SuppressWarnings("unused")
 public final class WorldUtils {
 
-    private static final BooleanField<ClientWorld.ClientWorldInfo> flatWorld = new BooleanField<>(ClientWorld.ClientWorldInfo.class, false, "flatWorld", "field_239146_c_");
+    private static final BooleanField<ClientLevel.ClientLevelData> flatWorld = new BooleanField<>(ClientLevel.ClientLevelData.class, false, "flatWorld", "isFlat");
 
     /**
      * Temperatures LESS than this value are considered cold temperatures.
@@ -59,21 +58,21 @@ public final class WorldUtils {
      * SereneSeasons support to obtain the temperature at a specific block location.
      */
     private interface ITemperatureHandler {
-        float getTemp(@Nonnull final World world, @Nonnull final BlockPos pos);
+        float getTemp(@Nonnull final Level world, @Nonnull final BlockPos pos);
     }
 
     /**
      * Weather support to obtain current rain/thunder strength client side
      */
     private interface IWeatherStrength {
-        float getStrength(@Nonnull final World world, final float partialTicks);
+        float getStrength(@Nonnull final Level world, final float partialTicks);
     }
 
     /**
      * Weather support to determine if an aspect of weather is occuring.
      */
     private interface IWeatherAspect {
-        boolean isOccuring(@Nonnull final World world);
+        boolean isOccuring(@Nonnull final Level world);
     }
 
     private static final ITemperatureHandler TEMP;
@@ -87,7 +86,7 @@ public final class WorldUtils {
         if (ModEnvironment.SereneSeasons.isLoaded()) {
             try {
                 final Class<?> clazz = Class.forName("sereneseasons.season.SeasonHooks");
-                final Method method = clazz.getMethod("getBiomeTemperature", World.class, Biome.class, BlockPos.class);
+                final Method method = clazz.getMethod("getBiomeTemperature", Level.class, Biome.class, BlockPos.class);
                 TEMP1 = (world, pos) -> {
                     try {
                         return (float)method.invoke(null, world, world.getBiome(pos), pos);
@@ -107,10 +106,10 @@ public final class WorldUtils {
         TEMP = TEMP1;
 
         // Place holder for future
-        RAIN_STRENGTH = World::getRainStrength;
-        RAIN_OCCURING = World::isRaining;
-        THUNDER_STRENGTH = World::getThunderStrength;
-        THUNDER_OCCURING = World::isThundering;
+        RAIN_STRENGTH = Level::getRainLevel;
+        RAIN_OCCURING = Level::isRaining;
+        THUNDER_STRENGTH = Level::getThunderLevel;
+        THUNDER_OCCURING = Level::isThundering;
     }
 
     private WorldUtils() {
@@ -118,14 +117,14 @@ public final class WorldUtils {
     }
 
     @Nonnull
-    public static BlockPos getTopSolidOrLiquidBlock(@Nonnull final IWorldReader world, @Nonnull final BlockPos pos) {
-        return new BlockPos(pos.getX(), world.getHeight(Heightmap.Type.MOTION_BLOCKING, pos.getX(), pos.getZ()), pos.getZ());
+    public static BlockPos getTopSolidOrLiquidBlock(@Nonnull final LevelReader world, @Nonnull final BlockPos pos) {
+        return new BlockPos(pos.getX(), world.getHeight(Heightmap.Types.MOTION_BLOCKING, pos.getX(), pos.getZ()), pos.getZ());
     }
 
     /**
      * Gets the temperature value for the given BlockPos in the world.
      */
-    public static float getTemperatureAt(@Nonnull final World world, @Nonnull final BlockPos pos) {
+    public static float getTemperatureAt(@Nonnull final Level world, @Nonnull final BlockPos pos) {
         return TEMP.getTemp(world, pos);
     }
 
@@ -146,30 +145,30 @@ public final class WorldUtils {
     /**
      * Determines if the side of the block at the specified position is considered solid.
      */
-    public static boolean isSolid(@Nonnull final IBlockReader world, @Nonnull final BlockPos pos, @Nonnull final Direction dir) {
+    public static boolean isSolid(@Nonnull final BlockGetter world, @Nonnull final BlockPos pos, @Nonnull final Direction dir) {
         final BlockState state = world.getBlockState(pos);
-        return Block.doesSideFillSquare(state.getCollisionShape(world, pos, ISelectionContext.dummy()),dir);
+        return Block.isFaceFull(state.getCollisionShape(world, pos, CollisionContext.empty()),dir);
     }
 
     /**
      * Determines if the top side of the block at the specified position is considered solid.
      */
-    public static boolean isTopSolid(@Nonnull final IBlockReader world, @Nonnull final BlockPos pos) {
+    public static boolean isTopSolid(@Nonnull final BlockGetter world, @Nonnull final BlockPos pos) {
         return isSolid(world, pos, Direction.UP);
     }
 
     /**
      * Determines if the block at the specified location is solid.
      */
-    public static boolean isBlockSolid(@Nonnull final IBlockReader world, @Nonnull final BlockPos pos) {
+    public static boolean isBlockSolid(@Nonnull final BlockGetter world, @Nonnull final BlockPos pos) {
         final BlockState state = world.getBlockState(pos);
-        return state.isSolid();
+        return state.canOcclude();
     }
 
     /**
      * Determines if the block at the specified location is an air block.
      */
-    public static boolean isAirBlock(@Nonnull final IBlockReader world, @Nonnull final BlockPos pos) {
+    public static boolean isAirBlock(@Nonnull final BlockGetter world, @Nonnull final BlockPos pos) {
         return isAirBlock(world.getBlockState(pos));
     }
 
@@ -184,58 +183,58 @@ public final class WorldUtils {
      * Gets the precipitation currently falling at the specified location.  It takes into account temperature and the
      * like.
      */
-    public static Biome.RainType getCurrentPrecipitationAt(@Nonnull final IWorldReader world, @Nonnull final BlockPos pos) {
-        if (!(world instanceof World) || !isRaining((World) world)) {
+    public static Biome.Precipitation getCurrentPrecipitationAt(@Nonnull final LevelReader world, @Nonnull final BlockPos pos) {
+        if (!(world instanceof Level) || !isRaining((Level) world)) {
             // Not currently raining
-            return Biome.RainType.NONE;
+            return Biome.Precipitation.NONE;
         }
 
         final Biome biome = world.getBiome(pos);
 
         // If the biome has no rain...
-        if (biome.getPrecipitation() == Biome.RainType.NONE)
-            return Biome.RainType.NONE;
+        if (biome.getPrecipitation() == Biome.Precipitation.NONE)
+            return Biome.Precipitation.NONE;
 
         // Is there a block above that is blocking the rainfall?
         final BlockPos p = getPrecipitationHeight(world, pos);
         if (p.getY() > pos.getY()) {
-            return Biome.RainType.NONE;
+            return Biome.Precipitation.NONE;
         }
 
         // Use the temperature of the biome to get whether it is raining or snowing
-        final float temp = getTemperatureAt((World) world, pos);
-        return isSnowTemperature(temp) ? Biome.RainType.SNOW : Biome.RainType.RAIN;
+        final float temp = getTemperatureAt((Level) world, pos);
+        return isSnowTemperature(temp) ? Biome.Precipitation.SNOW : Biome.Precipitation.RAIN;
     }
 
-    public static float getRainStrength(@Nonnull final World world, final float partialTicks) {
+    public static float getRainStrength(@Nonnull final Level world, final float partialTicks) {
         return RAIN_STRENGTH.getStrength(world, partialTicks);
     }
 
-    public static float getThunderStrength(@Nonnull final World world, final float partialTicks) {
+    public static float getThunderStrength(@Nonnull final Level world, final float partialTicks) {
         return THUNDER_STRENGTH.getStrength(world, partialTicks);
     }
 
-    public static boolean isRaining(@Nonnull final World world) {
+    public static boolean isRaining(@Nonnull final Level world) {
         return RAIN_OCCURING.isOccuring(world);
     }
 
-    public static boolean isThundering(@Nonnull final World world) {
+    public static boolean isThundering(@Nonnull final Level world) {
         return THUNDER_OCCURING.isOccuring(world);
     }
 
     @Nonnull
-    public static BlockPos getPrecipitationHeight(@Nonnull final IWorldReader world, @Nonnull final BlockPos pos) {
-        return world.getHeight(Heightmap.Type.MOTION_BLOCKING, pos);
+    public static BlockPos getPrecipitationHeight(@Nonnull final LevelReader world, @Nonnull final BlockPos pos) {
+        return world.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos);
     }
 
-    public static boolean hasVoidParticles(@Nonnull final World world) {
-        return world.getDimensionType().hasSkyLight();
+    public static boolean hasVoidParticles(@Nonnull final Level world) {
+        return world.dimensionType().hasSkyLight();
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static boolean isSuperFlat(@Nonnull final World world) {
-        final IWorldInfo info = world.getWorldInfo();
-        return info instanceof ClientWorld.ClientWorldInfo && flatWorld.get((ClientWorld.ClientWorldInfo) info);
+    public static boolean isSuperFlat(@Nonnull final Level world) {
+        final LevelData info = world.getLevelData();
+        return info instanceof ClientLevel.ClientLevelData && flatWorld.get((ClientLevel.ClientLevelData) info);
     }
 
 }

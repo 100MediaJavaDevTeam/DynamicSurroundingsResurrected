@@ -18,21 +18,20 @@
 
 package org.orecruncher.lib.particles;
 
-import javax.annotation.Nonnull;
-
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.particle.IAnimatedSprite;
-import net.minecraft.client.renderer.ActiveRenderInfo;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
+import net.minecraft.client.Camera;
+import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Quaternion;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.util.Mth;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.gui.Color;
 import org.orecruncher.lib.random.XorShiftRandom;
 
+import javax.annotation.Nonnull;
 import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
@@ -74,9 +73,9 @@ public abstract class AnimatedMote extends MotionMote {
 	protected float texV1, texV2;
 	protected float particleScale;
 
-	protected final IAnimatedSprite sprites;
+	protected final SpriteSet sprites;
 
-	protected AnimatedMote(final @Nonnull IAnimatedSprite sprites, @Nonnull final IBlockReader world, double x, double y,
+	protected AnimatedMote(final @Nonnull SpriteSet sprites, @Nonnull final BlockGetter world, double x, double y,
 						   double z, double dX, double dY, double dZ) {
 		super(world, x, y, z, dX, dY, dZ);
 
@@ -115,9 +114,9 @@ public abstract class AnimatedMote extends MotionMote {
 
 	private void lerpColors() {
 		final float scaling = 1 / (float) this.maxAge;
-		this.dRed = MathHelper.lerp(scaling, this.red, this.fadeTargetRed);
-		this.dGreen = MathHelper.lerp(scaling, this.green, this.fadeTargetGreen);
-		this.dBlue = MathHelper.lerp(scaling, this.blue, this.fadeTargetBlue);
+		this.dRed = Mth.lerp(scaling, this.red, this.fadeTargetRed);
+		this.dGreen = Mth.lerp(scaling, this.green, this.fadeTargetGreen);
+		this.dBlue = Mth.lerp(scaling, this.blue, this.fadeTargetBlue);
 	}
 
 	@Override
@@ -161,13 +160,13 @@ public abstract class AnimatedMote extends MotionMote {
 	}
 
 	@Override
-	public void renderParticle(@Nonnull final IVertexBuilder buffer, @Nonnull final ActiveRenderInfo info, float partialTicks) {
+	public void renderParticle(@Nonnull final VertexConsumer buffer, @Nonnull final Camera info, float partialTicks) {
 
 		final float x = renderX(info, partialTicks);
 		final float y = renderY(info, partialTicks);
 		final float z = renderZ(info, partialTicks);
 
-		Quaternion quaternion = info.getRotation();
+		Quaternion quaternion = info.rotation();
 
 		Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
 		vector3f1.transform(quaternion);
@@ -184,18 +183,18 @@ public abstract class AnimatedMote extends MotionMote {
 			vector3f.add(x, y, z);
 		}
 
-		drawVertex(buffer, avector3f[0].getX(), avector3f[0].getY(), avector3f[0].getZ(), this.texU2, this.texV2);
-		drawVertex(buffer, avector3f[1].getX(), avector3f[1].getY(), avector3f[1].getZ(), this.texU2, this.texV1);
-		drawVertex(buffer, avector3f[2].getX(), avector3f[2].getY(), avector3f[2].getZ(), this.texU1, this.texV1);
-		drawVertex(buffer, avector3f[3].getX(), avector3f[3].getY(), avector3f[3].getZ(), this.texU1, this.texV2);
+		drawVertex(buffer, avector3f[0].x(), avector3f[0].y(), avector3f[0].z(), this.texU2, this.texV2);
+		drawVertex(buffer, avector3f[1].x(), avector3f[1].y(), avector3f[1].z(), this.texU2, this.texV1);
+		drawVertex(buffer, avector3f[2].x(), avector3f[2].y(), avector3f[2].z(), this.texU1, this.texV1);
+		drawVertex(buffer, avector3f[3].x(), avector3f[3].y(), avector3f[3].z(), this.texU1, this.texV2);
 	}
 
 	public void setParticleTexture() {
 		final TextureAtlasSprite texture = this.sprites.get(this.age, this.maxAge);
-		this.texU1 = texture.getMinU();
-		this.texU2 = texture.getMaxU();
-		this.texV1 = texture.getMinV();
-		this.texV2 = texture.getMaxV();
+		this.texU1 = texture.getU0();
+		this.texU2 = texture.getU1();
+		this.texV1 = texture.getV0();
+		this.texV2 = texture.getV1();
 	}
 
 }

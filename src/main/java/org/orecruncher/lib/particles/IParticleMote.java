@@ -18,9 +18,9 @@
 
 package org.orecruncher.lib.particles;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.util.math.vector.Vector3d;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -51,13 +51,13 @@ public interface IParticleMote {
     /**
      * Causes the mote to render itself.
      */
-    void renderParticle(@Nonnull IVertexBuilder buffer, @Nonnull ActiveRenderInfo renderInfo, float partialTicks);
+    void renderParticle(@Nonnull VertexConsumer buffer, @Nonnull Camera renderInfo, float partialTicks);
 
     /**
      * obtains the current position of the mote
      * @return Position of the mote
      */
     @Nonnull
-    Vector3d getPosition();
+    Vec3 getPosition();
 
 }

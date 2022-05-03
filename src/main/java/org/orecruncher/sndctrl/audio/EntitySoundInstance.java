@@ -19,8 +19,8 @@
 package org.orecruncher.sndctrl.audio;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.sndctrl.api.sound.ISoundInstance;
@@ -67,8 +67,8 @@ public class EntitySoundInstance extends WrappedSoundInstance {
     }
 
     @Override
-    public boolean isDonePlaying() {
-        return !this.entity.isAlive() || super.isDonePlaying();
+    public boolean isStopped() {
+        return !this.entity.isAlive() || super.isStopped();
     }
 
     @Override
@@ -82,7 +82,7 @@ public class EntitySoundInstance extends WrappedSoundInstance {
     }
 
     private void updatePosition() {
-        final Vector3d box = this.entity.getBoundingBox().getCenter();
+        final Vec3 box = this.entity.getBoundingBox().getCenter();
         this.x = (float) box.x;
         this.y = (float) box.y;
         this.z = (float) box.z;
@@ -95,7 +95,7 @@ public class EntitySoundInstance extends WrappedSoundInstance {
 
         // If we are not done playing, and the sound is not global, we
         // update the sound's position.
-        if (!isDonePlaying() && !isGlobal()) {
+        if (!isStopped() && !isRelative()) {
             updatePosition();
         }
     }
@@ -106,12 +106,12 @@ public class EntitySoundInstance extends WrappedSoundInstance {
         //@formatter:off
         return MoreObjects.toStringHelper(this)
                 .addValue(this.entity.toString())
-                .addValue(getSoundLocation().toString())
-                .addValue(getCategory().toString())
-                .addValue(getAttenuationType().toString())
+                .addValue(getLocation().toString())
+                .addValue(getSource().toString())
+                .addValue(getAttenuation().toString())
                 .addValue(getState().toString())
                 .add("v", getVolume())
-                .add("ev", SoundInstance.getEffectiveVolume(this))
+                .add("ev", DSSoundInstance.getEffectiveVolume(this))
                 .add("p", getPitch())
                 .add("x", getX())
                 .add("y", getY())

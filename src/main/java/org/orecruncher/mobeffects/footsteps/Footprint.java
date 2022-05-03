@@ -18,26 +18,26 @@
 
 package org.orecruncher.mobeffects.footsteps;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
 public class Footprint {
 
 	private FootprintStyle style;
 	private LivingEntity entity;
-	private Vector3d stepLoc;
+	private Vec3 stepLoc;
 	private boolean isRightFoot;
 	private float rotation;
 	private float scale;
 
 	public static Footprint produce(@Nonnull final FootprintStyle style, @Nonnull final LivingEntity entity,
-			@Nonnull final Vector3d stepLoc, final float rotation, final float scale, final boolean rightFoot) {
+			@Nonnull final Vec3 stepLoc, final float rotation, final float scale, final boolean rightFoot) {
 		final Footprint print = new Footprint();
 		print.style = style;
 		print.entity = entity;
@@ -57,7 +57,7 @@ public class Footprint {
 	}
 
 	@Nullable
-	public Vector3d getStepLocation() {
+	public Vec3 getStepLocation() {
 		return this.stepLoc;
 	}
 

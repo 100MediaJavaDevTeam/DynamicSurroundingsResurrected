@@ -18,9 +18,10 @@
 
 package org.orecruncher.environs.effects.emitters;
 
-import net.minecraft.client.settings.ParticleStatus;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.client.ParticleStatus;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.Environs;
@@ -33,8 +34,6 @@ import org.orecruncher.environs.library.Constants;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.WorldUtils;
 import org.orecruncher.lib.math.MathStuff;
-
-import net.minecraft.util.math.BlockPos;
 import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
 import org.orecruncher.sndctrl.api.acoustics.Library;
 import org.orecruncher.sndctrl.audio.AudioEngine;
@@ -61,7 +60,7 @@ public class WaterSplashJet extends Jet {
 	protected int particleLimit;
 	protected final double deltaY;
 
-	public WaterSplashJet(final int strength, final IBlockReader world, final BlockPos loc, final double dY) {
+	public WaterSplashJet(final int strength, final BlockGetter world, final BlockPos loc, final double dY) {
 		super(0, strength, world, loc.getX() + 0.5D, loc.getY() + 0.5D, loc.getZ() + 0.5D, 4);
 		this.deltaY = loc.getY() + dY;
 		setSpawnCount((int) (strength * 2.5F));

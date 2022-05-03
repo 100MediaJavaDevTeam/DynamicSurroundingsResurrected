@@ -19,8 +19,8 @@
 package org.orecruncher.sndctrl.audio.handlers;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.client.audio.ISound;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.openal.EXTEfx;
@@ -59,8 +59,8 @@ public final class SourceContext implements Callable<Void> {
     private final SourcePropertyFloat airAbsorb;
     private final SoundFXUtils fxProcessor;
 
-    private ISound sound;
-    private Vector3d pos;
+    private SoundInstance sound;
+    private Vec3 pos;
     private ISoundCategory category = Category.MASTER;
 
     private boolean isEnabled;
@@ -73,7 +73,7 @@ public final class SourceContext implements Callable<Void> {
         this.lowPass3 = new LowPassData();
         this.direct = new LowPassData();
         this.airAbsorb = new SourcePropertyFloat(EXTEfx.AL_AIR_ABSORPTION_FACTOR, EXTEfx.AL_DEFAULT_AIR_ABSORPTION_FACTOR, EXTEfx.AL_MIN_AIR_ABSORPTION_FACTOR, EXTEfx.AL_MAX_AIR_ABSORPTION_FACTOR);
-        this.pos = Vector3d.ZERO;
+        this.pos = Vec3.ZERO;
         this.fxProcessor = new SoundFXUtils(this);
     }
 
@@ -120,7 +120,7 @@ public final class SourceContext implements Callable<Void> {
     }
 
     @Nonnull
-    public Vector3d getPosition() {
+    public Vec3 getPosition() {
         return this.pos;
     }
 
@@ -129,14 +129,14 @@ public final class SourceContext implements Callable<Void> {
         return this.category;
     }
 
-    public void attachSound(@Nonnull final ISound sound) {
+    public void attachSound(@Nonnull final SoundInstance sound) {
         this.sound = sound;
         this.category = Category.getCategory(sound).orElse(Category.MASTER);
         captureState();
     }
 
     @Nullable
-    public ISound getSound() {
+    public SoundInstance getSound() {
         return this.sound;
     }
 
@@ -201,7 +201,7 @@ public final class SourceContext implements Callable<Void> {
 
     private void captureState() {
         if (this.sound != null) {
-            this.pos = new Vector3d(this.sound.getX(), this.sound.getY(), this.sound.getZ());
+            this.pos = new Vec3(this.sound.getX(), this.sound.getY(), this.sound.getZ());
         }
     }
 

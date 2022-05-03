@@ -18,15 +18,15 @@
 
 package org.orecruncher.mobeffects.effects.particles;
 
-import net.minecraft.client.particle.IAnimatedSprite;
-import net.minecraft.client.particle.IParticleRenderType;
-import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.particles.ParticleTypes;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SpriteSet;
+import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -34,55 +34,55 @@ import org.orecruncher.lib.GameUtils;
 import javax.annotation.Nonnull;
 
 @OnlyIn(Dist.CLIENT)
-public class BubbleBreathParticle  extends SpriteTexturedParticle {
+public class BubbleBreathParticle  extends TextureSheetParticle {
     public BubbleBreathParticle(@Nonnull final LivingEntity entity, final boolean isDrowning) {
-        super((ClientWorld) entity.getEntityWorld(), 0, 0, 0);
+        super((ClientLevel) entity.getCommandSenderWorld(), 0, 0, 0);
 
         // Reuse the bubble sheet
-        final IAnimatedSprite spriteSet = GameUtils.getMC().particles.sprites.get(ParticleTypes.BUBBLE.getRegistryName());
-        this.selectSpriteRandomly(spriteSet);
+        final SpriteSet spriteSet = GameUtils.getMC().particleEngine.spriteSets.get(ParticleTypes.BUBBLE.getRegistryName());
+        this.pickSprite(spriteSet);
 
-        final Vector3d origin = ParticleUtils.getBreathOrigin(entity);
-        final Vector3d trajectory = ParticleUtils.getLookTrajectory(entity);
+        final Vec3 origin = ParticleUtils.getBreathOrigin(entity);
+        final Vec3 trajectory = ParticleUtils.getLookTrajectory(entity);
         final double factor = isDrowning ? 0.02D : 0.005D;
 
-        this.setPosition(origin.x, origin.y, origin.z);
-        this.prevPosX = origin.x;
-        this.prevPosY = origin.y;
-        this.prevPosZ = origin.z;
+        this.setPos(origin.x, origin.y, origin.z);
+        this.xo = origin.x;
+        this.yo = origin.y;
+        this.zo = origin.z;
 
-        this.motionX = trajectory.x * factor;
-        this.motionY = trajectory.y * 0.002D;
-        this.motionZ = trajectory.z * factor;
+        this.xd = trajectory.x * factor;
+        this.yd = trajectory.y * 0.002D;
+        this.zd = trajectory.z * factor;
 
-        this.particleGravity = 0F;
+        this.gravity = 0F;
 
-        this.setAlphaF(0.2F);
+        this.setAlpha(0.2F);
         this.setSize(0.02F, 0.02F);
-        this.particleScale *= this.rand.nextFloat() * 0.6F + 0.2F;
-        this.particleScale *= entity.isChild() ? 0.125F : 0.25F;
-        this.maxAge = (int) (8.0D / (Math.random() * 0.8D + 0.2D));
+        this.quadSize *= this.random.nextFloat() * 0.6F + 0.2F;
+        this.quadSize *= entity.isBaby() ? 0.125F : 0.25F;
+        this.lifetime = (int) (8.0D / (Math.random() * 0.8D + 0.2D));
     }
 
     public void tick() {
-        this.prevPosX = this.posX;
-        this.prevPosY = this.posY;
-        this.prevPosZ = this.posZ;
-        if (this.maxAge-- <= 0) {
-            this.setExpired();
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
+        if (this.lifetime-- <= 0) {
+            this.remove();
         } else {
-            this.motionY += 0.002D;
-            this.move(this.motionX, this.motionY, this.motionZ);
-            this.motionX *= 0.8500000238418579D;
-            this.motionY *= 0.8500000238418579D;
-            this.motionZ *= 0.8500000238418579D;
-            if (!this.world.getFluidState(new BlockPos(this.posX, this.posY, this.posZ)).isTagged(FluidTags.WATER)) {
-                this.setExpired();
+            this.yd += 0.002D;
+            this.move(this.xd, this.yd, this.zd);
+            this.xd *= 0.8500000238418579D;
+            this.yd *= 0.8500000238418579D;
+            this.zd *= 0.8500000238418579D;
+            if (!this.level.getFluidState(new BlockPos(this.x, this.y, this.z)).is(FluidTags.WATER)) {
+                this.remove();
             }
         }
     }
 
-    public IParticleRenderType getRenderType() {
-        return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 }

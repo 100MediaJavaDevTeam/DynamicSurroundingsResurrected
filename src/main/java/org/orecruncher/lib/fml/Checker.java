@@ -18,8 +18,8 @@
 
 package org.orecruncher.lib.fml;
 
-import net.minecraft.client.entity.player.ClientPlayerEntity;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -36,5 +36,5 @@ public abstract class Checker implements ClientLoginChecks.ICallbackHandler {
     }
 
     @Nullable
-    public abstract ITextComponent onClientLogin(@Nonnull ClientPlayerEntity player);
+    public abstract Component onClientLogin(@Nonnull LocalPlayer player);
 }

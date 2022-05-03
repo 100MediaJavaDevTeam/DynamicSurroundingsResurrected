@@ -18,9 +18,10 @@
 package org.orecruncher.lib.shaders;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.shaders.Effect;
+import com.mojang.blaze3d.shaders.Program;
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
-import net.minecraft.client.shader.IShaderManager;
-import net.minecraft.client.shader.ShaderLoader;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.Lib;
@@ -29,15 +30,15 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 
 @OnlyIn(Dist.CLIENT)
-final class ShaderProgram implements IShaderManager {
+final class ShaderProgram implements Effect {
 
     private final String name;
     private final int program;
-    private final ShaderLoader vert;
-    private final ShaderLoader frag;
+    private final Program vert;
+    private final Program frag;
     private final Object2IntOpenHashMap<String> uniforms = new Object2IntOpenHashMap<>();
 
-    ShaderProgram(@Nonnull final String name, int program, @Nonnull final ShaderLoader vert, @Nonnull final ShaderLoader frag) {
+    ShaderProgram(@Nonnull final String name, int program, @Nonnull final Program vert, @Nonnull final Program frag) {
         this.name = name;
         this.program = program;
         this.vert = vert;
@@ -47,13 +48,13 @@ final class ShaderProgram implements IShaderManager {
     }
 
     @Override
-    public int getProgram() {
+    public int getId() {
         return program;
     }
 
     void setUniforms(@Nonnull final Collection<String> uniforms) {
         for (final String u : uniforms) {
-            final int id = GlStateManager.getUniformLocation(this.program, u);
+            final int id = GlStateManager._glGetUniformLocation(this.program, u);
             if (id < 0)
                 Lib.LOGGER.warn("Cannot locate uniform '%s' for shader '%s'", u, this.name);
             this.uniforms.put(u, id);
@@ -71,14 +72,21 @@ final class ShaderProgram implements IShaderManager {
 
     @Override
     @Nonnull
-    public ShaderLoader getVertexShaderLoader() {
+    public Program getVertexProgram() {
         return vert;
     }
 
     @Override
     @Nonnull
-    public ShaderLoader getFragmentShaderLoader() {
+    public Program getFragmentProgram() {
         return frag;
+    }
+
+    @Override
+    public void attachToProgram() {
+        RenderSystem.assertOnRenderThread();
+        this.vert.attachToShader(this);
+        this.frag.attachToShader(this);
     }
 
     @Override

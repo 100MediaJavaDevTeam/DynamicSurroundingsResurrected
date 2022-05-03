@@ -18,10 +18,9 @@
 
 package org.orecruncher.environs.effects;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.environs.effects.particles.Collections;
@@ -43,7 +42,7 @@ public class FireFlyEffect extends BlockEffect {
     }
 
     @Override
-    public void doEffect(@Nonnull final IBlockReader provider, @Nonnull final BlockState state,
+    public void doEffect(@Nonnull final BlockGetter provider, @Nonnull final BlockState state,
                          @Nonnull final BlockPos pos, @Nonnull final Random random) {
         Collections.addFireFly(provider, pos.getX() + 0.5F, pos.getY() + 0.5F,
                 pos.getZ() + 0.5F);

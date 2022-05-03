@@ -18,10 +18,10 @@
 
 package org.orecruncher.mobeffects.config;
 
-import me.shedaniel.clothconfig2.forge.api.ConfigBuilder;
-import me.shedaniel.clothconfig2.forge.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.forge.impl.builders.*;
-import net.minecraft.util.text.TextFormatting;
+import me.shedaniel.clothconfig2.api.ConfigBuilder;
+import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
+import me.shedaniel.clothconfig2.impl.builders.*;
+import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.config.ClothAPIFactory;
@@ -35,9 +35,9 @@ public class ConfigGenerator {
     @Nonnull
     public static SubCategoryBuilder generate(@Nonnull final ConfigBuilder builder, @Nonnull final ConfigEntryBuilder entryBuilder) {
 
-        SubCategoryBuilder modCategory = ClothAPIFactory.createSubCategory(entryBuilder, "mobeffects.modname", TextFormatting.GOLD, false);
+        SubCategoryBuilder modCategory = ClothAPIFactory.createSubCategory(entryBuilder, "mobeffects.modname", ChatFormatting.GOLD, false);
 
-        SubCategoryBuilder subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "mobeffects.cfg.logging", TextFormatting.YELLOW, false);
+        SubCategoryBuilder subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "mobeffects.cfg.logging", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,
@@ -50,7 +50,7 @@ public class ConfigGenerator {
 
         modCategory.add(subCategory.build());
 
-        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "mobeffects.cfg.footsteps", TextFormatting.YELLOW, false);
+        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "mobeffects.cfg.footsteps", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,
@@ -99,7 +99,7 @@ public class ConfigGenerator {
 
         modCategory.add(subCategory.build());
 
-        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "mobeffects.cfg.effects", TextFormatting.YELLOW, false);
+        subCategory = ClothAPIFactory.createSubCategory(entryBuilder, "mobeffects.cfg.effects", ChatFormatting.YELLOW, false);
         subCategory.add(
                 ClothAPIFactory.createBoolean(
                         builder,

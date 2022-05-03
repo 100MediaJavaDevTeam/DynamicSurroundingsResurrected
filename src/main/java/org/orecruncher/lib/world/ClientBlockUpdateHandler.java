@@ -19,9 +19,9 @@
 package org.orecruncher.lib.world;
 
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
@@ -37,7 +37,9 @@ import org.orecruncher.lib.math.LoggingTimerEMA;
 import org.orecruncher.sndctrl.config.Config;
 
 import javax.annotation.Nonnull;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.Queue;
+import java.util.Set;
 
 @Mod.EventBusSubscriber(modid = DynamicSurroundings.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class ClientBlockUpdateHandler {
@@ -54,7 +56,7 @@ public final class ClientBlockUpdateHandler {
     private static int interval = 0;
 
     // Callback that is inserted into ClientWorld processing via ASM
-    public static void blockUpdateCallback(@Nonnull final ClientWorld world, @Nonnull final BlockPos pos, @Nonnull final BlockState state) {
+    public static void blockUpdateCallback(@Nonnull final ClientLevel world, @Nonnull final BlockPos pos, @Nonnull final BlockState state) {
         updates.add(Pair.of(interval + TICK_OFFSET, pos));
     }
 
@@ -84,7 +86,7 @@ public final class ClientBlockUpdateHandler {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onWorldLoad(@Nonnull final WorldEvent.Load event) {
-        if (event.getWorld().isRemote()) {
+        if (event.getWorld().isClientSide()) {
             updates.clear();
             interval = 0;
         }
@@ -92,7 +94,7 @@ public final class ClientBlockUpdateHandler {
 
     @SubscribeEvent(priority = EventPriority.LOW)
     public static void onWorldUnload(@Nonnull final WorldEvent.Unload event) {
-        if (event.getWorld().isRemote()) {
+        if (event.getWorld().isClientSide()) {
             updates.clear();
             interval = 0;
         }

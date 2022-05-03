@@ -18,23 +18,24 @@
 
 package org.orecruncher.sndctrl.audio.handlers;
 
-import net.minecraft.client.gui.screen.MainMenuScreen;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.GuiOpenEvent;
+import net.minecraftforge.client.event.ScreenOpenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.commons.lang3.StringUtils;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.logging.IModLog;
 import org.orecruncher.lib.random.XorShiftRandom;
+import org.orecruncher.sndctrl.SoundControl;
+import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
 import org.orecruncher.sndctrl.api.acoustics.IAcousticFactory;
 import org.orecruncher.sndctrl.api.sound.Category;
 import org.orecruncher.sndctrl.api.sound.ISoundInstance;
+import org.orecruncher.sndctrl.audio.AudioEngine;
+import org.orecruncher.sndctrl.audio.PlayerCenteredSoundInstance;
 import org.orecruncher.sndctrl.config.Config;
-import org.orecruncher.sndctrl.SoundControl;
-import org.orecruncher.sndctrl.audio.*;
-import org.orecruncher.sndctrl.api.acoustics.IAcoustic;
 import org.orecruncher.sndctrl.library.Primitives;
 
 import javax.annotation.Nonnull;
@@ -50,8 +51,8 @@ public final class SoundEventHandling {
     }
 
     @SubscribeEvent
-    public static void onGuiOpen(@Nonnull final GuiOpenEvent event) {
-        if (!hasPlayed && event.getGui() instanceof MainMenuScreen) {
+    public static void onGuiOpen(@Nonnull final ScreenOpenEvent event) {
+        if (!hasPlayed && event.getScreen() instanceof TitleScreen) {
 
             hasPlayed = true;
 
@@ -76,7 +77,7 @@ public final class SoundEventHandling {
             IAcousticFactory factory = acoustic.getFactory();
             if (factory != null) {
                 final ISoundInstance instance = new PlayerCenteredSoundInstance(acoustic.getFactory().createSound(), Category.MASTER);
-                GameUtils.getMC().enqueue(() -> {
+                GameUtils.getMC().tell(() -> {
                     try {
                         AudioEngine.play(instance);
                     } catch (@Nonnull final Throwable t) {

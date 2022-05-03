@@ -19,32 +19,30 @@
 
 package org.orecruncher.environs.effects.emitters;
 
-import java.util.Random;
-
-import javax.annotation.Nonnull;
-
-import net.minecraft.world.IBlockReader;
+import net.minecraft.client.particle.Particle;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.random.XorShiftRandom;
 
-import net.minecraft.client.particle.Particle;
-import net.minecraft.util.math.BlockPos;
+import javax.annotation.Nonnull;
+import java.util.Random;
 
 @OnlyIn(Dist.CLIENT)
 public abstract class ParticleEmitter {
 
 	protected static final Random RANDOM = XorShiftRandom.current();
 
-	protected final IBlockReader world;
+	protected final BlockGetter world;
 	protected final double posX;
 	protected final double posY;
 	protected final double posZ;
 	protected final BlockPos position;
 	private boolean isAlive = true;
 
-	protected ParticleEmitter(final IBlockReader worldIn, final double posXIn, final double posYIn, final double posZIn) {
+	protected ParticleEmitter(final BlockGetter worldIn, final double posXIn, final double posYIn, final double posZIn) {
 		this.world = worldIn;
 		this.posX = posXIn;
 		this.posY = posYIn;
@@ -62,7 +60,7 @@ public abstract class ParticleEmitter {
 	 * Minecraft particle manager.
 	 */
 	public void addParticle(@Nonnull final Particle particle) {
-		GameUtils.getMC().particles.addEffect(particle);
+		GameUtils.getMC().particleEngine.add(particle);
 	}
 
 	public boolean isAlive() {

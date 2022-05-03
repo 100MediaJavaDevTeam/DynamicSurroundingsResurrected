@@ -18,13 +18,13 @@
 
 package org.orecruncher.lib.particles;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.WorldRenderer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorldReader;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.LevelRenderer;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -34,14 +34,14 @@ import javax.annotation.Nonnull;
 @OnlyIn(Dist.CLIENT)
 public abstract class Mote implements IParticleMote {
 
-    protected final IBlockReader world;
-    protected final IWorldReader lighting;
+    protected final BlockGetter world;
+    protected final LevelReader lighting;
 
     protected boolean isAlive = true;
     protected double posX;
     protected double posY;
     protected double posZ;
-    protected final BlockPos.Mutable position = new BlockPos.Mutable();
+    protected final BlockPos.MutableBlockPos position = new BlockPos.MutableBlockPos();
 
     protected int packedLighting;
 
@@ -50,9 +50,9 @@ public abstract class Mote implements IParticleMote {
     protected float blue;
     protected float alpha;
 
-    public Mote(@Nonnull final IBlockReader world, final double x, final double y, final double z) {
+    public Mote(@Nonnull final BlockGetter world, final double x, final double y, final double z) {
         this.world = world;
-        this.lighting = world instanceof IWorldReader ? (IWorldReader) world : GameUtils.getWorld();
+        this.lighting = world instanceof LevelReader ? (LevelReader) world : GameUtils.getWorld();
         setPosition(x, y, z);
         configureColor();
     }
@@ -61,12 +61,12 @@ public abstract class Mote implements IParticleMote {
         this.posX = posX;
         this.posY = posY;
         this.posZ = posZ;
-        this.position.setPos(posX, posY, posZ);
+        this.position.set(posX, posY, posZ);
     }
 
     @Nonnull
-    public Vector3d getPosition() {
-        return new Vector3d(this.posX, this.posY, this.posZ);
+    public Vec3 getPosition() {
+        return new Vec3(this.posX, this.posY, this.posZ);
     }
 
     public void configureColor() {
@@ -103,42 +103,42 @@ public abstract class Mote implements IParticleMote {
     }
 
     public void updateBrightness() {
-        this.packedLighting = WorldRenderer.getCombinedLight(this.lighting, this.position);
+        this.packedLighting = LevelRenderer.getLightColor(this.lighting, this.position);
     }
 
-    protected final double interpX(ActiveRenderInfo info) {
-        return info.getProjectedView().x;
+    protected final double interpX(Camera info) {
+        return info.getPosition().x;
     }
 
-    protected final double interpY(ActiveRenderInfo info) {
-        return info.getProjectedView().y;
+    protected final double interpY(Camera info) {
+        return info.getPosition().y;
     }
 
-    protected final double interpZ(ActiveRenderInfo info) {
-        return info.getProjectedView().z;
+    protected final double interpZ(Camera info) {
+        return info.getPosition().z;
     }
 
-    protected float renderX(ActiveRenderInfo info, final float partialTicks) {
+    protected float renderX(Camera info, final float partialTicks) {
         return (float) (this.posX - interpX(info));
     }
 
-    protected float renderY(ActiveRenderInfo info, final float partialTicks) {
+    protected float renderY(Camera info, final float partialTicks) {
         return (float) (this.posY - interpY(info));
     }
 
-    protected float renderZ(ActiveRenderInfo info, final float partialTicks) {
+    protected float renderZ(Camera info, final float partialTicks) {
         return (float) (this.posZ - interpZ(info));
     }
 
-    protected void drawVertex(final IVertexBuilder buffer, final double x, final double y, final double z,
+    protected void drawVertex(final VertexConsumer buffer, final double x, final double y, final double z,
                               final float u, final float v) {
         buffer
-                .pos(x, y, z)
-                .tex(u, v)
+                .vertex(x, y, z)
+                .uv(u, v)
                 .color(this.red, this.green, this.blue, this.alpha)
-                .lightmap(this.packedLighting)
+                .uv2(this.packedLighting)
                 .endVertex();
     }
 
-    public abstract void renderParticle(@Nonnull IVertexBuilder buffer, @Nonnull ActiveRenderInfo renderInfo, float partialTicks);
+    public abstract void renderParticle(@Nonnull VertexConsumer buffer, @Nonnull Camera renderInfo, float partialTicks);
 }

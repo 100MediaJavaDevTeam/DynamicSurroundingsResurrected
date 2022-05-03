@@ -19,8 +19,8 @@
 package org.orecruncher.lib.gui;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.TextFormatting;
+import net.minecraft.ChatFormatting;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.Utilities;
@@ -55,7 +55,7 @@ public class Color {
         this.alpha = MathStuff.clamp1(a / 255F);
     }
 
-    public Color(@Nonnull final TextFormatting fmt) {
+    public Color(@Nonnull final ChatFormatting fmt) {
         Preconditions.checkArgument(fmt.isColor());
         Preconditions.checkNotNull(fmt.getColor());
 
@@ -78,7 +78,7 @@ public class Color {
         this(red / 255F, green / 255F, blue / 255F, alpha / 255F);
     }
 
-    public Color(@Nonnull final Vector3d vec) {
+    public Color(@Nonnull final Vec3 vec) {
         this((float) vec.x, (float) vec.y, (float) vec.z);
     }
 
@@ -136,8 +136,8 @@ public class Color {
     }
 
     @Nonnull
-    public Vector3d toVec3d() {
-        return new Vector3d(this.red, this.green, this.blue);
+    public Vec3 toVec3d() {
+        return new Vec3(this.red, this.green, this.blue);
     }
 
     /*
@@ -145,11 +145,11 @@ public class Color {
      * color after the specified number of iterations.
      */
     @Nonnull
-    public Vector3d transitionTo(@Nonnull final Color target, final int iterations) {
+    public Vec3 transitionTo(@Nonnull final Color target, final int iterations) {
         final double deltaRed = (target.red - this.red) / iterations;
         final double deltaGreen = (target.green - this.green) / iterations;
         final double deltaBlue = (target.blue - this.blue) / iterations;
-        return new Vector3d(deltaRed, deltaGreen, deltaBlue);
+        return new Vec3(deltaRed, deltaGreen, deltaBlue);
     }
 
     @Nonnull
@@ -300,7 +300,7 @@ public class Color {
         }
 
         @Nonnull
-        public Color adjust(@Nonnull final Vector3d adjust, @Nonnull final Color target) {
+        public Color adjust(@Nonnull final Vec3 adjust, @Nonnull final Color target) {
             this.red += adjust.x;
             if ((adjust.x < 0.0F && this.red < target.red) || (adjust.x > 0.0F && this.red > target.red)) {
                 this.red = target.red;

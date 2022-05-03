@@ -18,7 +18,7 @@
 
 package org.orecruncher.environs.library;
 
-import net.minecraft.util.StringUtils;
+import net.minecraft.util.StringUtil;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary;
@@ -57,7 +57,7 @@ public class BiomeEvaluator {
 
         for (final BiomeDictionary.Type t : types) {
             String name = t.getName();
-            if (StringUtils.isNullOrEmpty(name))
+            if (StringUtil.isNullOrEmpty(name))
                 continue;
             if (name.length() > 1) {
                 name = "is" + name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();

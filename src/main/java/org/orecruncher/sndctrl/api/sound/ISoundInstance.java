@@ -18,7 +18,7 @@
 
 package org.orecruncher.sndctrl.api.sound;
 
-import net.minecraft.client.audio.ISound;
+import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.sndctrl.audio.SoundState;
@@ -29,7 +29,7 @@ import javax.annotation.Nonnull;
  * Additional state information associated with a sound instance.
  */
 @OnlyIn(Dist.CLIENT)
-public interface ISoundInstance extends ISound {
+public interface ISoundInstance extends SoundInstance {
 
     /**
      * The sound category the sound instance belongs to.
