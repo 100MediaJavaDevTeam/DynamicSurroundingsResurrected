@@ -9,10 +9,10 @@ showAsResourcePack=false
 [[mods]]
 modId="dsurround"
 version="${file.jarVersion}"
-displayName="§3Dynamic Surroundings"
+displayName="§3Dynamic Surroundings: Ressurrected"
 updateJSONURL="https://raw.githubusercontent.com/OreCruncher/DynamicSurroundings2/master/version.json"
 credits="\n\n§6Wirsbo§r for §2BetterRain§r\n§6SonicEther§r for §2Sound Physics§r\n§6MrRube§r for §2Aurora Rubealis§r\n§6Hurricaaane§r for §2Presence Footsteps§r and §2MAtmos§r\n§eSound and Texture Attributions§r at https://tinyurl.com/mggnl76\n\n"
-authors="§6OreCruncher§r\n"
+authors="§6OreCruncher§r,§6Nyfaria§r,§6SizableShrimp§r\n"
 description="\nAdds a variety of §6sound§r and §6visual§r effects to improve your Minecraft experience"
 
 [[dependencies.dsurround]]
@@ -34,7 +34,7 @@ modId="sndctrl"
 version="${file.jarVersion}"
 displayName="§3Dynamic Surroundings: §eSound Control"
 credits="\n\n§6All the Players§r that installed and enjoyed §2Dynamic Surroundings§r\n§6SonicEther§r for making §2SoundPhysics§r GPL3\n"
-authors="§6OreCruncher§r\n"
+authors="§6OreCruncher§r,§6Nyfaria§r,§6SizableShrimp§r\n"
 description="\nEnhances and gives the player §6control§r over their §2Minecraft§r §6sound experience§r."
 
 [[dependencies.sndctrl]]
@@ -49,7 +49,7 @@ modId="environs"
 version="${file.jarVersion}"
 displayName="§3Dynamic Surroundings: §eEnvirons"
 credits="\n\n§6All the Players§r that installed and enjoyed §2Dynamic Surroundings§r\n"
-authors="§6OreCruncher§r\n"
+authors="§6OreCruncher§r,§6Nyfaria§r,§6SizableShrimp§r\n"
 description="\nAdds §6sound§r and §6visual§r effects to §6biomes§r"
 
 [[dependencies.environs]]
@@ -64,7 +64,7 @@ modId="mobeffects"
 version="${file.jarVersion}"
 displayName="§3Dynamic Surroundings: §eMob Effects"
 credits="\n\n§6All the Players§r that installed and enjoyed §2Dynamic Surroundings§r\n"
-authors="§6OreCruncher§r\n"
+authors="§6OreCruncher§r,§6Nyfaria§r,§6SizableShrimp§r\n"
 description="\nGiving §6mobs§r and §6players§r special §6sound§r and §6visual§r effects."
 
 [[dependencies.mobeffects]]
