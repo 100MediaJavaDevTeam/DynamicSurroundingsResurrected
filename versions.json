@@ -1,0 +1,10 @@
+{
+  "homepage": "https://www.curseforge.com/minecraft/mc-mods/dynamic-surrounding-resurrected",
+  "1.18.2": {
+    "5.0.0.0": "See https://github.com/Nyfaria/DynamicSurroundingsResurrected/blob/1.18.2/CHANGELOG.md"
+  },
+  "promos": {
+    "1.18.2-latest": "1.18.2-5.0.0.0",
+    "1.18.2-recommended": "1.18.2-5.0.0.0"
+  }
+}
