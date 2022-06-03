@@ -10,8 +10,8 @@ showAsResourcePack=false
 modId="dsurround"
 version="${file.jarVersion}"
 displayName="§3Dynamic Surroundings: Resurrected"
-updateJSONURL="https://raw.githubusercontent.com/Nyfaria/Resurrected/Versions/version.json"
-credits="\n\n§6Wirsbo§r for §2BetterRain§r\n§6SonicEther§r for §2Sound Physics§r\n§6MrRube§r for §2Aurora Rubealis§r\n§6Hurricaaane§r for §2Presence Footsteps§r and §2MAtmos§r\n§eSound and Texture Attributions§r at https://tinyurl.com/mggnl76\n\n"
+updateJSONURL="https://raw.githubusercontent.com/Nyfaria/DynamicSurroundingsResurrected/Versions/version.json"
+credits="\n\n§6Wirsbo§r for §2BetterRain§r\n§6SonicEther§r for §2Sound Physics§r\n§6MrRube§r for §2Aurora Rubealis§r\n§6Hurricaaane§r for §2Presence Footsteps§r and §2MAtmos§r\n§eSound and Texture Attributions§r at https://tinyurl.com/msfrxmjz\n\n"
 authors="§6OreCruncher§r,§6Nyfaria§r,§6SizableShrimp§r\n"
 description="\nAdds a variety of §6sound§r and §6visual§r effects to improve your Minecraft experience"
 
