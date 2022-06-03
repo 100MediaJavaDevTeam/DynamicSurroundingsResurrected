@@ -1,7 +1,7 @@
 modLoader="javafml"
 loaderVersion="[40,)"
-issueTrackerURL="https://github.com/OreCruncher/DynamicSurroundings/issues"
-displayURL="https://www.curseforge.com/minecraft/mc-mods/dynamic-surroundings"
+issueTrackerURL="https://github.com/Nyfaria/DynamicSurroundingsResurrected/issues"
+displayURL="https://www.curseforge.com/minecraft/mc-mods/dynamic-surrounding-resurrected"
 logoFile="logo.png"
 license = "GPL-3.0"
 showAsResourcePack=false
@@ -9,8 +9,8 @@ showAsResourcePack=false
 [[mods]]
 modId="dsurround"
 version="${file.jarVersion}"
-displayName="§3Dynamic Surroundings: Ressurrected"
-updateJSONURL="https://raw.githubusercontent.com/OreCruncher/DynamicSurroundings2/master/version.json"
+displayName="§3Dynamic Surroundings: Resurrected"
+updateJSONURL="https://raw.githubusercontent.com/Nyfaria/Resurrected/Versions/version.json"
 credits="\n\n§6Wirsbo§r for §2BetterRain§r\n§6SonicEther§r for §2Sound Physics§r\n§6MrRube§r for §2Aurora Rubealis§r\n§6Hurricaaane§r for §2Presence Footsteps§r and §2MAtmos§r\n§eSound and Texture Attributions§r at https://tinyurl.com/mggnl76\n\n"
 authors="§6OreCruncher§r,§6Nyfaria§r,§6SizableShrimp§r\n"
 description="\nAdds a variety of §6sound§r and §6visual§r effects to improve your Minecraft experience"
