@@ -27,7 +27,7 @@ public enum ModEnvironment {
     SoundPhysics("soundphysics"),
     SoundFilters("soundfilters"),
     SereneSeasons("sereneseasons"),
-    ClothAPI("me.shedaniel.clothconfig2.forge.api.ConfigBuilder");
+    ClothAPI("me.shedaniel.clothconfig2.api.ConfigBuilder");
 
     protected final String modId;
     protected boolean isLoaded;

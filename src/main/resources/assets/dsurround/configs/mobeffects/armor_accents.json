@@ -1,6 +1,6 @@
 {
   "SHIELD": [
-    "net.minecraft.item.ShieldItem"
+    "net.minecraft.world.item.ShieldItem"
   ],
   "LEATHER": [
     "minecraft:leather_boots",
@@ -37,30 +37,30 @@
     "minecraft:netherite_helmet"
   ],
   "AXE": [
-    "net.minecraft.item.AxeItem",
-    "net.minecraft.item.PickaxeItem"
+    "net.minecraft.world.item.AxeItem",
+    "net.minecraft.world.item.PickaxeItem"
   ],
   "BOW": [
-    "net.minecraft.item.BowItem"
+    "net.minecraft.world.item.BowItem"
   ],
   "CROSSBOW": [
-    "net.minecraft.item.CrossbowItem"
+    "net.minecraft.world.item.CrossbowItem"
   ],
   "SWORD": [
-    "net.minecraft.item.SwordItem"
+    "net.minecraft.world.item.SwordItem"
   ],
   "TOOL": [
-    "net.minecraft.item.ShovelItem",
-    "net.minecraft.item.HoeItem",
-    "net.minecraft.item.FishingRodItem"
+    "net.minecraft.world.item.ShovelItem",
+    "net.minecraft.world.item.HoeItem",
+    "net.minecraft.world.item.FishingRodItem"
   ],
   "BOOK": [
-    "net.minecraft.item.BookItem",
-    "net.minecraft.item.WritableBookItem",
-    "net.minecraft.item.WrittenBookItem",
-    "net.minecraft.item.EnchantedBookItem"
+    "net.minecraft.world.item.BookItem",
+    "net.minecraft.world.item.WritableBookItem",
+    "net.minecraft.world.item.WrittenBookItem",
+    "net.minecraft.world.item.EnchantedBookItem"
   ],
   "POTION": [
-    "net.minecraft.item.PotionItem"
+    "net.minecraft.world.item.PotionItem"
   ]
 }

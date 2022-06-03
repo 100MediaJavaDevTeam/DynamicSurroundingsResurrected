@@ -22,12 +22,13 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
-import net.minecraft.data.worldgen.biome.Biomes;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -117,8 +118,8 @@ public class BiomeUtilities {
     public static Biome getClientBiome(@Nonnull final BlockPos pos) {
         final ClientLevel world = GameUtils.getWorld();
         if (world == null)
-            return Biomes.THE_VOID;
-        final Biome biome = world.getBiome(pos);
+            return RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BIOME_REGISTRY).get(Biomes.THE_VOID);
+        final Biome biome = world.getBiome(pos).value();
         return getClientBiome(biome);
     }
 
@@ -126,13 +127,13 @@ public class BiomeUtilities {
     public static Biome getClientBiome(@Nonnull final Biome biome) {
         final ClientLevel world = GameUtils.getWorld();
         if (world == null)
-            return Biomes.THE_VOID;
+            return RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BIOME_REGISTRY).get(Biomes.THE_VOID);
         ResourceLocation loc = world.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
         if (loc == null)
-            return Biomes.THE_VOID;
+            return RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BIOME_REGISTRY).get(Biomes.THE_VOID);
         final Biome result = ForgeRegistries.BIOMES.getValue(loc);
         if (result == null)
-            return Biomes.THE_VOID;
+            return RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BIOME_REGISTRY).get(Biomes.THE_VOID);
         return result;
     }
 }

@@ -21,10 +21,12 @@ package org.orecruncher.environs.library;
 import com.google.gson.reflect.TypeToken;
 import it.unimi.dsi.fastutil.objects.ObjectOpenHashSet;
 import net.minecraft.core.BlockPos;
-import net.minecraft.data.worldgen.biome.Biomes;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.dsurround.DynamicSurroundings;
@@ -125,7 +127,7 @@ public final class BiomeLibrary {
 
 	@Nonnull
 	public static BiomeInfo getPlayerBiome(@Nonnull final Player player, final boolean getTrue) {
-		final Biome biome = player.getCommandSenderWorld().getBiome(new BlockPos(player.getX(), 0, player.getZ()));
+		final Biome biome = player.getCommandSenderWorld().getBiome(new BlockPos(player.getX(), 0, player.getZ())).value();
 		BiomeInfo info = BiomeUtil.getBiomeData(biome);
 
 		if (!getTrue) {
@@ -181,9 +183,10 @@ public final class BiomeLibrary {
 				BiomeUtil.setBiomeData(b, new BiomeInfo(handler));
 			});
 
-			// Make sure the default biomes are set
-			BiomeUtil.getBiomeData(Biomes.PLAINS);
-			BiomeUtil.getBiomeData(Biomes.THE_VOID);
+            Registry<Biome> biomeRegistry = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BIOME_REGISTRY);
+            // Make sure the default biomes are set
+            BiomeUtil.getBiomeData(biomeRegistry.get(Biomes.PLAINS));
+            BiomeUtil.getBiomeData(biomeRegistry.get(Biomes.THE_VOID));
 
 			final Collection<IResourceAccessor> configs = ResourceUtils.findConfigs(DynamicSurroundings.MOD_ID, DynamicSurroundings.DATA_PATH, "biomes.json");
 
@@ -203,8 +206,9 @@ public final class BiomeLibrary {
 		@Override
 		public void stop() {
 			ForgeUtils.getBiomes().forEach(b -> BiomeUtil.setBiomeData(b, null));
-			BiomeUtil.setBiomeData(Biomes.PLAINS, null);
-			BiomeUtil.setBiomeData(Biomes.THE_VOID, null);
+            Registry<Biome> biomeRegistry = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BIOME_REGISTRY);
+            BiomeUtil.setBiomeData(biomeRegistry.get(Biomes.PLAINS), null);
+            BiomeUtil.setBiomeData(biomeRegistry.get(Biomes.THE_VOID), null);
 		}
 	}
 

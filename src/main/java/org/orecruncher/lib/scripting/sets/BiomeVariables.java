@@ -19,9 +19,10 @@
 package org.orecruncher.lib.scripting.sets;
 
 import net.minecraft.core.Registry;
-import net.minecraft.data.worldgen.biome.Biomes;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.biome.Biomes;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.BiomeDictionary;
@@ -48,7 +49,7 @@ public class BiomeVariables extends VariableSet<IBiomeVariables> implements IBio
 
     public BiomeVariables() {
         super("biome");
-        setBiome(Biomes.PLAINS);
+        setBiome(RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BIOME_REGISTRY).get(Biomes.PLAINS));
     }
 
     public void setBiome(@Nonnull final Biome biome) {
@@ -70,7 +71,7 @@ public class BiomeVariables extends VariableSet<IBiomeVariables> implements IBio
         if (GameUtils.isInGame()) {
             newBiome = BiomeUtilities.getClientBiome(GameUtils.getPlayer().blockPosition());
         } else {
-            newBiome = Biomes.PLAINS;
+            newBiome = RegistryAccess.BUILTIN.get().registryOrThrow(Registry.BIOME_REGISTRY).get(Biomes.PLAINS);
         }
 
         if (newBiome != this.biome) {

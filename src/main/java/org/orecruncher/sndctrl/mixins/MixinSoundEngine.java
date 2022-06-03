@@ -100,7 +100,7 @@ public class MixinSoundEngine {
      *
      * @param ci ignored
      */
-    @Inject(method = "loadLibrary", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/audio/SoundSystem;init()V", shift = At.Shift.AFTER))
+    @Inject(method = "loadLibrary", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/audio/Library;init(Ljava/lang/String;)V", shift = At.Shift.AFTER))
     public void initialize(CallbackInfo ci) {
         SoundUtils.initialize(this.library);
     }
@@ -110,7 +110,7 @@ public class MixinSoundEngine {
      *
      * @param ci ignored
      */
-    @Inject(method = "destroy", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/audio/SoundSystem;cleanup()V", shift = At.Shift.BEFORE))
+    @Inject(method = "destroy", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/audio/Library;cleanup()V", shift = At.Shift.BEFORE))
     public void deinitialize(CallbackInfo ci) {
         SoundUtils.deinitialize(this.library);
     }
@@ -137,7 +137,7 @@ public class MixinSoundEngine {
      * @param completablefuture  Ignored
      * @param entry              The ChannelManager entry that is being queued to the SoundEngine for off thread processing.
      */
-    @Inject(method = "play", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/audio/ChannelManager$Entry;execute(Ljava/util/function/Consumer;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
+    @Inject(method = "play", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/sounds/ChannelAccess$ChannelHandle;execute(Ljava/util/function/Consumer;)V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILEXCEPTION)
     public void onSoundPlay(SoundInstance p_sound, CallbackInfo ci, WeighedSoundEvents soundeventaccessor, ResourceLocation resourcelocation, Sound sound, float f, float f1, SoundSource soundcategory, float f2, float f3, SoundInstance.Attenuation attenuationtype, boolean flag, Vec3 vector3d, boolean flag2, boolean flag3, CompletableFuture completablefuture, ChannelAccess.ChannelHandle entry) {
         try {
             SoundFXProcessor.onSoundPlay(p_sound, entry);

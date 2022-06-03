@@ -21,12 +21,12 @@ package org.orecruncher.environs.library;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.reflect.TypeToken;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.tags.ITag;
 import org.apache.commons.lang3.StringUtils;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.environs.Environs;
@@ -143,11 +143,9 @@ public final class BlockStateLibrary {
     private static Collection<BlockStateMatcher> expand(@Nonnull final String blockName) {
         if (blockName.startsWith(TAG_SPECIFIER)) {
             final String tagName = blockName.substring(1);
-            final Tag<Block> tag = TagUtils.getBlockTag(tagName);
-            if (tag != null) {
-                return tag.getValues().stream().map(BlockStateMatcher::create).filter(m -> !m.isEmpty()).collect(Collectors.toList());
-            }
-            LOGGER.debug("Unknown block tag '%s' in Block specification", tagName);
+            final ITag<Block> tag = TagUtils.getBlockTag(tagName);
+
+            return tag.stream().map(BlockStateMatcher::create).filter(m -> !m.isEmpty()).collect(Collectors.toList());
         } else {
             final BlockStateMatcher matcher = BlockStateMatcher.create(blockName);
             if (!matcher.isEmpty()) {

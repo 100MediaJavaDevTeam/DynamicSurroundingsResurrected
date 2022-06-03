@@ -45,7 +45,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Handles all things related to registered sounds.  This registry is kept in parallel with the Forge registeries.
+ * Handles all things related to registered sounds.  This registry is kept in parallel with the Forge registries.
  * The reason is that the Forge registries will change when sync'd with a server which pretty much hoses pure client
  * side mods that add their own sounds.  Also, extended data about sounds is maintained, like ownership and
  * attribution, that can be used when rendering tooltips and the like in a GUI.

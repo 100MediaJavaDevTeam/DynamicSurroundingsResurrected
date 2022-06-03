@@ -21,13 +21,15 @@ package org.orecruncher.environs.scanner;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.Tag;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.tags.ITagManager;
 import org.orecruncher.environs.handlers.CommonState;
 import org.orecruncher.environs.library.DimensionInfo;
 import org.orecruncher.environs.library.DimensionLibrary;
@@ -54,7 +56,7 @@ public final class CeilingCoverage {
 	private static final float INSIDE_THRESHOLD = 1.0F - 65.0F / 176.0F;
 	private static final Cell[] cells;
 	private static final float TOTAL_POINTS;
-	private static final ObjectArray<Tag<Block>> NON_CEILING = new ObjectArray<>();
+	private static final ObjectArray<TagKey<Block>> NON_CEILING = new ObjectArray<>();
 
 	static {
 
@@ -176,8 +178,9 @@ public final class CeilingCoverage {
 
 			// Test the block tags in our NON_CEILING set to see if any match
 			final Block block = state.getBlock();
-			for (final Tag<Block> tag : NON_CEILING) {
-				if (tag.contains(block))
+            ITagManager<Block> blockTags = ForgeRegistries.BLOCKS.tags();
+			for (final TagKey<Block> tagKey : NON_CEILING) {
+                if (blockTags.getTag(tagKey).contains(block))
 					return false;
 			}
 			return true;

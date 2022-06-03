@@ -146,7 +146,6 @@ public final class ModuleServiceManager implements ResourceManagerReloadListener
 
     private void load(@Nonnull final TagsUpdatedEvent event) {
         this.vanillaTagsEventFired = true;
-        TagUtils.setTagManager(event.getTagManager());
         this.reloadIfReady();
     }
 
@@ -164,7 +163,6 @@ public final class ModuleServiceManager implements ResourceManagerReloadListener
 
     private void stop() {
         performAction("stop", IModuleService::stop);
-        TagUtils.clearTagManager();
         this.clearReloadState();
     }
 

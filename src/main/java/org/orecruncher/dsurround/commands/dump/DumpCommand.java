@@ -48,7 +48,6 @@ public class DumpCommand {
                 .then(Commands.literal("acoustics").executes(cmd -> dumpAcoustics(cmd.getSource())))
                 .then(Commands.literal("audioeffects").executes(cmd -> dumpAudioEffects(cmd.getSource())))
                 .then(Commands.literal("blocks").executes(cmd -> dumpBlocks(cmd.getSource())))
-                .then(Commands.literal("blocktags").executes(cmd -> dumpBlockTags(cmd.getSource())))
                 .then(Commands.literal("biomes").executes(cmd -> dumpBiomes(cmd.getSource())))
                 .then(Commands.literal("items").executes(cmd -> dumpItems(cmd.getSource())))
                 .then(Commands.literal("footsteps").executes(cmd -> dumpFootsteps(cmd.getSource())))
@@ -67,10 +66,6 @@ public class DumpCommand {
 
     private static int dumpBlocks(@Nonnull final CommandSourceStack source) {
         return handle(source, "dump.blocks", DumpCommand::tbd);
-    }
-
-    private static int dumpBlockTags(@Nonnull final CommandSourceStack source) {
-        return handle(source, "dump.blocktags", TagUtils::dumpBlockTags);
     }
 
     private static int dumpBiomes(@Nonnull final CommandSourceStack source) {

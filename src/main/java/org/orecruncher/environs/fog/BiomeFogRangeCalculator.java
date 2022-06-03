@@ -60,7 +60,7 @@ public class BiomeFogRangeCalculator extends VanillaFogRangeCalculator {
         final BiomeManager biomemanager = world.getBiomeManager();
         final Vec3 origin = GameUtils.getMC().gameRenderer.getMainCamera().getPosition().subtract(2.0D, 2.0D, 2.0D).scale(0.25D);
         final Vec3 visibilitySurvey = CubicSampler.gaussianSampleVec3(origin, (x, y, z) -> {
-            final Biome b = biomemanager.getNoiseBiomeAtQuart(x, y, z);
+            final Biome b = biomemanager.getNoiseBiomeAtQuart(x, y, z).value();
             final BiomeInfo info = BiomeUtil.getBiomeData(b);
             return new Vec3(info.getVisibility(), 0, 0);
         });

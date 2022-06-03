@@ -27,7 +27,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import javax.annotation.Nonnull;
 
-@Mixin(targets = {"net.minecraft.client.particle.DripParticle$FallingLiquidParticle"})
+@Mixin(targets = {"net.minecraft.client.particle.DripParticle$FallAndLandParticle"})
 public class MixinDripParticleDripping {
 
     @Inject(method = "postMoveUpdate", at = @At("HEAD"))

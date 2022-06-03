@@ -22,13 +22,13 @@ import com.google.common.collect.ImmutableMap;
 import com.google.gson.annotations.SerializedName;
 import it.unimi.dsi.fastutil.objects.Object2FloatOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.tags.ITag;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.lib.MaterialUtils;
 import org.orecruncher.lib.blockstate.BlockStateMatcherMap;
@@ -155,14 +155,10 @@ public final class AudioEffectLibrary {
             } else if (name.startsWith(TAG_PREFIX)) {
                 // Tag entry
                 final String tagName = name.substring(1);
-                final Tag<Block> tag = TagUtils.getBlockTag(tagName);
-                if (tag != null) {
-                    for (final Block block : tag.getValues()) {
-                        for (final BlockState state : block.getStateDefinition().getPossibleStates())
-                            blockStateOcclusionMap.put(state, kvp.getValue());
-                    }
-                } else {
-                    LOGGER.debug("Unrecognized block tag: %s", tagName);
+                final ITag<Block> tag = TagUtils.getBlockTag(tagName);
+                for (final Block block : tag.stream().toList()) {
+                    for (final BlockState state : block.getStateDefinition().getPossibleStates())
+                        blockStateOcclusionMap.put(state, kvp.getValue());
                 }
             } else {
                 try {
@@ -196,14 +192,10 @@ public final class AudioEffectLibrary {
             } else if (name.startsWith(TAG_PREFIX)) {
                 // Tag entry
                 final String tagName = name.substring(1);
-                final Tag<Block> tag = TagUtils.getBlockTag(tagName);
-                if (tag != null) {
-                    for (final Block block : tag.getValues()) {
-                        for (final BlockState state : block.getStateDefinition().getPossibleStates())
-                            blockStateReflectMap.put(state, val);
-                    }
-                } else {
-                    LOGGER.debug("Unrecognized block tag: %s", tagName);
+                final ITag<Block> tag = TagUtils.getBlockTag(tagName);
+                for (final Block block : tag.stream().toList()) {
+                    for (final BlockState state : block.getStateDefinition().getPossibleStates())
+                        blockStateReflectMap.put(state, val);
                 }
             } else {
                 try {

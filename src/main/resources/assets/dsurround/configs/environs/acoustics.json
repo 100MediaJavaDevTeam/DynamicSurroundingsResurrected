@@ -200,7 +200,7 @@
   "_jump": {
     "type": "event",
     "jump": {
-      "name": "mobeffects:jump",
+      "name": "environs:jump",
       "pitch_min": 80,
       "pitch_max": 120
     }

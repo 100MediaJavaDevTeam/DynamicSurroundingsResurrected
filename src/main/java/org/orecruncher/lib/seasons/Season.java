@@ -22,7 +22,7 @@ import net.minecraft.world.level.Level;
 import org.orecruncher.lib.Localization;
 import org.orecruncher.lib.compat.ModEnvironment;
 import org.orecruncher.sndctrl.SoundControl;
-import sereneseasons.api.season.ISeasonState;
+// import sereneseasons.api.season.ISeasonState;
 
 import javax.annotation.Nonnull;
 
@@ -83,47 +83,47 @@ public enum Season {
     @Nonnull
     private static Season getSereneSeason(@Nonnull final Level world) {
         Season season = Season.NONE;
-        final ISeasonState state = sereneseasons.api.season.SeasonHelper.getSeasonState(world);
-        if (state != null) {
-            switch (state.getSubSeason()) {
-                case EARLY_SPRING:
-                    season = Season.EARLY_SPRING;
-                    break;
-                case MID_SPRING:
-                    season = Season.MID_SPRING;
-                    break;
-                case LATE_SPRING:
-                    season = Season.LATE_SPRING;
-                    break;
-                case EARLY_SUMMER:
-                    season = Season.EARLY_SUMMER;
-                    break;
-                case MID_SUMMER:
-                    season = Season.MID_SUMMER;
-                    break;
-                case LATE_SUMMER:
-                    season = Season.LATE_SUMMER;
-                    break;
-                case EARLY_AUTUMN:
-                    season = Season.EARLY_AUTUMN;
-                    break;
-                case MID_AUTUMN:
-                    season = Season.MID_AUTUMN;
-                    break;
-                case LATE_AUTUMN:
-                    season = Season.LATE_AUTUMN;
-                    break;
-                case EARLY_WINTER:
-                    season = Season.EARLY_WINTER;
-                    break;
-                case MID_WINTER:
-                    season = Season.MID_WINTER;
-                    break;
-                case LATE_WINTER:
-                    season = Season.LATE_WINTER;
-                    break;
-            }
-        }
+        // final ISeasonState state = sereneseasons.api.season.SeasonHelper.getSeasonState(world);
+        // if (state != null) {
+        //     switch (state.getSubSeason()) {
+        //         case EARLY_SPRING:
+        //             season = Season.EARLY_SPRING;
+        //             break;
+        //         case MID_SPRING:
+        //             season = Season.MID_SPRING;
+        //             break;
+        //         case LATE_SPRING:
+        //             season = Season.LATE_SPRING;
+        //             break;
+        //         case EARLY_SUMMER:
+        //             season = Season.EARLY_SUMMER;
+        //             break;
+        //         case MID_SUMMER:
+        //             season = Season.MID_SUMMER;
+        //             break;
+        //         case LATE_SUMMER:
+        //             season = Season.LATE_SUMMER;
+        //             break;
+        //         case EARLY_AUTUMN:
+        //             season = Season.EARLY_AUTUMN;
+        //             break;
+        //         case MID_AUTUMN:
+        //             season = Season.MID_AUTUMN;
+        //             break;
+        //         case LATE_AUTUMN:
+        //             season = Season.LATE_AUTUMN;
+        //             break;
+        //         case EARLY_WINTER:
+        //             season = Season.EARLY_WINTER;
+        //             break;
+        //         case MID_WINTER:
+        //             season = Season.MID_WINTER;
+        //             break;
+        //         case LATE_WINTER:
+        //             season = Season.LATE_WINTER;
+        //             break;
+        //     }
+        // }
 
         return season;
     }

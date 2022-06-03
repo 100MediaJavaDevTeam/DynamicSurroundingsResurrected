@@ -67,7 +67,7 @@ public class Inspector {
     }
 
     private static List<String> getTags(@Nonnull final BlockState state) {
-        return state.getBlock().getTags().stream().map(t -> "#" + t.toString()).collect(Collectors.toList());
+        return state.getBlock().builtInRegistryHolder().tags().map(t -> "#" + t.location()).toList();
     }
 
     private static void gatherBlockText(final ItemStack stack, final List<String> text, final BlockState state,

@@ -23,7 +23,6 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceOpenHashSet;
 import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.tags.Tag;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
@@ -33,6 +32,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.tags.ITag;
 import org.apache.commons.lang3.tuple.Pair;
 import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.lib.SoundTypeUtils;
@@ -396,21 +396,16 @@ public final class FootstepLibrary {
             tagName = tagName.substring(0, idx);
         }
 
-        final Tag<Block> blockTag = TagUtils.getBlockTag(tagName);
-        if (blockTag != null) {
-            final List<Block> elements = blockTag.getValues();
-            if (elements.size() == 0) {
-                LOGGER.debug("No blocks associated with tag '%s'", tagName);
-            } else {
-                for (final Block b : blockTag.getValues()) {
-                    String blockName = Objects.requireNonNull(b.getRegistryName()).toString();
-                    if (substrate != null)
-                        blockName = blockName + "+" + substrate;
-                    register(blockName, acousticList);
-                }
-            }
+        final ITag<Block> blockTag = TagUtils.getBlockTag(tagName);
+        if (blockTag.isEmpty()) {
+            LOGGER.debug("No blocks associated with tag '%s'", tagName);
         } else {
-            LOGGER.debug("Unable to identify block tag '%s'", tagName);
+            for (final Block b : blockTag.stream().toList()) {
+                String blockName = Objects.requireNonNull(b.getRegistryName()).toString();
+                if (substrate != null)
+                    blockName = blockName + "+" + substrate;
+                register(blockName, acousticList);
+            }
         }
     }
 

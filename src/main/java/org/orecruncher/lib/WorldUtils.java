@@ -90,17 +90,17 @@ public final class WorldUtils {
                 TEMP1 = (world, pos) -> {
                     try {
                         return (float)method.invoke(null, world, world.getBiome(pos), pos);
-                    } catch(@Nonnull final Throwable t) {
-                        return world.getBiome(pos).getTemperature(pos);
+                    } catch (@Nonnull final Throwable t) {
+                        return world.getBiome(pos).value().getTemperature(pos);
                     }
                 };
                 Lib.LOGGER.info("Hooked SereneSeasons getBiomeTemperature()");
-            } catch(@Nonnull final Throwable t) {
+            } catch (@Nonnull final Throwable t) {
                 Lib.LOGGER.warn("Unable to hook SereneSeasons getBiomeTemperature()!");
-                TEMP1 = (world, pos) -> world.getBiome(pos).getTemperature(pos);
+                TEMP1 = (world, pos) -> world.getBiome(pos).value().getTemperature(pos);
             }
         } else {
-            TEMP1 = (world, pos) -> world.getBiome(pos).getTemperature(pos);
+            TEMP1 = (world, pos) -> world.getBiome(pos).value().getTemperature(pos);
         }
 
         TEMP = TEMP1;
@@ -189,7 +189,7 @@ public final class WorldUtils {
             return Biome.Precipitation.NONE;
         }
 
-        final Biome biome = world.getBiome(pos);
+        final Biome biome = world.getBiome(pos).value();
 
         // If the biome has no rain...
         if (biome.getPrecipitation() == Biome.Precipitation.NONE)
