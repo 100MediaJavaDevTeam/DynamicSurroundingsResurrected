@@ -64,7 +64,7 @@ public final class ParticleHooks {
     public static void dripHandler(@Nonnull final DripParticle particle) {
         // If the particle is down at bedrock level kill it.  This could happen if water is sitting on top of flat
         // bedrock.
-        if (particle.y < 1) {
+        if (particle.y < -63) {
             particle.remove();
             return;
         }

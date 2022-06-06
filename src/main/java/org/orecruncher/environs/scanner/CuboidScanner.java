@@ -66,8 +66,8 @@ public abstract class CuboidScanner extends Scanner {
 		BlockPos min = pos.offset(-this.xRange, -this.yRange, -this.zRange);
 		final BlockPos max = pos.offset(this.xRange, this.yRange, this.zRange);
 
-		if (min.getY() < 0)
-			min = new BlockPos(min.getX(), 0, min.getZ());
+		if (min.getY() < -64)
+			min = new BlockPos(min.getX(), -64, min.getZ());
 
 		return new BlockPos[] { min, max };
 	}
@@ -92,7 +92,7 @@ public abstract class CuboidScanner extends Scanner {
 
 		// If there is no player position or it's bogus just return
 		final BlockPos playerPos = this.locus.getCenter();
-		if (playerPos.getY() < 0) {
+		if (playerPos.getY() < -64) {
 			this.fullRange = null;
 		} else {
 			// If the full range was reset, or the player dimension changed,
