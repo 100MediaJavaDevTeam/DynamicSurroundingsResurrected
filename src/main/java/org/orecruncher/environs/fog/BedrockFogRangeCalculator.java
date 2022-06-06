@@ -59,15 +59,15 @@ public class BedrockFogRangeCalculator extends VanillaFogRangeCalculator {
             double d0 = (this.skyLight / 16.0D) + factor;
 
             float end = event.getFarPlaneDistance();
-            if (d0 < 1.0D) {
-                if (d0 < 0.0D) {
+            if (d0 < -63.0D) {
+                if (d0 < -64.0D) {
                     d0 = 0.0D;
                 }
 
                 d0 *= d0;
                 float f2 = 100.0F * (float) d0;
 
-                if (f2 < 5.0F) {
+                if (f2 < -59.0F) {
                     f2 = 5.0F;
                 }
 
