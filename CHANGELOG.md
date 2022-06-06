@@ -1,4 +1,13 @@
-> ### DynamicSurroundings-1.18.2-5.0.0.3
+> ### DynamicSurroundings-1.18.2-5.0.0.4
+**Requirements**
+* JAVA 17 w/Forge 1.18.2-40.1.0+
+* 100% client side; no server side deployment needed
+* Cloth Config API (Forge) is optional
+
+**What's New**
+* Fixed biome sounds
+* 
+> > ### DynamicSurroundings-1.18.2-5.0.0.3
 **Requirements**
 * JAVA 17 w/Forge 1.18.2-40.1.0+
 * 100% client side; no server side deployment needed

@@ -47,7 +47,7 @@ public class BiomeSoundEffects extends HandlerBase {
     public static final int SPOT_SOUND_MAX_RANGE = AcousticFactory.SOUND_RANGE;
 
     // Reusable map for biome acoustic work
-    private static final Reference2FloatOpenHashMap<IAcoustic> WORK_MAP = new Reference2FloatOpenHashMap<>(8, 1F);
+    private static final Reference2FloatOpenHashMap<IAcoustic> WORK_MAP = new Reference2FloatOpenHashMap<>(8);
 
     static {
         WORK_MAP.defaultReturnValue(0F);

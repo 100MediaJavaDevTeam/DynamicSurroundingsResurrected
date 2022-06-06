@@ -64,7 +64,7 @@ public class Manager {
         // This has to be first!
         register(new CommonStateHandler());
         register(new AreaBlockEffects());
-//todo: figure this out        register(new BiomeSoundEffects());
+        register(new BiomeSoundEffects());
         register(new ParticleSystems());
         register(new AuroraHandler());
         register(new FogHandler());
