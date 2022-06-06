@@ -1,4 +1,13 @@
-> ### DynamicSurroundings-1.18.2-5.0.0.1
+> ### DynamicSurroundings-1.18.2-5.0.0.3
+**Requirements**
+* JAVA 17 w/Forge 1.18.2-40.1.0+
+* 100% client side; no server side deployment needed
+* Cloth Config API (Forge) is optional
+
+**What's New**
+* Fixed waterfall and other effects below 0 y level
+
+> ### DynamicSurroundings-1.18.2-5.0.0.2
 **Requirements**
 * JAVA 17 w/Forge 1.18.2-40.1.0+
 * 100% client side; no server side deployment needed
