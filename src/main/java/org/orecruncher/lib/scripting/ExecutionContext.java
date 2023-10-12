@@ -24,7 +24,9 @@ import org.orecruncher.lib.logging.IModLog;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.script.*;
+import javax.script.Compilable;
+import javax.script.CompiledScript;
+import javax.script.ScriptEngine;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;

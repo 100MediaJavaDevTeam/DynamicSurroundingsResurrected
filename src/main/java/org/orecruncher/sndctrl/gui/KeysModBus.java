@@ -20,30 +20,34 @@ package org.orecruncher.sndctrl.gui;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.settings.KeyModifier;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.orecruncher.lib.GameUtils;
 import org.orecruncher.sndctrl.SoundControl;
 
-@Mod.EventBusSubscriber(modid = SoundControl.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class Keys {
+@Mod.EventBusSubscriber(modid = SoundControl.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+public class KeysModBus {
 
-
+    public static KeyMapping quickVolumeGui;
+    public static KeyMapping soundConfigGui;
 
     @SubscribeEvent
-    public static void keyPressed(InputEvent.Key event) {
-        if (GameUtils.getMC().screen == null && GameUtils.getPlayer() != null) {
-            if (KeysModBus.quickVolumeGui.consumeClick()) {
-                GameUtils.getMC().setScreen(new QuickVolumeScreen());
-            } else if (KeysModBus.soundConfigGui.consumeClick()) {
-                final boolean singlePlayer = GameUtils.getMC().getSingleplayerServer() != null && GameUtils.getMC().getSingleplayerServer().isPublished();
-                GameUtils.getMC().setScreen(new IndividualSoundControlScreen(null, singlePlayer));
-                if (singlePlayer)
-                    GameUtils.getMC().getSoundManager().pause();
-            }
-        }
+    public static void register(RegisterKeyMappingsEvent event) {
+        quickVolumeGui = new KeyMapping(
+                "sndctrl.text.quickvolumemenu.open",
+                InputConstants.UNKNOWN.getValue(),
+                "dsurround.text.controls.group");
+        quickVolumeGui.setKeyModifierAndCode(KeyModifier.CONTROL, InputConstants.getKey("key.keyboard.v"));
+
+        soundConfigGui = new KeyMapping(
+                "sndctrl.text.soundconfig.open",
+                InputConstants.UNKNOWN.getValue(),
+                "dsurround.text.controls.group");
+        soundConfigGui.setKeyModifierAndCode(KeyModifier.CONTROL, InputConstants.getKey("key.keyboard.i"));
+
+        event.register(quickVolumeGui);
+        event.register(soundConfigGui);
     }
+
 }

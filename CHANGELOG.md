@@ -1,4 +1,4 @@
-> ### DynamicSurroundings-1.18.2-5.0.0.4
+> ### DynamicSurroundings-1.18.2-6.0.0.1
 **Requirements**
 * JAVA 17 w/Forge 1.18.2-40.1.0+
 * 100% client side; no server side deployment needed

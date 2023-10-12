@@ -156,8 +156,8 @@ dependencies {
     // implementation fg.deobf("curse.maven:SereneSeasons-291874:3621343")
     implementation fg.deobf("me.shedaniel.cloth:cloth-config-forge:${cloth_config_version}")
 
-    runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_file_id}")
-    runtimeOnly fg.deobf("curse.maven:the-one-probe-245211:${the_one_probe_file_id}")
+//    runtimeOnly fg.deobf("curse.maven:jei-238222:${jei_file_id}")
+//    runtimeOnly fg.deobf("curse.maven:the-one-probe-245211:${the_one_probe_file_id}")
 
     // Capability Syncer
     shadow fg.deobf("dev._100media.capabilitysyncer:capabilitysyncer:${capabilitysyncer_version}")

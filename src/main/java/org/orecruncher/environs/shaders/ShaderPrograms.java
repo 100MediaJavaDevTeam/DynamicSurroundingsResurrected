@@ -32,8 +32,8 @@ import java.util.Collection;
 public enum ShaderPrograms implements IShaderResourceProvider {
 
     AURORA(
-            "environs:shaders/aurora.vert",
-            "environs:shaders/aurora.frag",
+            "minecraft:shaders/aurora.vert",
+            "minecraft:shaders/aurora.frag",
             ImmutableList.of(
                     "time",
                     "resolution",

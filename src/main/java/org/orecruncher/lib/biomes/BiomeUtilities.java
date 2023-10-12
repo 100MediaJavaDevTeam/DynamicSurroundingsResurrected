@@ -19,6 +19,7 @@
 package org.orecruncher.lib.biomes;
 
 import com.google.common.collect.ImmutableSet;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -26,6 +27,7 @@ import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
@@ -33,7 +35,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.BiomeDictionary;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.orecruncher.environs.Environs;
 import org.orecruncher.lib.GameUtils;
@@ -44,6 +46,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @OnlyIn(Dist.CLIENT)
 public class BiomeUtilities {
@@ -55,11 +58,11 @@ public class BiomeUtilities {
 
     @Nonnull
     public static String getBiomeName(@Nonnull final Biome biome) {
-        ResourceLocation loc = biome.getRegistryName();
+        ResourceLocation loc = Minecraft.getInstance().level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
         if (loc == null) {
             final Biome forgeBiome = getClientBiome(biome);
             if (forgeBiome != null)
-                loc = forgeBiome.getRegistryName();
+                loc = ForgeRegistries.BIOMES.getKey(forgeBiome);
         }
         if (loc == null)
             return "UNKNOWN";
@@ -73,8 +76,8 @@ public class BiomeUtilities {
     //
     // ===================================
     @Nonnull
-    public static Collection<BiomeDictionary.Type> getBiomeTypes() {
-        return BiomeDictionary.Type.getAll();
+    public static Collection<TagKey<Biome>> getBiomeTypes() {
+        return Minecraft.getInstance().level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getTagNames().collect(Collectors.toSet());
     }
 
     @Nonnull
@@ -91,22 +94,27 @@ public class BiomeUtilities {
             if (biome != null)
                 return new Color(biome.getWaterColor());
         }
-        return new Color(fluid.getAttributes().getColor());
+        return new Color(IClientFluidTypeExtensions.of(fluid.getFluidType()).getTintColor());
     }
 
     @Nonnull
-    public static Set<BiomeDictionary.Type> getBiomeTypes(@Nonnull final Biome biome) {
+    public static Set<TagKey<Biome>> getBiomeTypes(@Nonnull final Biome biome) {
         try {
-            ResourceLocation loc = biome.getRegistryName();
-            if (loc == null) {
-                final Biome forgeBiome = getClientBiome(biome);
-                if (forgeBiome != null)
-                    loc = forgeBiome.getRegistryName();
+            ResourceLocation boop = ForgeRegistries.BIOMES.getKey(biome);
+
+//            ResourceKey<Biome> loc = Minecraft.getInstance().level.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getResourceKey(biome).get();
+            if (boop != null) {
+                return ForgeRegistries.BIOMES.tags().getReverseTag(biome).get().getTagKeys().collect(Collectors.toSet());
             }
-            if (loc != null) {
-                ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, loc);
-                return BiomeDictionary.getTypes(key);
-            }
+//            if (loc == null) {
+//                final Biome forgeBiome = getClientBiome(biome);
+//                if (forgeBiome != null)
+//                    loc = forgeBiome.getRegistryName();
+//            }
+//            if (loc != null) {
+//                ResourceKey<Biome> key = ResourceKey.create(Registry.BIOME_REGISTRY, loc);
+//                return ;
+//            }
         } catch (@Nonnull final Throwable t) {
             final String name = biome.toString(); //biome.getDisplayName().getFormattedText();
             Environs.LOGGER.warn("Unable to get biome type data for biome '%s'", name);

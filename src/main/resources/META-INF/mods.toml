@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[40,)"
+loaderVersion="[41,)"
 issueTrackerURL="https://github.com/Nyfaria/DynamicSurroundingsResurrected/issues"
 displayURL="https://www.curseforge.com/minecraft/mc-mods/dynamic-surrounding-resurrected"
 logoFile="logo.png"
@@ -18,14 +18,14 @@ description="\nAdds a variety of §6sound§r and §6visual§r effects to improve
 [[dependencies.dsurround]]
 modId="forge"
 mandatory=true
-versionRange="[5.0.0.4,)"
+versionRange="[6.0.0.1,)"
 ordering="NONE"
 side="CLIENT"
 
 [[dependencies.dsurround]]
 modId="minecraft"
 mandatory=true
-versionRange="[1.18.2,1.19)"
+versionRange="[1.19,1.20)"
 ordering="NONE"
 side="CLIENT"
 
@@ -40,7 +40,7 @@ description="\nEnhances and gives the player §6control§r over their §2Minecra
 [[dependencies.sndctrl]]
 modId="dsurround"
 mandatory=false
-versionRange="[5.0.0.4,)"
+versionRange="[6.0.0.1,)"
 ordering="AFTER"
 side="CLIENT"
 
@@ -55,7 +55,7 @@ description="\nAdds §6sound§r and §6visual§r effects to §6biomes§r"
 [[dependencies.environs]]
 modId="sndctrl"
 mandatory=false
-versionRange="[5.0.0.4,)"
+versionRange="[6.0.0.1,)"
 ordering="AFTER"
 side="CLIENT"
 
@@ -70,6 +70,6 @@ description="\nGiving §6mobs§r and §6players§r special §6sound§r and §6vi
 [[dependencies.mobeffects]]
 modId="sndctrl"
 mandatory=false
-versionRange="[5.0.0.4,)"
+versionRange="[6.0.0.1,)"
 ordering="AFTER"
 side="CLIENT"

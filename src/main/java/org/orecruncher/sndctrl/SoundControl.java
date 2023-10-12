@@ -18,6 +18,8 @@
 
 package org.orecruncher.sndctrl;
 
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
@@ -68,6 +70,7 @@ public final class SoundControl {
             FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
             FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setupComplete);
             MinecraftForge.EVENT_BUS.register(this);
+            SoundInit.SOUNDS.register(FMLJavaModLoadingContext.get().getModEventBus());
 
             // Initialize our configuration
             Config.setup();
@@ -81,10 +84,10 @@ public final class SoundControl {
     }
 
     private void clientSetup(@Nonnull final FMLClientSetupEvent event) {
-        Keys.register();
+//        Keys.register();
 
         if (Config.CLIENT.effects.fixupRandoms.get()) {
-            GameUtils.getMC().gameRenderer.random = new XorShiftRandom();
+            GameUtils.getMC().gameRenderer.random = new XoroshiroRandomSource(0);
         }
 
         AudioEngine.initialize();

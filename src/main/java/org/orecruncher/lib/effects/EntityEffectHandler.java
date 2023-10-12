@@ -23,7 +23,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -84,9 +84,9 @@ public final class EntityEffectHandler {
     }
 
     @SubscribeEvent(receiveCanceled = true)
-    public static void onLivingUpdate(@Nonnull final LivingEvent.LivingUpdateEvent event) {
+    public static void onLivingUpdate(@Nonnull final LivingEvent.LivingTickEvent event) {
         try {
-            final LivingEntity entity = event.getEntityLiving();
+            final LivingEntity entity = event.getEntity();
             if (entity != null && entity.getCommandSenderWorld().isClientSide) {
 
                 final ProfilerFiller profiler = GameUtils.getMC().getProfiler();
@@ -128,8 +128,8 @@ public final class EntityEffectHandler {
      * changed.
      */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onEntityJoin(@Nonnull final EntityJoinWorldEvent event) {
-        if (event.getWorld().isClientSide) {
+    public static void onEntityJoin(@Nonnull final EntityJoinLevelEvent event) {
+        if (event.getLevel().isClientSide) {
             if (GameUtils.getPlayer() == event.getEntity())
                 clearHandlers();
         }

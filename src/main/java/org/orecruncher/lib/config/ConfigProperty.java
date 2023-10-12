@@ -19,7 +19,9 @@
 package org.orecruncher.lib.config;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.StringUtil;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -70,10 +72,10 @@ public final class ConfigProperty {
     public MutableComponent getConfigName() {
         final String key = getTranslationKey();
         if (StringUtil.isNullOrEmpty(key)) {
-            return new TextComponent(this.name);
+            return Component.literal(this.name);
         }
 
-        return new TranslatableComponent(key);
+        return Component.translatable(key);
     }
 
     @Nullable
@@ -90,9 +92,9 @@ public final class ConfigProperty {
                 key = getComment();
                 if (StringUtil.isNullOrEmpty(key))
                     return null;
-                result.add(new TextComponent(key));
+                result.add(Component.literal(key));
             } else {
-                final Component title = new TextComponent(ChatFormatting.GOLD + new TranslatableComponent(key).getString());
+                final Component title = Component.literal(ChatFormatting.GOLD + Component.translatable(key).getString());
                 result.add(title);
                 result.addAll(GuiHelpers.getTrimmedTextCollection(key + ".tooltip", TOOLTIP_WIDTH));
             }
@@ -106,17 +108,17 @@ public final class ConfigProperty {
                     text = CommonComponents.OPTION_OFF.getString();
                 else
                     text = GuiHelpers.getTrimmedText(text, TOOLTIP_WIDTH).getString();
-                text = new TranslatableComponent("dsurround.text.format.default", text).getString();
-                result.add(new TextComponent(text));
+                text = Component.translatable("dsurround.text.format.default", text).getString();
+                result.add(Component.literal(text));
             }
 
             final Object range = this.valueSpec.getRange();
             if (range != null) {
-                result.add(new TextComponent(ChatFormatting.GREEN + "[ " + range.toString() + " ]"));
+                result.add(Component.literal(ChatFormatting.GREEN + "[ " + range.toString() + " ]"));
             }
 
             if (getNeedsWorldRestart()) {
-                result.add(new TranslatableComponent("dsurround.text.tooltip.restartRequired"));
+                result.add(Component.translatable("dsurround.text.tooltip.restartRequired"));
             }
 
             this.toolTip = result.toArray(new Component[0]);

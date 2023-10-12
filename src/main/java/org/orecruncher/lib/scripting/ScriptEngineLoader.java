@@ -21,7 +21,6 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 
 import javax.annotation.Nonnull;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
 
 class ScriptEngineLoader {
     public static ScriptEngine getEngine() {

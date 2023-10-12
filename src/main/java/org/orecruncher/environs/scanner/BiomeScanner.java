@@ -26,6 +26,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.orecruncher.environs.Environs;
 import org.orecruncher.environs.handlers.CommonState;
 import org.orecruncher.environs.library.BiomeInfo;
@@ -82,7 +83,7 @@ public final class BiomeScanner {
 					for (int dX = -BIOME_SURVEY_RANGE; dX <= BIOME_SURVEY_RANGE; dX++) {
 						this.mutable.set(this.surveyedPosition.getX() + dX, 0, this.surveyedPosition.getZ() + dZ);
 						final Biome biome = BiomeUtilities.getClientBiome(this.mutable);
-						if (biome == null || biome.getRegistryName() == null) {
+						if (biome == null || ForgeRegistries.BIOMES.getKey(biome) == null) {
 							continue;
 						}
 						final BiomeInfo info = BiomeUtil.getBiomeData(biome);

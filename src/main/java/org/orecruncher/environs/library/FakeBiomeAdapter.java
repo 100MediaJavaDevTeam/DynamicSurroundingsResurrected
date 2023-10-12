@@ -21,10 +21,10 @@ package org.orecruncher.environs.library;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.BiomeDictionary.Type;
 import org.orecruncher.environs.Environs;
 import org.orecruncher.lib.GameUtils;
 
@@ -93,7 +93,7 @@ public class FakeBiomeAdapter implements IBiome {
 	}
 
 	@Override
-	public Set<Type> getTypes() {
+	public Set<TagKey<Biome>> getTypes() {
 		return ImmutableSet.of();
 	}
 

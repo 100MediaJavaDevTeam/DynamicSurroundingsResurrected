@@ -8,8 +8,8 @@
   "mixins": [
   ],
   "client": [
-    "MixinBlockState",
     "MixinBiome",
+    "MixinBlockState",
     "MixinDripParticleDripping",
     "MixinRainParticle"
   ]

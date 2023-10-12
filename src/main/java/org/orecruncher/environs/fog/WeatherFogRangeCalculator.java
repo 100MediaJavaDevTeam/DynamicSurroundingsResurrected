@@ -20,7 +20,7 @@ package org.orecruncher.environs.fog;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import org.orecruncher.environs.config.Config;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.WorldUtils;
@@ -50,10 +50,10 @@ public class WeatherFogRangeCalculator extends VanillaFogRangeCalculator {
 
     @Override
     @Nonnull
-    public FogResult calculate(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
+    public FogResult calculate(@Nonnull final ViewportEvent.RenderFog event) {
         // Start with what vanilla thinks
         this.cache.set(event);
-        final float rainStr = WorldUtils.getRainStrength(GameUtils.getWorld(), (float) event.getPartialTicks());
+        final float rainStr = WorldUtils.getRainStrength(GameUtils.getWorld(), (float) event.getPartialTick());
         if (rainStr > 0) {
             // Calculate our scaling factor
             final float startScale = 1F - (START_IMPACT * rainStr);

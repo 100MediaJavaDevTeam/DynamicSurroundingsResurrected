@@ -18,16 +18,14 @@
 
 package org.orecruncher.environs.handlers;
 
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.FogType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.orecruncher.environs.config.Config;
@@ -61,7 +59,8 @@ public class FogHandler extends HandlerBase {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void fogRenderEvent(final EntityViewRenderEvent.RenderFogEvent event) {
+    public void fogRenderEvent(final ViewportEvent.RenderFog event) {
+        //todo: figure out if this is right
         if (event.getMode() == FogRenderer.FogMode.FOG_TERRAIN && doFog()) {
             final ProfilerFiller profiler = GameUtils.getMC().getProfiler();
             profiler.push("Environs Fog Render");

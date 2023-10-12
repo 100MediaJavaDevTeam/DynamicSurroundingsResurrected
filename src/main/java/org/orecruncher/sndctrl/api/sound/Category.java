@@ -21,7 +21,6 @@ package org.orecruncher.sndctrl.api.sound;
 import com.google.common.base.MoreObjects;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -201,7 +200,7 @@ public class Category implements ISoundCategory {
     @Override
     @Nonnull
     public Component getTextComponent() {
-        return new TranslatableComponent(this.translationKey);
+        return Component.translatable(this.translationKey);
     }
 
     @Override
@@ -263,7 +262,7 @@ public class Category implements ISoundCategory {
         @Override
         public Component getTextComponent() {
             // From the SoundConfig slider logic for Vanilla categories
-            return new TranslatableComponent("soundCategory." + this.getName());
+            return Component.translatable("soundCategory." + this.getName());
         }
 
         @Override

@@ -47,7 +47,7 @@ public class ClientLoginChecks {
     }
 
     @SubscribeEvent
-    public static void onLogin(@Nonnull final ClientPlayerNetworkEvent.LoggedInEvent event) {
+    public static void onLogin(@Nonnull final ClientPlayerNetworkEvent.LoggingIn event) {
         final LocalPlayer player = event.getPlayer();
         if (player != null) {
             Lib.LOGGER.info("Player login: %s", event.getPlayer().getName().getString());
@@ -55,7 +55,7 @@ public class ClientLoginChecks {
             for (final ICallbackHandler callback : handlers) {
                 final Component msg = callback.onClientLogin(event.getPlayer());
                 if (msg != null)
-                    event.getPlayer().sendMessage(msg, Util.NIL_UUID);
+                    event.getPlayer().sendSystemMessage(msg);
             }
         }
     }

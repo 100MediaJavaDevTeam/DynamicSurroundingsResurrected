@@ -21,8 +21,8 @@ package org.orecruncher.dsurround.gui;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.event.InputEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.orecruncher.dsurround.DynamicSurroundings;
@@ -36,13 +36,14 @@ public class Keys {
     private static KeyMapping lightLevelHUD;
     private static KeyMapping chunkBorders;
 
-    public static void register() {
+    @SubscribeEvent
+    public static void register(RegisterKeyMappingsEvent event) {
         if ((Config.CLIENT.logging.flagMask.get() & Config.Flags.ALLOW_CHUNK_BORDER_HUD) != 0) {
             lightLevelHUD = new KeyMapping(
                     "dsurround.text.lightlevel.toggle",
                     InputConstants.UNKNOWN.getValue(),
                     "dsurround.text.controls.group");
-            ClientRegistry.registerKeyBinding(lightLevelHUD);
+            event.register(lightLevelHUD);
         }
 
         if ((Config.CLIENT.logging.flagMask.get() & Config.Flags.ALLOW_LIGHTLEVEL_HUD) != 0) {
@@ -50,12 +51,12 @@ public class Keys {
                     "dsurround.text.chunkborders.toggle",
                     InputConstants.UNKNOWN.getValue(),
                     "dsurround.text.controls.group");
-            ClientRegistry.registerKeyBinding(chunkBorders);
+            event.register(chunkBorders);
         }
     }
 
     @SubscribeEvent
-    public static void keyPressed(InputEvent.KeyInputEvent event) {
+    public static void keyPressed(InputEvent.Key event) {
         if (GameUtils.getMC().screen == null && GameUtils.getPlayer() != null) {
             if (lightLevelHUD != null && lightLevelHUD.consumeClick()) {
                 LightLevelHUD.toggleDisplay();

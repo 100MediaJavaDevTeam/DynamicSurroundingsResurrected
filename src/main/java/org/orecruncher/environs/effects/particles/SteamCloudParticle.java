@@ -27,6 +27,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.random.XorShiftRandom;
 
@@ -44,7 +45,7 @@ public class SteamCloudParticle extends TextureSheetParticle {
         super((ClientLevel) world, x, y, z, RANDOM.nextGaussian() * 0.02D, dY,
                 RANDOM.nextGaussian() * 0.02D);
 
-        this.sprites = GameUtils.getMC().particleEngine.spriteSets.get(ParticleTypes.CLOUD.getRegistryName());
+        this.sprites = GameUtils.getMC().particleEngine.spriteSets.get(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.CLOUD));
         this.xd *= 0.1F;
         this.yd *= 0.1F;
         this.zd *= 0.1F;

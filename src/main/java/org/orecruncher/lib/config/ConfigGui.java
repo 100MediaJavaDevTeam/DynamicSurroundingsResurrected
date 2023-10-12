@@ -25,10 +25,9 @@ import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ConfigGuiHandler;
+import net.minecraftforge.client.ConfigScreenHandler;
 import net.minecraftforge.fml.ModLoadingContext;
 
 import javax.annotation.Nonnull;
@@ -40,15 +39,15 @@ public class ConfigGui {
     public static void registerConfigGui(@Nonnull final BiFunction<Minecraft, Screen, Screen> factory) {
         final ModLoadingContext context = ModLoadingContext.get();
         context.registerExtensionPoint(
-                ConfigGuiHandler.ConfigGuiFactory.class,
-                () -> new ConfigGuiHandler.ConfigGuiFactory(factory));
+                ConfigScreenHandler.ConfigScreenFactory.class,
+                () -> new ConfigScreenHandler.ConfigScreenFactory(factory));
     }
 
     public static class InstallClothGuiFactory implements BiFunction<Minecraft, Screen, Screen> {
 
         // Resources for displaying info about getting ClothAPI
-        private static final Component title = new TranslatableComponent("dsurround.dialog.missingcloth.title");
-        private static final Component description = new TranslatableComponent("dsurround.dialog.missingcloth.description");
+        private static final Component title = Component.translatable("dsurround.dialog.missingcloth.title");
+        private static final Component description = Component.translatable("dsurround.dialog.missingcloth.description");
 
         @Override
         public Screen apply(@Nonnull final Minecraft minecraft, @Nonnull final Screen screen) {

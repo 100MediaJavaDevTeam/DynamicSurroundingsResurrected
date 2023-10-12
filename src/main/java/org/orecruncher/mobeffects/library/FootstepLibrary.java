@@ -32,6 +32,7 @@ import net.minecraft.world.level.material.Material;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.tags.ITag;
 import org.apache.commons.lang3.tuple.Pair;
 import org.orecruncher.dsurround.DynamicSurroundings;
@@ -401,7 +402,7 @@ public final class FootstepLibrary {
             LOGGER.debug("No blocks associated with tag '%s'", tagName);
         } else {
             for (final Block b : blockTag.stream().toList()) {
-                String blockName = Objects.requireNonNull(b.getRegistryName()).toString();
+                String blockName = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(b)).toString();
                 if (substrate != null)
                     blockName = blockName + "+" + substrate;
                 register(blockName, acousticList);
@@ -432,7 +433,7 @@ public final class FootstepLibrary {
         } else if (entity instanceof Player) {
             var = Config.CLIENT.footsteps.footstepsAsQuadruped.get() ? playerQuadrupedVariator : playerVariator;
         } else {
-            var = getVariator(entity.getType().getRegistryName().toString());
+            var = getVariator(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()).toString());
         }
 
         return var.QUADRUPED ? new GeneratorQP(var) : new Generator(var);

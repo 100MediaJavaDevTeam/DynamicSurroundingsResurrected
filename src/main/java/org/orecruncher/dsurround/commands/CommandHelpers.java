@@ -20,7 +20,7 @@ package org.orecruncher.dsurround.commands;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.util.thread.BlockableEventLoop;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.util.LogicalSidedProvider;
@@ -42,7 +42,7 @@ public class CommandHelpers {
     @SubscribeEvent
     public static void registerCommands(@Nonnull final RegisterCommandsEvent event) {
         // Only register if its an integrated server environment
-        if (event.getEnvironment() == Commands.CommandSelection.INTEGRATED) {
+        if (event.getCommandSelection() == Commands.CommandSelection.INTEGRATED) {
             DumpCommand.register(event.getDispatcher());
         }
     }
@@ -54,11 +54,11 @@ public class CommandHelpers {
 
     public static void sendSuccess(@Nonnull final CommandSourceStack source, @Nonnull final String command, @Nonnull String operation, @Nonnull String target) {
         final String key = String.format("command.dsurround.%s.success", command);
-        source.sendSuccess(new TranslatableComponent(key, operation, target), true);
+        source.sendSuccess(Component.translatable(key, operation, target), true);
     }
 
     public static void sendFailure(@Nonnull final CommandSourceStack source, @Nonnull final String command) {
         final String key = String.format("command.dsurround.%s.failure", command);
-        source.sendSuccess(new TranslatableComponent(key), true);
+        source.sendSuccess(Component.translatable(key), true);
     }
 }

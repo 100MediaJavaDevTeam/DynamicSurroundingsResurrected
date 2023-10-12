@@ -28,13 +28,11 @@ import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.widget.Slider;
+import net.minecraftforge.client.gui.widget.ForgeSlider;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.fml.ForgeUtils;
 import org.orecruncher.lib.gui.ColorPalette;
@@ -55,22 +53,23 @@ import java.util.List;
 import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
-public class IndividualSoundControlListEntry extends ContainerObjectSelectionList.Entry<IndividualSoundControlListEntry> implements Slider.ISlider, AutoCloseable {
+public class IndividualSoundControlListEntry extends ContainerObjectSelectionList.Entry<IndividualSoundControlListEntry> implements AutoCloseable {
 
     private static final int SLIDER_WIDTH = 100;
     private static final int BUTTON_WIDTH = 60;
     private static final int TOOLTIP_WIDTH = 300;
-    private static final Button.OnPress NULL_PRESSABLE = (b) -> {};
-    private static final Component CULL_ON = new TranslatableComponent("sndctrl.text.soundconfig.cull");
-    private static final Component CULL_OFF = new TranslatableComponent("sndctrl.text.soundconfig.nocull");
-    private static final Component BLOCK_ON = new TranslatableComponent("sndctrl.text.soundconfig.block");
-    private static final Component BLOCK_OFF = new TranslatableComponent("sndctrl.text.soundconfig.noblock");
-    private static final Component PLAY = new TranslatableComponent("sndctrl.text.soundconfig.play");
-    private static final Component STOP = new TranslatableComponent("sndctrl.text.soundconfig.stop");
-    private static final Component VANILLA_CREDIT = new TranslatableComponent("sndctrl.text.tooltip.vanilla");
-    private static final Component SLIDER_SUFFIX = new TextComponent("%");
+    private static final Button.OnPress NULL_PRESSABLE = (b) -> {
+    };
+    private static final Component CULL_ON = Component.translatable("sndctrl.text.soundconfig.cull");
+    private static final Component CULL_OFF = Component.translatable("sndctrl.text.soundconfig.nocull");
+    private static final Component BLOCK_ON = Component.translatable("sndctrl.text.soundconfig.block");
+    private static final Component BLOCK_OFF = Component.translatable("sndctrl.text.soundconfig.noblock");
+    private static final Component PLAY = Component.translatable("sndctrl.text.soundconfig.play");
+    private static final Component STOP = Component.translatable("sndctrl.text.soundconfig.stop");
+    private static final Component VANILLA_CREDIT = Component.translatable("sndctrl.text.tooltip.vanilla");
+    private static final Component SLIDER_SUFFIX = Component.literal("%");
 
-    private static final ChatFormatting[] CODING = new ChatFormatting[] {ChatFormatting.ITALIC, ChatFormatting.AQUA};
+    private static final ChatFormatting[] CODING = new ChatFormatting[]{ChatFormatting.ITALIC, ChatFormatting.AQUA};
     private static final Collection<Component> VOLUME_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.volume.help", TOOLTIP_WIDTH, CODING);
     private static final Collection<Component> PLAY_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.play.help", TOOLTIP_WIDTH, CODING);
     private static final Collection<Component> CULL_HELP = GuiHelpers.getTrimmedTextCollection("sndctrl.text.soundconfig.cull.help", TOOLTIP_WIDTH, CODING);
@@ -79,7 +78,7 @@ public class IndividualSoundControlListEntry extends ContainerObjectSelectionLis
     private static final int CONTROL_SPACING = 3;
 
     private final IndividualSoundConfig config;
-    private final Slider volume;
+    private final ForgeSlider volume;
     private final Button blockButton;
     private final Button cullButton;
     private final Button playButton;
@@ -90,23 +89,24 @@ public class IndividualSoundControlListEntry extends ContainerObjectSelectionLis
 
     private ISoundInstance soundPlay;
 
+
     public IndividualSoundControlListEntry(@Nonnull final IndividualSoundConfig data, final boolean enablePlay) {
         this.config = data;
 
-        this.volume = new Slider(
+        this.volume = new ForgeSlider(
                 0,
                 0,
                 SLIDER_WIDTH,
                 0,
-                TextComponent.EMPTY,
+                Component.empty(),
                 SLIDER_SUFFIX,
                 0,
                 400,
                 this.config.getVolumeScaleInt(),
-                false,
+                false/*,
                 true,
                 NULL_PRESSABLE,
-                this);
+                this*/);
         this.children.add(this.volume);
 
         this.blockButton = new Button(
@@ -193,9 +193,14 @@ public class IndividualSoundControlListEntry extends ContainerObjectSelectionLis
         button.setMessage(this.config.isCulled() ? CULL_ON : CULL_OFF);
     }
 
+    //    @Override
+//    public void onChangeSliderValue(@Nonnull final ForgeSlider slider) {
+//        this.config.setVolumeScaleInt(slider.getValueInt());
+//    }
     @Override
-    public void onChangeSliderValue(@Nonnull final Slider slider) {
-        this.config.setVolumeScaleInt(slider.getValueInt());
+    public boolean mouseReleased(double pMouseX, double pMouseY, int pButton) {
+        this.config.setVolumeScaleInt(volume.getValueInt());
+        return super.mouseReleased(pMouseX, pMouseY, pButton);
     }
 
     protected void play(@Nonnull final Button button) {
@@ -240,17 +245,17 @@ public class IndividualSoundControlListEntry extends ContainerObjectSelectionLis
             final ResourceLocation loc = this.config.getLocation();
 
             final String modName = ForgeUtils.getModDisplayName(loc.getNamespace());
-            this.defaultTooltip.add(new TextComponent(ChatFormatting.GOLD + modName));
+            this.defaultTooltip.add(Component.literal(ChatFormatting.GOLD + modName));
 
-            this.defaultTooltip.add(new TextComponent(ChatFormatting.GRAY + loc.toString()));
+            this.defaultTooltip.add(Component.literal(ChatFormatting.GRAY + loc.toString()));
 
             final SoundMetadata meta = SoundLibrary.getSoundMetadata(loc);
             final Component title = meta.getTitle();
-            if (title != TextComponent.EMPTY)
+            if (!title.equals(Component.empty()))
                 this.defaultTooltip.add(title);
             final ISoundCategory category = meta.getCategory();
             if (category != Category.NEUTRAL) {
-                this.defaultTooltip.add(new TranslatableComponent("sndctrl.text.tooltip.category").append(category.getTextComponent()));
+                this.defaultTooltip.add(Component.translatable("sndctrl.text.tooltip.category").append(category.getTextComponent()));
             }
 
             if (modName.equals("Minecraft"))
@@ -276,6 +281,7 @@ public class IndividualSoundControlListEntry extends ContainerObjectSelectionLis
 
     /**
      * Retrieves the updated data from the entry
+     *
      * @return Updated IndividualSoundControl data
      */
     @Nonnull

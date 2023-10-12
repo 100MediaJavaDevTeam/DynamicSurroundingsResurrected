@@ -22,7 +22,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import org.orecruncher.environs.config.Config;
 import org.orecruncher.environs.handlers.CommonState;
 import org.orecruncher.lib.GameUtils;
@@ -50,12 +50,12 @@ public class BedrockFogRangeCalculator extends VanillaFogRangeCalculator {
 
     @Override
     @Nonnull
-    public FogResult calculate(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
+    public FogResult calculate(@Nonnull final ViewportEvent.RenderFog event) {
 
         this.cached.set(event);
         if (!CommonState.getDimensionInfo().isFlatWorld() && WorldUtils.hasVoidParticles(GameUtils.getWorld())) {
             final Player player = GameUtils.getPlayer();
-            final double factor = (Mth.lerp(event.getPartialTicks(), player.yOld, player.getY()) + 4.0D) / 32.0D;
+            final double factor = (Mth.lerp(event.getPartialTick(), player.yOld, player.getY()) + 4.0D) / 32.0D;
             double d0 = (this.skyLight / 16.0D) + factor;
 
             float end = event.getFarPlaneDistance();
@@ -84,6 +84,6 @@ public class BedrockFogRangeCalculator extends VanillaFogRangeCalculator {
 
     @Override
     public void tick() {
-        this.skyLight = GameUtils.getPlayer().getBrightness();
+        this.skyLight = GameUtils.getPlayer().getLightLevelDependentMagicValue();
     }
 }

@@ -20,7 +20,7 @@ package org.orecruncher.environs.fog;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 
 import javax.annotation.Nonnull;
 
@@ -40,7 +40,7 @@ public final class FogResult {
         this.set(distance, scale);
     }
 
-    public FogResult(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
+    public FogResult(@Nonnull final ViewportEvent.RenderFog event) {
         this.set(event);
     }
 
@@ -54,7 +54,7 @@ public final class FogResult {
         this.end = end;
     }
 
-    public void set(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
+    public void set(@Nonnull final ViewportEvent.RenderFog event) {
         this.setScaled(event.getFarPlaneDistance(), DEFAULT_PLANE_SCALE);
     }
 
@@ -66,7 +66,7 @@ public final class FogResult {
         return this.end;
     }
 
-    public boolean isValid(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
+    public boolean isValid(@Nonnull final ViewportEvent.RenderFog event) {
         return this.end > this.start;
     }
 

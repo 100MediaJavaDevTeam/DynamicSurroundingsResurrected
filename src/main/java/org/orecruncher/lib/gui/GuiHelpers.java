@@ -21,7 +21,9 @@ package org.orecruncher.lib.gui;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -49,10 +51,10 @@ public class GuiHelpers {
         final Style style = prefixHelper(formatting);
         return GameUtils.getMC().font.getSplitter()
                 .splitLines(
-                        new TranslatableComponent(key),
+                        Component.translatable(key),
                         width,
                         style)
-                .stream().map(e -> new TextComponent(e.getString()))
+                .stream().map(e -> Component.literal(e.getString()))
                 .collect(Collectors.toList());
     }
 
@@ -67,17 +69,17 @@ public class GuiHelpers {
      */
     public static Component getTrimmedText(@Nonnull final String key, final int width, @Nullable final ChatFormatting... formatting) {
         final Style style = prefixHelper(formatting);
-        final Component text = new TranslatableComponent(key);
+        final Component text = Component.translatable(key);
         final Font fr = GameUtils.getMC().font;
         final StringSplitter cm = fr.getSplitter();
         if (fr.width(text) > width) {
             final int ellipsesWidth = fr.width(ELLIPSES);
             final int trueWidth = width - ellipsesWidth;
             final FormattedText str = cm.headByWidth(text, trueWidth, style);
-            return new TextComponent(str.getString() + ELLIPSES);
+            return Component.literal(str.getString() + ELLIPSES);
         }
         final FormattedText str = cm.headByWidth(text, width, style);
-        return new TextComponent(str.getString());
+        return Component.literal(str.getString());
     }
 
     private static Style prefixHelper(@Nullable final ChatFormatting[] formatting) {

@@ -20,7 +20,7 @@ package org.orecruncher.environs.fog;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 
 import javax.annotation.Nonnull;
 
@@ -36,7 +36,7 @@ public class FixedFogRangeCalculator extends VanillaFogRangeCalculator {
 
     @Override
     @Nonnull
-    public FogResult calculate(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
+    public FogResult calculate(@Nonnull final ViewportEvent.RenderFog event) {
         return this.cached;
     }
 

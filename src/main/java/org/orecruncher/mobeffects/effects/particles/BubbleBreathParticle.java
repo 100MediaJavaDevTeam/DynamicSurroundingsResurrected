@@ -29,6 +29,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.orecruncher.lib.GameUtils;
 
 import javax.annotation.Nonnull;
@@ -39,7 +40,7 @@ public class BubbleBreathParticle  extends TextureSheetParticle {
         super((ClientLevel) entity.getCommandSenderWorld(), 0, 0, 0);
 
         // Reuse the bubble sheet
-        final SpriteSet spriteSet = GameUtils.getMC().particleEngine.spriteSets.get(ParticleTypes.BUBBLE.getRegistryName());
+        final SpriteSet spriteSet = GameUtils.getMC().particleEngine.spriteSets.get(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.BUBBLE));
         this.pickSprite(spriteSet);
 
         final Vec3 origin = ParticleUtils.getBreathOrigin(entity);

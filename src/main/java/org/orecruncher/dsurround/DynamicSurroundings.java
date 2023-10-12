@@ -112,7 +112,7 @@ public final class DynamicSurroundings {
     }
 
     private void clientSetup(@Nonnull final FMLClientSetupEvent event) {
-        Keys.register();
+//        Keys.register();
         if (Config.CLIENT.logging.onlineVersionCheck.get())
             ClientLoginChecks.register(new UpdateChecker(DynamicSurroundings.MOD_ID));
     }

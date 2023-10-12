@@ -20,10 +20,11 @@ package org.orecruncher.environs.library;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.BiomeTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.BiomeDictionary.Type;
 import org.apache.commons.lang3.StringUtils;
 import org.orecruncher.environs.Environs;
 import org.orecruncher.environs.library.config.AcousticConfig;
@@ -71,11 +72,11 @@ public final class BiomeInfo implements Comparable<BiomeInfo> {
 	public BiomeInfo(@Nonnull final IBiome biome) {
 		this.biome = biome;
 
-		this.isRiver = this.biome.getTypes().contains(Type.RIVER);
-		this.isOcean = this.biome.getTypes().contains(Type.OCEAN);
+		this.isRiver = this.biome.getTypes().contains(BiomeTags.IS_RIVER);
+		this.isOcean = this.biome.getTypes().contains(BiomeTags.IS_OCEAN);
 		this.isDeepOcean = this.isOcean && getBiomeName().matches("(?i).*deep.*ocean.*|.*abyss.*");
 	
-		this.traits = getBiomeTypes().stream().map(Type::getName).collect(Collectors.joining(" "));
+		this.traits = getBiomeTypes().stream().map(TagKey::toString).collect(Collectors.joining(" "));
 	}
 
 	public boolean isRiver() {
@@ -98,7 +99,7 @@ public final class BiomeInfo implements Comparable<BiomeInfo> {
 		return this.biome.getBiome();
 	}
 
-	public Set<Type> getBiomeTypes() {
+	public Set<TagKey<Biome>> getBiomeTypes() {
 		return this.biome.getTypes();
 	}
 	

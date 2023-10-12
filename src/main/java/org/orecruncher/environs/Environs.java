@@ -74,6 +74,7 @@ public final class Environs {
             ShaderPrograms.MANAGER.initShaders();
 
             DynamicSurroundings.doConfigMenuSetup();
+            SoundInit.SOUNDS.register(FMLJavaModLoadingContext.get().getModEventBus());
         }
     }
 
@@ -93,12 +94,12 @@ public final class Environs {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void clientConnect(@Nonnull final ClientPlayerNetworkEvent.LoggedInEvent event) {
+    public void clientConnect(@Nonnull final ClientPlayerNetworkEvent.LoggingIn event) {
         Manager.connect();
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    public void clientDisconnect(@Nonnull final ClientPlayerNetworkEvent.LoggedOutEvent event) {
+    public void clientDisconnect(@Nonnull final ClientPlayerNetworkEvent.LoggingOut event) {
         Manager.disconnect();
     }
 

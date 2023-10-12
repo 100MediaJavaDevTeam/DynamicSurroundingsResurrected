@@ -28,9 +28,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.particles.CollectionManager;
+import org.orecruncher.lib.particles.DSParticleRenderType;
 import org.orecruncher.lib.particles.IParticleCollection;
 import org.orecruncher.lib.particles.IParticleMote;
-import org.orecruncher.lib.particles.DSParticleRenderType;
 import org.orecruncher.mobeffects.MobEffects;
 import org.orecruncher.mobeffects.footsteps.FootprintStyle;
 

@@ -20,9 +20,9 @@ package org.orecruncher.sndctrl.config;
 
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
-import me.shedaniel.clothconfig2.impl.builders.*;
+import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.config.ClothAPIFactory;
@@ -104,7 +104,7 @@ public class ConfigGenerator {
                         Config.CLIENT.sound.individualSounds,
                         (v) -> {
                             if (!IndividualSoundConfig.isValid(v))
-                                return Optional.of(new TranslatableComponent("sndctrl.message.cfg.soundconfig.invalid"));
+                                return Optional.of(Component.translatable("sndctrl.message.cfg.soundconfig.invalid"));
                             return Optional.empty();
                         }));
 

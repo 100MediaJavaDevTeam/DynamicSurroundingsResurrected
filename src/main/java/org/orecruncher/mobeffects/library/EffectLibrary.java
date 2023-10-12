@@ -94,7 +94,7 @@ public final class EffectLibrary {
         EntityEffectInfo eei = effects.get(entity.getClass());
         if (eei == null) {
             // Do we have a config for it?
-            eei = effectConfiguration.get(entity.getType().getRegistryName());
+            eei = effectConfiguration.get(ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()));
             if (eei == null)
                 eei = DEFAULT;
             effects.put(entity.getClass(), eei);
@@ -137,9 +137,9 @@ public final class EffectLibrary {
         public void start() {
 
             // Seed our configuration with known entities that have defaults
-            ForgeRegistries.ENTITIES.forEach(e -> {
+            ForgeRegistries.ENTITY_TYPES.forEach(e -> {
                 if (e.getCategory() != MobCategory.MISC)
-                    effectConfiguration.put(e.getRegistryName(), DEFAULT);
+                    effectConfiguration.put(ForgeRegistries.ENTITY_TYPES.getKey(e), DEFAULT);
             });
 
             // Apply configuration.  These will replace defaults as needed.

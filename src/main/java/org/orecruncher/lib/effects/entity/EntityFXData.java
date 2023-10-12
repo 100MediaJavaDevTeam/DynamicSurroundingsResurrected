@@ -18,17 +18,16 @@
 
 package org.orecruncher.lib.effects.entity;
 
-import javax.annotation.Nullable;
-
 import dev._100media.capabilitysyncer.core.EntityCapability;
 import dev._100media.capabilitysyncer.network.EntityCapabilityStatusPacket;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.network.simple.SimpleChannel;
 import org.orecruncher.lib.effects.EntityEffectManager;
+
+import javax.annotation.Nullable;
 
 
 @OnlyIn(Dist.CLIENT)

@@ -24,6 +24,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.gui.ColorPalette;
 import org.orecruncher.lib.particles.AnimatedMote;
@@ -40,7 +41,7 @@ public class MoteFireFly extends AnimatedMote {
     private boolean doRender;
 
     public MoteFireFly(@Nonnull final BlockGetter world, final double x, final double y, final double z) {
-        super(GameUtils.getMC().particleEngine.spriteSets.get(ParticleTypes.FIREWORK.getRegistryName()), world, x, y, z, 0, 0, 0);
+        super(GameUtils.getMC().particleEngine.spriteSets.get(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.FIREWORK)), world, x, y, z, 0, 0, 0);
 
         this.motionX = RANDOM.nextGaussian() * XZ_MOTION_DELTA;
         this.motionZ = RANDOM.nextGaussian() * XZ_MOTION_DELTA;

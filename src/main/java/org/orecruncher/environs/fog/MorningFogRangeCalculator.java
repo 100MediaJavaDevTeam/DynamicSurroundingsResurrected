@@ -21,7 +21,7 @@ package org.orecruncher.environs.fog;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import org.orecruncher.environs.config.Config;
 import org.orecruncher.environs.handlers.CommonState;
 import org.orecruncher.lib.GameUtils;
@@ -73,10 +73,10 @@ public class MorningFogRangeCalculator extends VanillaFogRangeCalculator {
 
     @Override
     @Nonnull
-    public FogResult calculate(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
+    public FogResult calculate(@Nonnull final ViewportEvent.RenderFog event) {
         this.cache.set(event);
         if (this.type != FogType.NONE && this.cache.getStart() > this.type.getReserve()) {
-            final float ca = GameUtils.getWorld().getTimeOfDay((float) event.getPartialTicks());
+            final float ca = GameUtils.getWorld().getTimeOfDay((float) event.getPartialTick());
             if (ca >= this.type.getStart() && ca <= this.type.getEnd()) {
                 final float mid = (this.type.getStart() + this.type.getEnd()) / 2F;
                 final float factor = 1F - MathStuff.abs(ca - mid) / (mid - this.type.getStart());

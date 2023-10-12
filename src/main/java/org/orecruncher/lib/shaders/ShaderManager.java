@@ -23,7 +23,6 @@ import com.mojang.blaze3d.preprocessor.GlslPreprocessor;
 import com.mojang.blaze3d.shaders.Program;
 import com.mojang.blaze3d.shaders.ProgramManager;
 import net.minecraft.FileUtil;
-import net.minecraft.client.renderer.ShaderInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.Resource;
@@ -41,10 +40,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.EnumMap;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
@@ -133,7 +129,11 @@ public final class ShaderManager<T extends Enum<T> & IShaderResourceProvider> {
 	private ShaderProgram createProgram(@Nonnull final ResourceManager manager, @Nonnull final T shader) {
 		try {
 			final Program vert = createShader(manager, shader.getVertex(), Program.Type.VERTEX);
+			if(vert == null)
+				return null;
 			final Program frag = createShader(manager, shader.getFragment(), Program.Type.FRAGMENT);
+			if(frag == null)
+				return null;
 			final int programId = ProgramManager.createProgram();
 			final ShaderProgram program = new ShaderProgram(shader.getShaderName(), programId, vert, frag);
 			ProgramManager.linkShader(program);
@@ -146,7 +146,9 @@ public final class ShaderManager<T extends Enum<T> & IShaderResourceProvider> {
 	}
 
 	private static Program createShader(@Nonnull final ResourceManager manager, @Nonnull final ResourceLocation loc, @Nonnull final Program.Type shaderType) throws IOException {
-		try (InputStream is = new BufferedInputStream(manager.getResource(loc).getInputStream())) {
+		Optional<Resource> stream = manager.getResource(loc);
+		if(stream.isEmpty())return null;
+		try (InputStream is = new BufferedInputStream(stream.get().open())) {
 			return Program.compileShader(shaderType, loc.toString(), is, shaderType.name().toLowerCase(Locale.ROOT),new GlslPreprocessor() {
 				private final Set<String> importedPaths = Sets.newHashSet();
 
@@ -161,15 +163,16 @@ public final class ShaderManager<T extends Enum<T> & IShaderResourceProvider> {
 						ResourceLocation resourcelocation1 = new ResourceLocation(p_173375_);
 
 						try {
-							Resource resource1 = manager.getResource(resourcelocation1);
+							Resource resource1 = manager.getResource(resourcelocation1).get();
 
 							String s2;
 							try {
-								s2 = IOUtils.toString(resource1.getInputStream(), StandardCharsets.UTF_8);
+								s2 = IOUtils.toString(resource1.open(), StandardCharsets.UTF_8);
 							} catch (Throwable throwable1) {
 								if (resource1 != null) {
 									try {
-										resource1.close();
+										//todo: figure out
+//										resource1.close();
 									} catch (Throwable throwable) {
 										throwable1.addSuppressed(throwable);
 									}
@@ -179,7 +182,8 @@ public final class ShaderManager<T extends Enum<T> & IShaderResourceProvider> {
 							}
 
 							if (resource1 != null) {
-								resource1.close();
+								//todo: figure out
+//								resource1.close();
 							}
 
 							return s2;

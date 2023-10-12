@@ -23,7 +23,7 @@ import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.api.ConfigEntryBuilder;
 import me.shedaniel.clothconfig2.impl.builders.SubCategoryBuilder;
 import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -36,7 +36,7 @@ import javax.annotation.Nonnull;
 public class ConfigMenuBuilder extends ClothAPIFactory {
 
     public ConfigMenuBuilder() {
-        super(new TranslatableComponent("dsurround.modname"), () -> {
+        super(Component.translatable("dsurround.modname"), () -> {
                     Config.SPEC.save();
                     org.orecruncher.sndctrl.config.Config.SPEC.save();
                     org.orecruncher.environs.config.Config.SPEC.save();

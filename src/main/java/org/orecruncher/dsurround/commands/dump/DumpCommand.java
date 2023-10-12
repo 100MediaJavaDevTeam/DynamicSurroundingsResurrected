@@ -26,7 +26,6 @@ import org.orecruncher.dsurround.DynamicSurroundings;
 import org.orecruncher.dsurround.commands.CommandHelpers;
 import org.orecruncher.environs.library.DimensionLibrary;
 import org.orecruncher.lib.GameUtils;
-import org.orecruncher.lib.tags.TagUtils;
 import org.orecruncher.mobeffects.library.FootstepLibrary;
 import org.orecruncher.sndctrl.library.AcousticLibrary;
 

@@ -20,7 +20,7 @@ package org.orecruncher.lib;
 
 import net.minecraft.ChatFormatting;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -102,7 +102,7 @@ public final class Diagnostics {
     }
 
     @SubscribeEvent
-    public static void onGatherText(@Nonnull final RenderGameOverlayEvent.Text event) {
+    public static void onGatherText(@Nonnull final CustomizeGuiOverlayEvent.DebugText event) {
         if (GameUtils.displayDebug()) {
             if (!lastEvent.getLeft().isEmpty())
                 event.getLeft().addAll(lastEvent.getLeft());

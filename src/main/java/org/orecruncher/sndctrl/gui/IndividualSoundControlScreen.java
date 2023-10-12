@@ -23,8 +23,6 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.GameUtils;
@@ -56,8 +54,8 @@ public class IndividualSoundControlScreen extends Screen {
 
     private static final int TOOLTIP_Y_OFFSET = 30;
 
-    private static final Component SAVE = new TranslatableComponent("gui.done");
-    private static final Component CANCEL = new TranslatableComponent("gui.cancel");
+    private static final Component SAVE = Component.translatable("gui.done");
+    private static final Component CANCEL = Component.translatable("gui.cancel");
 
     protected final Screen parent;
     protected final boolean enablePlay;
@@ -67,7 +65,7 @@ public class IndividualSoundControlScreen extends Screen {
     protected Button cancel;
 
     protected IndividualSoundControlScreen(@Nullable final Screen parent, final boolean enablePlay) {
-        super(new TranslatableComponent("sndctrl.text.soundconfig.title"));
+        super(Component.translatable("sndctrl.text.soundconfig.title"));
         this.parent = parent;
         this.enablePlay = enablePlay;
     }
@@ -87,7 +85,7 @@ public class IndividualSoundControlScreen extends Screen {
                 SEARCH_BAR_WIDTH,
                 SEARCH_BAR_HEIGHT,
                 this.searchField,   // Copy existing data over
-                TextComponent.EMPTY);
+                Component.empty());
 
         this.searchField.setResponder((filter) -> this.soundConfigList.setSearchFilter(() -> filter, false));
 

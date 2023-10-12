@@ -27,6 +27,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.math.MathStuff;
 import org.orecruncher.lib.random.XorShiftRandom;
@@ -44,7 +45,7 @@ public class FrostBreathParticle extends TextureSheetParticle {
         final Random rand = XorShiftRandom.current();
 
         // Reuse the cloud sheet
-        this.sprites = GameUtils.getMC().particleEngine.spriteSets.get(ParticleTypes.CLOUD.getRegistryName());
+        this.sprites = GameUtils.getMC().particleEngine.spriteSets.get(ForgeRegistries.PARTICLE_TYPES.getKey(ParticleTypes.CLOUD));
 
         final Vec3 origin = ParticleUtils.getBreathOrigin(entity);
         final Vec3 trajectory = ParticleUtils.getLookTrajectory(entity);

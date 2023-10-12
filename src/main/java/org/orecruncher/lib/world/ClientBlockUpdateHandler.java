@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -85,16 +85,16 @@ public final class ClientBlockUpdateHandler {
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onWorldLoad(@Nonnull final WorldEvent.Load event) {
-        if (event.getWorld().isClientSide()) {
+    public static void onWorldLoad(@Nonnull final LevelEvent.Load event) {
+        if (event.getLevel().isClientSide()) {
             updates.clear();
             interval = 0;
         }
     }
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    public static void onWorldUnload(@Nonnull final WorldEvent.Unload event) {
-        if (event.getWorld().isClientSide()) {
+    public static void onWorldUnload(@Nonnull final LevelEvent.Unload event) {
+        if (event.getLevel().isClientSide()) {
             updates.clear();
             interval = 0;
         }

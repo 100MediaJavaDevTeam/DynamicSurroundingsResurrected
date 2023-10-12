@@ -18,12 +18,12 @@
 
 package org.orecruncher.lib.effects.entity;
 
-import javax.annotation.Nullable;
-
 import dev._100media.capabilitysyncer.core.ISyncableCapability;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.orecruncher.lib.effects.EntityEffectManager;
+
+import javax.annotation.Nullable;
 
 @OnlyIn(Dist.CLIENT)
 public interface IEntityFX extends ISyncableCapability {

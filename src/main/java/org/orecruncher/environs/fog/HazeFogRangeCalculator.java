@@ -21,7 +21,7 @@ package org.orecruncher.environs.fog;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityViewRenderEvent;
+import net.minecraftforge.client.event.ViewportEvent;
 import org.orecruncher.environs.config.Config;
 import org.orecruncher.environs.handlers.CommonState;
 import org.orecruncher.environs.library.DimensionInfo;
@@ -54,7 +54,7 @@ public class HazeFogRangeCalculator extends VanillaFogRangeCalculator {
 
     @Override
     @Nonnull
-    public FogResult calculate(@Nonnull final EntityViewRenderEvent.RenderFogEvent event) {
+    public FogResult calculate(@Nonnull final ViewportEvent.RenderFog event) {
         final DimensionInfo di = CommonState.getDimensionInfo();
         if (di.hasHaze()) {
             final float lowY = di.getCloudHeight() - BAND_OFFSETS;
@@ -62,7 +62,7 @@ public class HazeFogRangeCalculator extends VanillaFogRangeCalculator {
 
             // Calculate the players Y. If it's in the band range calculate the fog
             // parameters
-            final Vec3 eyes = GameUtils.getPlayer().getEyePosition((float) event.getPartialTicks());
+            final Vec3 eyes = GameUtils.getPlayer().getEyePosition((float) event.getPartialTick());
             if (eyes.y > lowY && eyes.y < highY) {
                 final float coreLowY = lowY + BAND_OFFSETS;
                 final float coreHighY = coreLowY + BAND_CORE_SIZE;

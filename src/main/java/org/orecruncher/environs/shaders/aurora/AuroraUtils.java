@@ -43,7 +43,7 @@ public class AuroraUtils {
 	 * The range in chunks of the player view.
 	 */
 	public static int getChunkRenderDistance() {
-		return GameUtils.getGameSettings().renderDistance;
+		return GameUtils.getGameSettings().renderDistance().get();
 	}
 
 	/*

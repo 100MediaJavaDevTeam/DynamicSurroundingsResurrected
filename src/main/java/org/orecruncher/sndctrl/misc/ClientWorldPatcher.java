@@ -20,12 +20,12 @@ package org.orecruncher.sndctrl.misc;
 
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import org.orecruncher.lib.random.XorShiftRandom;
 import org.orecruncher.sndctrl.SoundControl;
 import org.orecruncher.sndctrl.config.Config;
 
@@ -37,12 +37,12 @@ public final class ClientWorldPatcher {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onWorldLoad(@Nonnull final WorldEvent.Load event) {
+    public static void onWorldLoad(@Nonnull final LevelEvent.Load event) {
         if (Config.CLIENT.effects.fixupRandoms.get()) {
-            final LevelAccessor world = event.getWorld();
+            final LevelAccessor world = event.getLevel();
             if (world.isClientSide() && world instanceof Level) {
                 final Level w = (Level) world;
-                w.random = new XorShiftRandom();
+                w.random = new XoroshiroRandomSource(0);
             }
         }
     }

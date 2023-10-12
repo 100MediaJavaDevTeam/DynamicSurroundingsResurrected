@@ -20,10 +20,11 @@ package org.orecruncher.environs.library;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.BiomeDictionary.Type;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.orecruncher.lib.biomes.BiomeUtilities;
 
 import javax.annotation.Nonnull;
@@ -33,7 +34,7 @@ import java.util.Set;
 public class BiomeAdapter implements IBiome {
 
 	protected final Biome biome;
-	protected final Set<Type> types;
+	protected final Set<TagKey<Biome>> types;
 
 	public BiomeAdapter(@Nonnull final Biome biome) {
 		this.biome = biome;
@@ -47,7 +48,7 @@ public class BiomeAdapter implements IBiome {
 
 	@Override
 	public ResourceLocation getKey() {
-		return this.biome.getRegistryName();
+		return ForgeRegistries.BIOMES.getKey(biome);
 	}
 
 	@Override
@@ -56,7 +57,7 @@ public class BiomeAdapter implements IBiome {
 	}
 
 	@Override
-	public Set<Type> getTypes() {
+	public Set<TagKey<Biome>> getTypes() {
 		return this.types;
 	}
 

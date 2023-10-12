@@ -18,17 +18,12 @@
 
 package org.orecruncher.environs.handlers;
 
-import com.google.common.collect.Streams;
 import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringUtil;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.block.entity.BellBlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.EventPriority;
@@ -40,7 +35,6 @@ import org.orecruncher.environs.library.BiomeLibrary;
 import org.orecruncher.environs.library.DimensionLibrary;
 import org.orecruncher.environs.scanner.CeilingCoverage;
 import org.orecruncher.lib.DayCycle;
-import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.TickCounter;
 import org.orecruncher.lib.WorldUtils;
 import org.orecruncher.lib.events.DiagnosticEvent;
@@ -49,7 +43,6 @@ import org.orecruncher.lib.seasons.Season;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 

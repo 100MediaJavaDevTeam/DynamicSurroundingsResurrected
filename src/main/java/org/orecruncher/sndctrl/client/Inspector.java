@@ -52,7 +52,6 @@ import org.orecruncher.sndctrl.library.AudioEffectLibrary;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = SoundControl.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class Inspector {
@@ -89,7 +88,7 @@ public class Inspector {
                 text.add(ChatFormatting.DARK_AQUA + info.getBlock().getClass().getName());
                 text.add("Material: " + MaterialUtils.getMaterialName(state.getMaterial()));
                 final SoundType st = state.getSoundType();
-                text.add("Step Sound: " + st.getStepSound().getRegistryName().toString());
+                text.add("Step Sound: " + st.getStepSound().getLocation().toString());
                 text.add("Reflectivity: " + AudioEffectLibrary.getReflectivity(state));
                 text.add("Occlusion: " + AudioEffectLibrary.getOcclusion(state));
                 text.add(TEXT_BLOCKSTATE);

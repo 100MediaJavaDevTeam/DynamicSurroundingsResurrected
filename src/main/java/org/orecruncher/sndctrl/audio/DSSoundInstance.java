@@ -19,12 +19,14 @@
 package org.orecruncher.sndctrl.audio;
 
 import com.google.common.base.MoreObjects;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -48,7 +50,7 @@ public class DSSoundInstance extends AbstractSoundInstance implements ISoundInst
     }
 
     public DSSoundInstance(@Nonnull final ResourceLocation soundResource, @Nonnull final ISoundCategory cat) {
-        super(soundResource, cat.getRealCategory());
+        super(soundResource, cat.getRealCategory(), new XoroshiroRandomSource(0));
 
         this.state = SoundState.NONE;
         this.category = cat;

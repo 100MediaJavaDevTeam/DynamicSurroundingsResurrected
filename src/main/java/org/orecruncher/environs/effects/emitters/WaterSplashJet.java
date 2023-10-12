@@ -71,7 +71,7 @@ public class WaterSplashJet extends Jet {
 	}
 
 	public int getSpawnCount() {
-		final ParticleStatus state = GameUtils.getGameSettings().particles;
+		final ParticleStatus state = GameUtils.getGameSettings().particles().get();
 		switch (state) {
 			case MINIMAL:
 				return 0;

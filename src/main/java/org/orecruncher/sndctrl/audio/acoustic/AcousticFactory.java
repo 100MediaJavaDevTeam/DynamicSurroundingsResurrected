@@ -28,8 +28,8 @@ import org.orecruncher.lib.random.XorShiftRandom;
 import org.orecruncher.sndctrl.api.acoustics.IAcousticFactory;
 import org.orecruncher.sndctrl.api.sound.*;
 import org.orecruncher.sndctrl.audio.BackgroundSoundInstance;
-import org.orecruncher.sndctrl.audio.EntitySoundInstance;
 import org.orecruncher.sndctrl.audio.DSSoundInstance;
+import org.orecruncher.sndctrl.audio.EntitySoundInstance;
 
 import javax.annotation.Nonnull;
 import java.util.Random;

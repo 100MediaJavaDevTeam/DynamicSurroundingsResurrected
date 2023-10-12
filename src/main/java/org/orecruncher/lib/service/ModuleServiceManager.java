@@ -25,7 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.event.TagsUpdatedEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.orecruncher.dsurround.DynamicSurroundings;
@@ -35,7 +35,6 @@ import org.orecruncher.lib.collections.ObjectArray;
 import org.orecruncher.lib.fml.ForgeUtils;
 import org.orecruncher.lib.logging.IModLog;
 import org.orecruncher.lib.resource.ResourceUtils;
-import org.orecruncher.lib.tags.TagUtils;
 
 import javax.annotation.Nonnull;
 import java.util.List;
@@ -126,16 +125,16 @@ public final class ModuleServiceManager implements ResourceManagerReloadListener
     }
 
     @SubscribeEvent
-    public static void entityJoinWorld(@Nonnull final EntityJoinWorldEvent event) {
+    public static void entityJoinWorld(@Nonnull final EntityJoinLevelEvent event) {
         final Player player = GameUtils.getPlayer();
         if (player != null && player.getCommandSenderWorld().isClientSide() && player.getId() == event.getEntity().getId()) {
             instance().joinWorld(event);
         }
     }
 
-    private void joinWorld(@Nonnull final EntityJoinWorldEvent ignore) {
+    private void joinWorld(@Nonnull final EntityJoinLevelEvent ignore) {
         this.playerJoined = true;
-        reportStatus("EntityJoinWorldEvent fired");
+        reportStatus("EntityJoinLevelEvent fired");
         this.reloadIfReady();
     }
 
@@ -157,7 +156,7 @@ public final class ModuleServiceManager implements ResourceManagerReloadListener
      * @param event Event that is raised
      */
     @SubscribeEvent
-    public static void onStop(@Nonnull final ClientPlayerNetworkEvent.LoggedOutEvent event) {
+    public static void onStop(@Nonnull final ClientPlayerNetworkEvent.LoggingOut event) {
         instance().stop();
     }
 

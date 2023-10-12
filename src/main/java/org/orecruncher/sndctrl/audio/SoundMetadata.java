@@ -20,8 +20,6 @@ package org.orecruncher.sndctrl.audio;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +35,7 @@ import java.util.Objects;
 @OnlyIn(Dist.CLIENT)
 public final class SoundMetadata {
 
-    private static final Component NO_STRING = TextComponent.EMPTY;
+    private static final Component NO_STRING = Component.empty();
 
     private final Component title;
     private final Component caption;
@@ -54,8 +52,8 @@ public final class SoundMetadata {
     public SoundMetadata(@Nonnull final SoundMetadataConfig cfg) {
         Objects.requireNonNull(cfg);
 
-        this.title = StringUtils.isEmpty(cfg.title) ? NO_STRING : new TranslatableComponent(cfg.title);
-        this.caption = StringUtils.isEmpty(cfg.caption) ? NO_STRING : new TranslatableComponent(cfg.caption);
+        this.title = StringUtils.isEmpty(cfg.title) ? NO_STRING : Component.translatable(cfg.title);
+        this.caption = StringUtils.isEmpty(cfg.caption) ? NO_STRING : Component.translatable(cfg.caption);
         this.category = Category.getCategory(cfg.category).orElse(Category.NEUTRAL);
 
         if (cfg.credits == null || cfg.credits.size() == 0) {
@@ -66,7 +64,7 @@ public final class SoundMetadata {
                 if (StringUtils.isEmpty(s))
                     this.credits.add(NO_STRING);
                 else
-                    this.credits.add(new TextComponent(s));
+                    this.credits.add(Component.literal(s));
             }
         }
     }

@@ -18,6 +18,8 @@
 
 package org.orecruncher.lib.random;
 
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.PositionalRandomFactory;
 import org.orecruncher.lib.math.MathStuff;
 
 import java.util.Random;
@@ -59,6 +61,7 @@ public final class XorShiftRandom extends Random {
         this.s0 = seed == 0 ? 0xdeadbeefL : seed;
         this.s1 = MurmurHash3.hash(this.s0);
     }
+
 
     @Override
     public void setSeed(final long seed) {

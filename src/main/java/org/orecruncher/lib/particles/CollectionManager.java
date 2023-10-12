@@ -22,7 +22,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.orecruncher.lib.collections.ObjectArray;
@@ -50,8 +50,8 @@ public final class CollectionManager {
     }
 
     @SubscribeEvent
-    public static void onWorldUnload(@Nonnull final WorldEvent.Unload event) {
-        if (event.getWorld() instanceof ClientLevel) {
+    public static void onWorldUnload(@Nonnull final LevelEvent.Unload event) {
+        if (event.getLevel() instanceof ClientLevel) {
             helpers.forEach(ParticleCollectionHelper::clear);
         }
     }

@@ -26,7 +26,10 @@ import me.shedaniel.clothconfig2.impl.builders.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.*;
+import net.minecraft.network.chat.CommonComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -93,9 +96,9 @@ public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, S
 
         final List<Component> toolTip = new ArrayList<>();
         toolTip.add(label);
-        final List<FormattedText> lines = GameUtils.getMC().font.getSplitter().splitLines(new TranslatableComponent(translationKey + ".tooltip"), ConfigProperty.TOOLTIP_WIDTH, Style.EMPTY);
+        final List<FormattedText> lines = GameUtils.getMC().font.getSplitter().splitLines(Component.translatable(translationKey + ".tooltip"), ConfigProperty.TOOLTIP_WIDTH, Style.EMPTY);
         for (final FormattedText l : lines) {
-            toolTip.add(new TextComponent(l.getString()));
+            toolTip.add(Component.literal(l.getString()));
         }
 
         return entryBuilder.startSubCategory(label)
@@ -206,10 +209,10 @@ public abstract class ClothAPIFactory implements BiFunction<Minecraft, Screen, S
     }
 
     private static Component transformText(@Nonnull final String key, @Nullable final ChatFormatting color) {
-        Component result = new TranslatableComponent(key);
+        Component result = Component.translatable(key);
         if (color != null) {
-            final String text = color + new TranslatableComponent(key).getString();
-            result = new TextComponent(text);
+            final String text = color + Component.translatable(key).getString();
+            result = Component.literal(text);
         }
         return result;
     }

@@ -18,11 +18,10 @@
 
 package org.orecruncher.environs.library.config;
 
+import com.google.gson.annotations.SerializedName;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.StringUtils;
-
-import com.google.gson.annotations.SerializedName;
 import org.orecruncher.environs.Environs;
 import org.orecruncher.environs.effects.BlockEffectType;
 import org.orecruncher.lib.validation.IValidator;

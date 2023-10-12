@@ -20,10 +20,10 @@ package org.orecruncher.environs.library;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.BiomeDictionary.Type;
 
 import javax.annotation.Nonnull;
 import java.util.Set;
@@ -37,7 +37,7 @@ public interface IBiome {
 
 	String getName();
 
-	Set<Type> getTypes();
+	Set<TagKey<Biome>> getTypes();
 
 	Biome.Precipitation getPrecipitationType();
 

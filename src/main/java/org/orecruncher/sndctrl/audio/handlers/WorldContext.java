@@ -28,6 +28,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.orecruncher.lib.GameUtils;
 import org.orecruncher.lib.WorldUtils;
 import org.orecruncher.sndctrl.library.AudioEffectLibrary;
@@ -92,7 +93,7 @@ public final class WorldContext {
             this.playerEyePos = new BlockPos(this.playerEyePosition);
 
             final Fluid fs = this.player.level.getFluidState(this.playerEyePos).getType();
-            final ResourceLocation name = fs.getRegistryName();
+            final ResourceLocation name = ForgeRegistries.FLUIDS.getKey(fs);
             if (name != null)
                 this.auralDampening = AudioEffectLibrary.getFluidCoeffcient(name);
             else
